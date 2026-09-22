@@ -34,7 +34,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('save-config').addEventListener('click', save);
 
-    window.LTA_ADMIN_AUTH.renderGate(document.getElementById('auth-gate'), {
+    window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Configuración de Envío',
       subtitle: 'Acceso solo para staff autorizado de La Tapatía Ahogadas.',
       onSignedIn: async (token) => {

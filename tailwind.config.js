@@ -8,6 +8,9 @@ module.exports = {
     './admin/catalogo/**/*.html',
     './admin/pedidos/**/*.html',
     './admin/config-envio/**/*.html',
+    './cuenta/rastreo/**/*.html',
+    './cuenta/perfil/**/*.html',
+    './cuenta/historial/**/*.html',
     './src/js/**/*.js'
   ],
   theme: {

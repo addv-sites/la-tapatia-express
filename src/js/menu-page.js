@@ -69,9 +69,63 @@
     return row;
   }
 
+  let currentIdToken = null;
+
+  async function restoreSession() {
+    const token = sessionStorage.getItem('lta_id_token');
+    if (!token) return;
+    try {
+      const data = await window.LTA_API.callAction('client.getProfile', {}, token);
+      currentIdToken = token;
+      applyProfile(data.profile);
+      document.getElementById('signin-invite-checkout').hidden = true;
+    } catch (err) {
+      sessionStorage.removeItem('lta_id_token');
+    }
+  }
+
+  function applyProfile(profile) {
+    if (!profile) return;
+    const nameEl = document.getElementById('field-name');
+    const phoneEl = document.getElementById('field-phone');
+    const addrEl = document.getElementById('field-address-input');
+    if (!nameEl.value && profile.name) nameEl.value = profile.name;
+    if (!phoneEl.value && profile.phone) phoneEl.value = profile.phone;
+    if (!addrEl.value && profile.address) addrEl.value = profile.address;
+  }
+
+  async function saveProfileFromForm() {
+    if (!currentIdToken) return;
+    try {
+      await window.LTA_API.callAction('client.upsertProfile', {
+        name: document.getElementById('field-name').value.trim(),
+        phone: document.getElementById('field-phone').value.trim(),
+        address: document.getElementById('field-address-input').value.trim()
+      }, currentIdToken);
+    } catch (err) {
+      console.warn('No se pudo guardar el perfil:', err.message);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(() => {});
     window.LTA_PWA_INSTALL.setup(document.getElementById('btn-install'), null);
+    restoreSession();
+
+    window.LTA_INLINE_SIGNIN.render(document.getElementById('signin-invite-checkout'), {
+      key: 'checkout',
+      message: 'Guarda tu dirección y pide en 10 segundos la próxima vez.',
+      iconBase: '../assets/icons/',
+      onSignedIn: async (idToken, profile) => {
+        currentIdToken = idToken;
+        try {
+          const data = await window.LTA_API.callAction('client.getProfile', {}, idToken);
+          applyProfile(data.profile);
+        } catch (err) { /* seguimos con lo que ya escribió */ }
+        await saveProfileFromForm();
+        window.LTA_TOAST && window.LTA_TOAST.show('Cuenta vinculada. Guardamos tus datos.');
+      }
+    });
 
     const sections = document.getElementById('category-sections');
     const cartList = document.getElementById('cart-list');
@@ -175,16 +229,42 @@
           delivery_address: customer.address,
           notes: customer.notes,
           items: items
-        });
+        }, currentIdToken);
         folio = result.order_id;
         totals = { subtotal, deliveryFee: result.delivery_fee || 0, total: result.total };
       } catch (err) {
         console.warn('No se pudo registrar el pedido en el sistema todavía (Apps Script sin desplegar o sin conexión). Se continúa directo a WhatsApp.', err);
       }
 
+      if (currentIdToken) await saveProfileFromForm();
+
       const message = buildWhatsappMessage(folio, items, totals, customer);
       window.open(whatsappUrl(message), '_blank', 'noopener');
       window.LTA_CART.clear();
+
+      form.classList.add('hidden');
+      const successEl = document.getElementById('order-success');
+      successEl.classList.remove('hidden');
+      successEl.classList.add('flex');
+      document.getElementById('success-folio').textContent = folio || '(sin confirmar en sistema)';
+      document.getElementById('success-tracking-link').href =
+        '../cuenta/rastreo/?folio=' + encodeURIComponent(folio || '') + '&tel=' + encodeURIComponent(customer.phone);
+
+      if (!currentIdToken) {
+        window.LTA_INLINE_SIGNIN.render(document.getElementById('signin-invite-postorder'), {
+          key: 'postorder',
+          message: '¿Guardamos estos datos para tu próximo pedido?',
+          iconBase: '../assets/icons/',
+          onSignedIn: async (idToken) => {
+            currentIdToken = idToken;
+            await window.LTA_API.callAction('client.upsertProfile', {
+              name: customer.name, phone: customer.phone, address: customer.address
+            }, idToken).catch(() => {});
+            window.LTA_TOAST && window.LTA_TOAST.show('¡Guardado! La próxima vez pides más rápido.');
+          }
+        });
+      }
+
       submitBtn.disabled = false;
       submitBtn.textContent = 'Continuar por WhatsApp';
     });

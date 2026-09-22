@@ -190,10 +190,18 @@ function action_configUpdate_(payload, user) {
   });
 }
 
-function action_orderCreate_(payload, sessionId) {
+function action_orderCreate_(payload, sessionId, idToken) {
   checkRateLimit_(sessionId);
   if (payload.clientLoadedAt && (Date.now() - Number(payload.clientLoadedAt)) < MIN_SUBMIT_MS) {
     throw new Error('Solicitud rechazada');
+  }
+
+  // El email del cliente nunca se toma del payload declarado por el
+  // navegador — solo del token de Google verificado, si vino uno.
+  let customerEmail = '';
+  if (idToken) {
+    const verifiedUser = verifyIdToken_(idToken);
+    if (verifiedUser) customerEmail = verifiedUser.email;
   }
 
   const folio = nextFolio_();
@@ -219,7 +227,7 @@ function action_orderCreate_(payload, sessionId) {
     created_at: Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss'),
     customer_name: payload.customer_name || '',
     customer_phone: payload.customer_phone || '',
-    customer_email: payload.customer_email || '',
+    customer_email: customerEmail,
     items: JSON.stringify(payload.items || []),
     subtotal: subtotal,
     delivery_fee: deliveryFee,
@@ -320,6 +328,12 @@ function action_orderList_(payload) {
   return { orders: filtered };
 }
 
+function action_orderListMine_(user) {
+  const rows = readSheetAsObjects_('PEDIDOS');
+  const mine = rows.filter((r) => String(r.customer_email || '').toLowerCase() === user.email);
+  return { orders: mine };
+}
+
 function action_orderTrackingRead_(payload) {
   const found = findOrderRow_(payload.order_id);
   if (!found) throw new Error('Pedido no encontrado');
@@ -385,6 +399,12 @@ function action_catalogToggleAvailability_(payload, user) {
     }
     throw new Error('Producto no encontrado');
   });
+}
+
+function action_clientGetProfile_(user) {
+  const rows = readSheetAsObjects_('CLIENTES');
+  const match = rows.find((r) => String(r.email).toLowerCase() === user.email);
+  return { profile: match || null };
 }
 
 function action_clientUpsertProfile_(payload, user) {
@@ -460,8 +480,10 @@ function route_(action, payload, idToken, sessionId) {
   switch (action) {
     case 'catalog.read': return action_catalogRead_();
     case 'config.read': return action_configRead_();
-    case 'order.create': return action_orderCreate_(payload, sessionId);
+    case 'order.create': return action_orderCreate_(payload, sessionId, idToken);
     case 'order.trackingRead': return action_orderTrackingRead_(payload);
+    case 'order.listMine': return action_orderListMine_(requireRole_(idToken, 'ANY'));
+    case 'client.getProfile': return action_clientGetProfile_(requireRole_(idToken, 'ANY'));
 
     case 'catalog.readAll': return action_catalogReadAll_(requireRole_(idToken, 'STAFF'));
     case 'config.update': return action_configUpdate_(payload, requireRole_(idToken, 'STAFF'));

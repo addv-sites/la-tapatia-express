@@ -117,7 +117,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dish-search').addEventListener('keyup', render);
 
-    window.LTA_ADMIN_AUTH.renderGate(document.getElementById('auth-gate'), {
+    window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestor de Catálogo',
       subtitle: 'Acceso solo para staff autorizado de La Tapatía Ahogadas.',
       onSignedIn: async (token) => {
@@ -129,7 +129,7 @@
         } catch (err) {
           document.getElementById('admin-content').classList.add('hidden');
           document.getElementById('auth-gate').classList.remove('hidden');
-          window.LTA_ADMIN_AUTH.showUnauthorized(document.getElementById('auth-gate'), err.message);
+          window.LTA_AUTH_GATE.showUnauthorized(document.getElementById('auth-gate'), err.message);
         }
       }
     });

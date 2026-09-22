@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rastreo de pedido | La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-sm">
+  <div class="h-16 px-margin flex items-center justify-between">
+    <a href="../../" class="font-headline-sm text-headline-sm text-primary">La Tapatía Ahogadas</a>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Rastreo de pedido</span>
+  </div>
+</header>
+
+<main class="flex-1 w-full pt-24 pb-12 px-margin max-w-md mx-auto w-full">
+  <form id="lookup-form" class="flex flex-col gap-3">
+    <h1 class="font-headline-lg text-headline-lg text-on-surface">¿Cómo va mi pedido?</h1>
+    <p class="font-body-sm text-body-sm text-on-surface-variant">Ingresa el folio (te llegó al armar tu pedido) y el teléfono que usaste.</p>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm">Folio
+      <input id="input-folio" required placeholder="#TA-0001" class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm">
+    </label>
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm">Teléfono
+      <input id="input-tel" required type="tel" class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm">
+    </label>
+    <p id="lookup-error" class="hidden font-body-sm text-body-sm text-error"></p>
+    <button type="submit" class="min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm">Buscar pedido</button>
+  </form>
+
+  <div id="tracking-result" class="hidden flex-col gap-5">
+    <div class="flex items-center justify-between">
+      <h1 class="font-headline-lg text-headline-lg text-primary" id="result-folio"></h1>
+      <span class="font-price-md text-price-md text-on-surface" id="result-total"></span>
+    </div>
+
+    <div id="result-steps" class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-4"></div>
+
+    <div id="result-items" class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-1"></div>
+
+    <a id="result-whatsapp" href="#" target="_blank" rel="noopener" class="min-h-[48px] rounded-xl bg-whatsapp-green text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md">
+      Chatear por WhatsApp
+    </a>
+  </div>
+</main>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/catalog.js"></script>
+<script src="../../src/js/rastreo.js"></script>
+</body>
+</html>

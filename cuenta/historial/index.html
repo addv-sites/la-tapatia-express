@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Historial de Pedidos | La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-sm">
+  <div class="h-16 px-margin flex items-center justify-between">
+    <a href="../../" class="font-headline-sm text-headline-sm text-primary">La Tapatía Ahogadas</a>
+    <nav class="flex items-center gap-4 font-label-md text-label-md">
+      <a href="../perfil/" class="text-on-surface-variant hover:text-primary">Mi Cuenta</a>
+    </nav>
+  </div>
+</header>
+
+<main class="flex-1 w-full pt-24 pb-12 px-margin max-w-md mx-auto w-full">
+  <div id="auth-gate" class="min-h-[50vh] flex items-center justify-center"></div>
+
+  <div id="history-content" class="hidden flex-col gap-4">
+    <h1 class="font-headline-lg text-headline-lg text-on-surface">Historial de Pedidos</h1>
+    <p id="orders-empty" class="hidden font-body-sm text-body-sm text-on-surface-variant py-6 text-center">
+      Todavía no tienes pedidos ligados a esta cuenta.
+    </p>
+    <div id="orders-list" class="flex flex-col gap-3"></div>
+  </div>
+</main>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/auth.js"></script>
+<script src="../../src/js/auth-gate.js"></script>
+<script src="../../src/js/catalog.js"></script>
+<script src="../../src/js/toast.js"></script>
+<script src="../../src/js/portal-historial.js"></script>
+</body>
+</html>

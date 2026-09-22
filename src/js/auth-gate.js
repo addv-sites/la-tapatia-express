@@ -53,5 +53,5 @@
     });
   }
 
-  window.LTA_ADMIN_AUTH = { renderGate, showUnauthorized };
+  window.LTA_AUTH_GATE = { renderGate, showUnauthorized };
 })();

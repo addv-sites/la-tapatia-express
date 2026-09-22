@@ -16,13 +16,19 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="../css/site.css">
 <script defer src="../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
 
 <header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(50,20,10,0.06)]">
   <div class="h-16 px-margin flex items-center justify-between gap-space-sm">
     <a href="../" class="font-headline-sm text-headline-sm text-primary tracking-tight">La Tapatía Ahogadas</a>
-    <button id="btn-install" type="button" class="hidden flex-shrink-0 items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm">Instalar</button>
+    <div class="flex items-center gap-2 shrink-0">
+      <button id="btn-install" type="button" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm">Instalar</button>
+      <a href="../cuenta/perfil/" aria-label="Mi cuenta" class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-person"/></svg>
+      </a>
+    </div>
   </div>
   <div class="flex items-center gap-2 overflow-x-auto px-margin pb-2.5 pt-1 no-scrollbar">
     <a href="#tortas" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tortas</a>
@@ -87,6 +93,7 @@
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-phone">Teléfono / WhatsApp</label>
           <input id="field-phone" required class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="tel" autocomplete="tel">
         </div>
+        <div id="signin-invite-checkout" hidden></div>
         <div id="field-address" class="hidden flex-col gap-1">
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-address-input">Dirección de entrega</label>
           <input id="field-address-input" class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" autocomplete="street-address">
@@ -103,12 +110,24 @@
           Vas a revisar el mensaje antes de enviarlo — nada se manda automáticamente.
         </p>
       </form>
+
+      <div id="order-success" class="hidden flex-col gap-3 pt-2 border-t border-surface-container-high">
+        <div class="p-3 bg-tertiary-fixed/40 rounded-xl">
+          <p class="font-label-md text-label-md text-on-surface font-bold">Pedido enviado — Folio <span id="success-folio"></span></p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">Revisa el mensaje de WhatsApp que se abrió y dale enviar para confirmar con cocina.</p>
+        </div>
+        <a id="success-tracking-link" href="#" class="font-label-md text-label-md text-primary font-bold text-center">Ver seguimiento de mi pedido →</a>
+        <div id="signin-invite-postorder" hidden></div>
+      </div>
     </div>
   </section>
 </main>
 
 <script src="../src/js/cart.js"></script>
 <script src="../src/js/catalog.js"></script>
+<script src="../src/js/auth.js"></script>
+<script src="../src/js/inline-signin.js"></script>
+<script src="../src/js/toast.js"></script>
 <script src="../src/js/api.js"></script>
 <script src="../src/js/pwa-install.js"></script>
 <script src="../src/js/menu-page.js"></script>
