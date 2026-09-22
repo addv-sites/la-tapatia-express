@@ -1,0 +1,75 @@
+# Estado del Proyecto — La Tapatía Ahogadas
+
+Última actualización: 2026-09-21
+
+## Qué existe hoy
+
+- **Diseños completos** (exportes Stitch/AI, `code.html` + `screen.png` + `DESIGN.md` compartido) en 6 carpetas:
+  - `design/` — sitio público (Home/Antojo)
+  - `admin/administrador_de_precios_y_catalogo_la_tapatia_ahogadas/` — gestor de catálogo/precios/fotos
+  - `admin/gestion_de_pedidos_comandas_en_vivo_la_tapatia_ahogadas/` — KDS de pedidos en tiempo real
+  - `pc/` — portal cliente (pantalla "Rastreo En Vivo")
+  - `analitica/` — panel BI geoespacial/CRM para ADDV
+  - `reparto/` — app repartidor
+- **Docs de especificación de negocio:** `buildClaude.md`, `stitch.md`, `seo.md`, `images_prompt.md` (raíz).
+- **Ruflo inicializado** (orquestación multi-agente, `.claude-flow/`, `.mcp.json`, agentes/skills en `.claude/`).
+- **agent-skills instalado** (25 skills en `.agents/skills/`).
+- **Ningún código de producción escrito todavía** — cero HTML/CSS/JS/Apps Script fuera de los mockups de diseño.
+
+## Pantallas de mockup que NO cubren todo el flujo (se extrapolan de `DESIGN.md`)
+
+- Sitio público: solo Home tiene comp visual. Menú completo, Ubicación y Contacto dedicados se extrapolan del sistema de componentes ya documentado (`stitch.md`).
+- Portal cliente: solo "Mi Pedido" (rastreo) tiene comp. Menú, Historial, Perfil se extrapolan.
+- App repartidor: solo "Ruta Activa" tiene comp. Mis Entregas, Ganancias, Perfil se extrapolan.
+
+## Decisiones tomadas (2026-09-21)
+
+1. Stack: GitHub Pages + Google Sheets + Google Apps Script. Sin backend tradicional, sin Docker/VPS/DB propia.
+2. Sin dominio propio — `usuario.github.io/repo`.
+3. Autenticación: Google Sign-In en 4 niveles — STAFF (whitelist), cliente (abierto), ADDV (dominio `@addv.mx`), DRIVERS (whitelist). Verificación siempre server-side vía Apps Script (token, nunca email declarado por el cliente).
+4. Flujo de pedido: el sitio escribe el pedido como `pendiente` en Sheets (folio simple `#TA-0001`) **antes** de abrir WhatsApp; folio va como primera línea del mensaje. Si no se concreta, se borra desde el gestor (borrado real, no soft-cancel, por instrucción explícita).
+5. Envío a domicilio: sí existe. Tarifa **variable por zona/distancia** (Z1/Z2/Z3), editable desde el admin — no costo fijo único (se corrigió una contradicción inicial).
+6. App repartidor: se construye ahora, mismo patrón de arquitectura (Google Sign-In + hoja DRIVERS + Apps Script recibe GPS del navegador). Comisión: **monto fijo por entrega**, configurable desde admin.
+7. Mapas/geolocalización: OpenStreetMap + Leaflet + Nominatim — gratis, sin llave. Nunca Google Maps Platform (tiene costo). Se elimina cualquier promesa de "tráfico en vivo" real que no se pueda respaldar con datos verdaderos.
+8. Multi-sucursal: `branch_id` en el esquema desde v1, pero lógica de una sola sucursal (Morelia) — no hay segunda sucursal confirmada todavía.
+9. Dueño de la cuenta Google/Apps Script del proyecto: **ADDV** (Workspace ya existente — costo preexistente, no nuevo por este proyecto).
+10. CRM: registro con Google Sign-In (cliente), invitación no-bloqueante a registrarse (nunca bloquea pedido de invitado), precarga de dirección guardada para clientes registrados, opt-in explícito + aviso de privacidad real (LFPDPPP) para campañas de marketing.
+11. Campañas: correo vía `MailApp`/`GmailApp` de Apps Script (cuota gratuita aceptada para este volumen); WhatsApp masivo saliente **no** es viable sin backend/API de pago — descartado.
+12. SEO: rutas reales por sección (no anclas `#`), catálogo servido por snapshot en build-time (GitHub Action) + revalidación silenciosa en cliente (para no romper LCP/PageSpeed).
+13. PWA: instalable, botón dual (prompt real Android/desktop, modal instructivo iOS), sin push notifications (fuera de alcance v1, requeriría servidor).
+14. Regla de costo: **cero costo incremental de herramientas** en esta fase (POC). Revisar antes de sugerir cualquier servicio de pago; queda para una eventual "versión robusta" futura.
+15. Nomenclatura "bot de WhatsApp" de los mockups originales es incorrecta — se corrige en toda la UI: no hay bot conversacional, es captura desde el sitio + envío manual del cliente.
+
+## Decisiones pendientes / por confirmar con el negocio
+
+- Precios reales del menú (marcados `requiresValidation` hasta confirmación).
+- Horarios, montos exactos de tarifas de envío por zona (Z1/Z2/Z3 son placeholders del mock, no confirmados).
+- Redacción final del aviso de privacidad (LFPDPPP) — placeholder hasta validación legal.
+- Segunda sucursal: ¿roadmap futuro confirmado o solo posibilidad?
+- Assets de marca reales (logo, tipografía oficial) si difieren del sistema provisional ya definido en `DESIGN.md`.
+
+## Progreso de construcción
+
+- [x] **Segmento 1 — Scaffolding** (2026-09-21): estructura de carpetas, `package.json`+Tailwind compilado (reemplaza el CDN de los mocks), `tailwind.config.js` con los tokens de `DESIGN.md`, `src/config/site.js` central, `docs/apps-script-contract.md` (contrato completo de endpoints/hojas), `apps-script/Code.gs` (implementación real: auth por token verificado, LockService, folios, geocodificación Nominatim, tarifas por zona), `src/js/api.js` + `src/js/auth.js` compartidos, PWA (`manifest.webmanifest`, `sw.js`, `offline.html`, íconos provisionales generados con Pillow — pendiente logo real), `robots.txt`/`sitemap.xml`, GitHub Action de build+deploy (`.github/workflows/deploy.yml`, snapshot best-effort vía `scripts/build-snapshot.mjs`), `data/catalog.json` con el menú de `buildClaude.md` (todo `requiresValidation: true`), `README.md`.
+- [x] **Segmento 2 — Sitio público** (2026-09-21): `index.html` (Home), `menu/` (catálogo completo + carrito + checkout → WhatsApp con folio), `ubicacion/`, `contacto/`. Fuentes self-hosted (`assets/fonts/`, cero requests a Google Fonts), íconos SVG inline (`assets/icons/sprite.svg`, reemplaza Material Symbols), sin Tailwind CDN. Probado en navegador real (Chrome vía claude-in-chrome): las 4 páginas cargan sin errores de consola, catálogo se pinta desde `data/catalog.json`, carrito agrega/quita/calcula, toggle Para llevar/A domicilio muestra campo de dirección correctamente, botón "Instalar" aparece (Chrome sí soporta `beforeinstallprompt`). Servido localmente con `python -m http.server` en el puerto 8099 (8080 estaba ocupado por otro proyecto local).
+  - **Bug encontrado y corregido durante la prueba:** varios elementos (modal de instrucciones iOS, selector de modalidad, campo de dirección) usaban el atributo nativo `hidden` junto con una clase de Tailwind que fija `display` (`flex`/`grid`) en el mismo elemento — el atributo nativo pierde contra la clase de autor sin importar el orden, así que se mostraban aunque debían estar ocultos. Se corrigió usando la clase `hidden` de Tailwind (no el atributo) alternada por JS en todos los casos afectados (`index.html`, `menu/index.html`, `src/js/pwa-install.js`, `src/js/menu-page.js`).
+  - Pendiente de este segmento (no bloqueante): fotografía real de producto (hoy son placeholders SVG intencionales, nunca imágenes de comida falsas), portal cliente/admin aún no llaman a este flujo (eso es CLIENTES/Google Sign-In, parte de segmentos 3-4).
+- [x] **Segmento 3 — Admin catálogo/precios + pedidos/KDS** (2026-09-21): `admin/catalogo/` (edición de precio en vivo, validar, disponibilidad), `admin/pedidos/` (Kanban Por Confirmar/En Cocina/Listo, polling 15s, aceptar/marcar listo/finalizar/eliminar), `admin/config-envio/` (pantalla nueva no incluida en el mock original, tarifas Z1/Z2/Z3 + comisión repartidor — avisado como desviación al agregarla). Gate de acceso compartido (`src/js/admin-auth.js`) con Google Identity Services + whitelist STAFF validada server-side. Acciones nuevas agregadas al contrato/backend que no estaban originalmente: `catalog.readAll`, `order.list`, `config.update`.
+  - **Bug real encontrado y corregido en esta prueba:** el Service Worker (`sw.js`) usaba cache-first para CSS/JS del shell — en un sitio que se reconstruye seguido, dejaba a los visitantes atorados en una versión vieja del sitio indefinidamente (no solo un problema de dev). Se cambió a network-first con fallback a cache solo si no hay red; se subió `CACHE_NAME` a `v2` para invalidar el cache viejo de quien ya lo tenga instalado.
+  - Verificado en navegador real: las 3 pantallas cargan sin errores de consola y muestran correctamente el estado "backend aún no configurado" (esperado, ya que Apps Script/Google Client ID siguen sin desplegarse). No se pudo probar el flujo autenticado real (login, guardar precio, mover pedido) por faltar esas credenciales — queda pendiente para cuando se despliegue Apps Script.
+  - Pendiente de este segmento (no bloqueante, ya lo sabía el usuario): subida de fotografías HD, historial de auditoría visual (los datos ya se escriben en la hoja LOG, solo falta UI para leerlos), asignación de repartidor desde el Kanban.
+- [ ] Segmento 4 — Portal cliente.
+- [ ] Segmento 5 — Analítica ADDV.
+- [ ] Segmento 6 — App repartidor.
+- [ ] Segmento 7 — Pruebas + verificación funcional.
+
+## Pendiente de que el usuario provea/despliegue (bloquea producción, no bloquea seguir construyendo)
+
+- Desplegar el Google Sheet + `apps-script/Code.gs` como Web App y llenar `SPREADSHEET_ID` + `appsScript.webAppUrl`.
+- Crear el OAuth 2.0 Client ID de Google Cloud Console y llenar `googleClientId`.
+- Logo real de la marca (los íconos PWA actuales son un placeholder monograma "LT" generado localmente).
+- Repo `addv-sites/la-tapatia-express` ya vinculado como `origin` — sin commits todavía (se hace cuando el usuario lo pida explícitamente).
+
+## Próximo paso
+
+Continuar con el Segmento 2 (sitio público) siguiendo `buildClaude.md`.

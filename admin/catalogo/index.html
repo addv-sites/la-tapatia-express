@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor de Catálogo — La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between px-6">
+  <div class="flex items-center gap-3">
+    <span class="font-headline-sm text-headline-sm text-primary">La Tapatía Ahogadas</span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Gestor de Catálogo &amp; Precios</span>
+  </div>
+  <div class="flex items-center gap-4 font-label-md text-label-md">
+    <a href="../pedidos/" class="text-on-surface-variant hover:text-primary">Pedidos</a>
+    <a href="../config-envio/" class="text-on-surface-variant hover:text-primary">Config. Envío</a>
+  </div>
+</header>
+
+<main class="pt-16 min-h-screen">
+  <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
+
+  <div id="admin-content" class="hidden max-w-6xl mx-auto px-6 py-8 flex flex-col gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg text-on-surface" id="kpi-total">0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Platillos registrados</p>
+      </div>
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg text-secondary" id="kpi-pending">0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Precios pendientes</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+      <input id="dish-search" class="w-full md:w-64 px-4 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm shadow-sm" type="text" placeholder="Buscar por platillo...">
+    </div>
+
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-crema-surface text-on-surface-variant font-label-sm text-label-sm uppercase">
+              <th class="py-3.5 px-4">Platillo</th>
+              <th class="py-3.5 px-3">Categoría</th>
+              <th class="py-3.5 px-3 w-36">Precio (MXN)</th>
+              <th class="py-3.5 px-3 text-center">Validación</th>
+              <th class="py-3.5 px-3 text-center">Disponibilidad</th>
+              <th class="py-3.5 px-4 text-right">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="catalog-tbody" class="divide-y divide-surface-container-low font-body-sm text-body-sm text-on-surface"></tbody>
+        </table>
+      </div>
+      <div class="p-4 bg-crema-surface/60 font-body-sm text-body-sm text-on-surface-variant" id="showing-count"></div>
+    </div>
+
+    <p class="font-body-sm text-[12px] text-on-surface-variant">
+      Subida de fotografías HD y el historial de auditoría detallado quedan pendientes para una siguiente iteración — hoy la edición de precio/disponibilidad ya escribe en tiempo real a Google Sheets.
+    </p>
+  </div>
+</main>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/auth.js"></script>
+<script src="../../src/js/admin-auth.js"></script>
+<script src="../../src/js/toast.js"></script>
+<script src="../../src/js/admin-catalogo.js"></script>
+</body>
+</html>

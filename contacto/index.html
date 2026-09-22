@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Contacto | La Tapatía Ahogadas — Morelia</title>
+<meta name="description" content="Contacta a La Tapatía Ahogadas en Morelia: WhatsApp, teléfono, Facebook y TikTok.">
+<link rel="canonical" href="https://addv-sites.github.io/la-tapatia-express/contacto/">
+<meta name="theme-color" content="#93000b">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="../css/site.css">
+<script defer src="../src/config/site.js"></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-between">
+    <a href="../" class="font-headline-sm text-headline-sm text-primary tracking-tight">La Tapatía Ahogadas</a>
+    <nav class="flex items-center gap-4 font-label-md text-label-md">
+      <a href="../menu/" class="text-on-surface-variant hover:text-primary">Menú</a>
+      <a href="../ubicacion/" class="text-on-surface-variant hover:text-primary">Ubicación</a>
+    </nav>
+  </div>
+</header>
+
+<main class="flex-1 w-full pt-24 pb-12 px-margin max-w-xl mx-auto w-full flex flex-col gap-4">
+  <h1 class="font-headline-lg text-headline-lg text-on-surface">Contacto</h1>
+  <p class="font-body-md text-body-md text-on-surface-variant">
+    ¿Dudas sobre tu pedido o quieres hacer una reservación para grupo grande? Escríbenos directo.
+  </p>
+
+  <a id="whatsapp-contact" href="#" target="_blank" rel="noopener noreferrer"
+     class="min-h-[52px] px-4 rounded-xl bg-whatsapp-green text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md">
+    <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-whatsapp"/></svg>
+    WhatsApp 443 328 8181
+  </a>
+
+  <a id="phone-contact" href="#" class="min-h-[48px] px-4 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm">
+    Llamar por teléfono
+  </a>
+
+  <div class="flex items-center justify-center gap-4 pt-2">
+    <a aria-label="Facebook" href="https://www.facebook.com/Latapatiaahogadas" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:text-primary">
+      <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-facebook"/></svg>
+    </a>
+    <a aria-label="TikTok" href="https://www.tiktok.com/@ahogadas.la.tapat" target="_blank" rel="noopener noreferrer" class="w-11 h-11 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:text-primary">
+      <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-tiktok"/></svg>
+    </a>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var cfg = window.SITE_CONFIG;
+  document.getElementById('whatsapp-contact').href = 'https://wa.me/' + cfg.whatsapp;
+  document.getElementById('phone-contact').href = 'tel:' + cfg.phone;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ubicación | La Tapatía Ahogadas — Morelia</title>
+<meta name="description" content="Visita La Tapatía Ahogadas en Arboledas de Valladolid, Morelia. Dirección, cómo llegar y contacto por WhatsApp.">
+<link rel="canonical" href="https://addv-sites.github.io/la-tapatia-express/ubicacion/">
+<meta name="theme-color" content="#93000b">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="../css/site.css">
+<script defer src="../src/config/site.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "PostalAddress",
+  "streetAddress": "Av. San Juanito Itzicuaro 171, Arboledas de Valladolid",
+  "addressLocality": "Morelia",
+  "addressRegion": "Michoacán",
+  "addressCountry": "MX"
+}
+</script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-between">
+    <a href="../" class="font-headline-sm text-headline-sm text-primary tracking-tight">La Tapatía Ahogadas</a>
+    <nav class="flex items-center gap-4 font-label-md text-label-md">
+      <a href="../menu/" class="text-on-surface-variant hover:text-primary">Menú</a>
+      <a href="../contacto/" class="text-on-surface-variant hover:text-primary">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<main class="flex-1 w-full pt-24 pb-12 px-margin max-w-2xl mx-auto w-full">
+  <h1 class="font-headline-lg text-headline-lg text-on-surface mb-4">Visítanos en Morelia</h1>
+
+  <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+    <div class="flex items-start gap-3">
+      <svg class="w-6 h-6 text-primary shrink-0 mt-0.5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-pin"/></svg>
+      <div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">Dirección</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Av. San Juanito Itzicuaro 171, Arboledas de Valladolid, Morelia, Michoacán, México.</p>
+      </div>
+    </div>
+
+    <div id="map-embed" class="w-full h-64 rounded-xl bg-surface-container-high hidden"></div>
+
+    <div class="flex items-start gap-3">
+      <svg class="w-6 h-6 text-secondary shrink-0 mt-0.5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-fire"/></svg>
+      <div>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">Horario</h2>
+        <p id="schedule-text" class="font-body-md text-body-md text-on-surface-variant">Horario por confirmar</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col xs:flex-row gap-2 pt-1">
+      <a class="flex-1 min-h-[48px] px-3 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-2" id="maps-link" href="#" rel="noopener noreferrer" target="_blank">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-navigation"/></svg>
+        Cómo llegar (Google Maps)
+      </a>
+      <a class="flex-1 min-h-[48px] px-3 rounded-lg bg-whatsapp-green text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm" id="whatsapp-link" href="#" rel="noopener noreferrer" target="_blank">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-whatsapp"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var cfg = window.SITE_CONFIG;
+  document.getElementById('maps-link').href = cfg.googleMapsUrl;
+  document.getElementById('whatsapp-link').href = 'https://wa.me/' + cfg.whatsapp;
+  if (cfg.schedule && !cfg.schedule.requiresValidation) {
+    document.getElementById('schedule-text').textContent = cfg.schedule.display;
+  }
+  // El embed de mapa (Leaflet + OpenStreetMap) se activa solo cuando haya
+  // coordenadas reales confirmadas — ver src/config/site.js `coordinates`.
+  // No se inventa un pin sin dato real.
+});
+</script>
+</body>
+</html>

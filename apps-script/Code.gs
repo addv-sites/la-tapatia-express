@@ -1,0 +1,510 @@
+/**
+ * La Tapatía Ahogadas — Apps Script Web App
+ *
+ * Este archivo se pega tal cual en el editor de script.google.com del
+ * proyecto (Extensiones > Apps Script desde el Google Sheet). No corre en
+ * GitHub Pages — es la única capa de escritura/autorización del proyecto.
+ * Contrato completo de acciones y esquema de hojas: docs/apps-script-contract.md
+ *
+ * Desplegar como Web App: Ejecutar como "Yo", Acceso "Cualquier usuario".
+ */
+
+const SPREADSHEET_ID = ''; // TODO: id del Google Sheet al desplegar
+const TIMEZONE = 'America/Mexico_City';
+const RATE_LIMIT_PER_MINUTE = 5;
+const MIN_SUBMIT_MS = 1500; // rechaza submits a <1.5s de cargada la página
+
+function ss_() {
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
+function sheet_(name) {
+  const sh = ss_().getSheetByName(name);
+  if (!sh) throw new Error('Hoja no encontrada: ' + name);
+  return sh;
+}
+
+/** Lee una hoja completa como array de objetos usando la primera fila como headers. */
+function readSheetAsObjects_(name) {
+  const sh = sheet_(name);
+  const values = sh.getDataRange().getValues();
+  if (values.length < 2) return [];
+  const headers = values[0];
+  return values.slice(1).map((row) => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i]; });
+    return obj;
+  });
+}
+
+function appendRow_(sheetName, obj, headers) {
+  const sh = sheet_(sheetName);
+  const row = headers.map((h) => (obj[h] !== undefined ? obj[h] : ''));
+  sh.appendRow(row);
+}
+
+/** Verifica el ID token de Google Sign-In contra el endpoint oficial de Google. Nunca confiar en el email declarado por el cliente sin esto. */
+function verifyIdToken_(idToken) {
+  if (!idToken) return null;
+  const resp = UrlFetchApp.fetch(
+    'https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken),
+    { muteHttpExceptions: true }
+  );
+  if (resp.getResponseCode() !== 200) return null;
+  const payload = JSON.parse(resp.getContentText());
+  if (!payload.email || payload.email_verified !== 'true') return null;
+  return { email: payload.email.toLowerCase(), name: payload.name || '' };
+}
+
+function requireRole_(idToken, role) {
+  const user = verifyIdToken_(idToken);
+  if (!user) throw new Error('No autorizado: token inválido');
+
+  if (role === 'ADDV') {
+    if (!user.email.endsWith('@addv.mx')) throw new Error('No autorizado: dominio no permitido');
+    return user;
+  }
+
+  const sheetName = role === 'STAFF' ? 'STAFF' : role === 'DRIVERS' ? 'DRIVERS' : null;
+  if (sheetName) {
+    const rows = readSheetAsObjects_(sheetName);
+    const match = rows.find((r) => String(r.email).toLowerCase() === user.email && r.active);
+    if (!match) throw new Error('No autorizado: no está en la whitelist ' + role);
+    return user;
+  }
+
+  // role === 'ANY' → cualquier cuenta Google verificada (cliente)
+  return user;
+}
+
+/** Rate limit simple por sesión usando CacheService. */
+function checkRateLimit_(sessionId) {
+  const cache = CacheService.getScriptCache();
+  const key = 'rl_' + sessionId;
+  const count = Number(cache.get(key) || 0);
+  if (count >= RATE_LIMIT_PER_MINUTE) throw new Error('Demasiadas solicitudes, intenta más tarde');
+  cache.put(key, String(count + 1), 60);
+}
+
+function withLock_(fn) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    return fn();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function nextFolio_() {
+  return withLock_(() => {
+    const props = PropertiesService.getScriptProperties();
+    const current = Number(props.getProperty('last_folio') || 0) + 1;
+    props.setProperty('last_folio', String(current));
+    return '#TA-' + String(current).padStart(4, '0');
+  });
+}
+
+function logAudit_(actorEmail, action, entity, entityId, before, after) {
+  appendRow_('LOG', {
+    timestamp: Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss'),
+    actor_email: actorEmail,
+    action: action,
+    entity: entity,
+    entity_id: entityId,
+    before: JSON.stringify(before || {}),
+    after: JSON.stringify(after || {})
+  }, ['timestamp', 'actor_email', 'action', 'entity', 'entity_id', 'before', 'after']);
+}
+
+// ---------------------------------------------------------------------------
+// Geocodificación (Nominatim / OpenStreetMap — gratis, respeta 1 req/seg)
+// ---------------------------------------------------------------------------
+
+function geocodeAddress_(address) {
+  const cache = CacheService.getScriptCache();
+  const cacheKey = 'geo_' + address;
+  const cached = cache.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  Utilities.sleep(1000); // respeta política de uso de Nominatim
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(address);
+  const resp = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true,
+    headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
+  });
+  if (resp.getResponseCode() !== 200) return null;
+  const results = JSON.parse(resp.getContentText());
+  if (!results.length) return null;
+  const result = { lat: Number(results[0].lat), lng: Number(results[0].lon) };
+  cache.put(cacheKey, JSON.stringify(result), 21600); // 6h
+  return result;
+}
+
+function distanceKm_(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function resolveDeliveryZone_(distanceKm, config) {
+  if (distanceKm <= Number(config.delivery_zone_1_km_max)) return { zone: 'Z1', cost: Number(config.delivery_zone_1_cost) };
+  if (distanceKm <= Number(config.delivery_zone_2_km_max)) return { zone: 'Z2', cost: Number(config.delivery_zone_2_cost) };
+  return { zone: 'Z3', cost: Number(config.delivery_zone_3_cost) };
+}
+
+// ---------------------------------------------------------------------------
+// Acciones
+// ---------------------------------------------------------------------------
+
+function action_catalogRead_() {
+  const rows = readSheetAsObjects_('CATALOGO').filter((r) => r.active);
+  return { products: rows };
+}
+
+function action_catalogReadAll_() {
+  return { products: readSheetAsObjects_('CATALOGO') };
+}
+
+function action_configRead_() {
+  const rows = readSheetAsObjects_('CONFIG');
+  return { config: rows[0] || {} };
+}
+
+function action_configUpdate_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CONFIG');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    if (values.length < 2) throw new Error('Hoja CONFIG sin fila de datos — crear la primera fila manualmente');
+    const before = {};
+    headers.forEach((h, i) => { before[h] = values[1][i]; });
+    Object.keys(payload).forEach((key) => {
+      const col = headers.indexOf(key);
+      if (col >= 0) sh.getRange(2, col + 1).setValue(payload[key]);
+    });
+    logAudit_(user.email, 'config.update', 'CONFIG', 'default', before, payload);
+    return { ok: true };
+  });
+}
+
+function action_orderCreate_(payload, sessionId) {
+  checkRateLimit_(sessionId);
+  if (payload.clientLoadedAt && (Date.now() - Number(payload.clientLoadedAt)) < MIN_SUBMIT_MS) {
+    throw new Error('Solicitud rechazada');
+  }
+
+  const folio = nextFolio_();
+  let deliveryFee = 0;
+  let deliveryZone = '';
+
+  if (payload.order_type === 'delivery') {
+    const config = action_configRead_().config;
+    const branch = readSheetAsObjects_('SUCURSALES').find((b) => b.branch_id === payload.branch_id);
+    const dest = geocodeAddress_(payload.delivery_address);
+    if (branch && dest && branch.latitude && branch.longitude) {
+      const km = distanceKm_(Number(branch.latitude), Number(branch.longitude), dest.lat, dest.lng);
+      const zoneInfo = resolveDeliveryZone_(km, config);
+      deliveryFee = zoneInfo.cost;
+      deliveryZone = zoneInfo.zone;
+    }
+  }
+
+  const subtotal = (payload.items || []).reduce((sum, it) => sum + Number(it.price) * Number(it.quantity), 0);
+
+  const order = {
+    order_id: folio,
+    created_at: Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss'),
+    customer_name: payload.customer_name || '',
+    customer_phone: payload.customer_phone || '',
+    customer_email: payload.customer_email || '',
+    items: JSON.stringify(payload.items || []),
+    subtotal: subtotal,
+    delivery_fee: deliveryFee,
+    total: subtotal + deliveryFee,
+    notes: payload.notes || '',
+    order_type: payload.order_type || 'pickup',
+    delivery_address: payload.delivery_address || '',
+    delivery_zone: deliveryZone,
+    cash_denomination: payload.cash_denomination || '',
+    branch_id: payload.branch_id || '',
+    status: 'pendiente',
+    driver_id: '',
+    driver_lat: '',
+    driver_lng: '',
+    driver_ping_at: '',
+    source: 'sitio',
+    whatsapp_sent: false,
+    internal_notes: ''
+  };
+
+  const headers = ['order_id', 'created_at', 'customer_name', 'customer_phone', 'customer_email', 'items', 'subtotal', 'delivery_fee', 'total', 'notes', 'order_type', 'delivery_address', 'delivery_zone', 'cash_denomination', 'branch_id', 'status', 'driver_id', 'driver_lat', 'driver_lng', 'driver_ping_at', 'source', 'whatsapp_sent', 'internal_notes'];
+  appendRow_('PEDIDOS', order, headers);
+  logAudit_(payload.customer_email || 'invitado', 'order.create', 'PEDIDOS', folio, null, order);
+
+  return { order_id: folio, delivery_fee: deliveryFee, delivery_zone: deliveryZone, total: order.total };
+}
+
+function findOrderRow_(orderId) {
+  const sh = sheet_('PEDIDOS');
+  const values = sh.getDataRange().getValues();
+  const headers = values[0];
+  const idCol = headers.indexOf('order_id');
+  for (let i = 1; i < values.length; i++) {
+    if (values[i][idCol] === orderId) return { rowIndex: i + 1, headers, row: values[i] };
+  }
+  return null;
+}
+
+function action_orderUpdateStatus_(payload, user) {
+  return withLock_(() => {
+    const found = findOrderRow_(payload.order_id);
+    if (!found) throw new Error('Pedido no encontrado');
+    const sh = sheet_('PEDIDOS');
+    const statusCol = found.headers.indexOf('status') + 1;
+    const before = found.row[statusCol - 1];
+    sh.getRange(found.rowIndex, statusCol).setValue(payload.status);
+    logAudit_(user.email, 'order.updateStatus', 'PEDIDOS', payload.order_id, { status: before }, { status: payload.status });
+    return { ok: true };
+  });
+}
+
+function action_orderDelete_(payload, user) {
+  return withLock_(() => {
+    const found = findOrderRow_(payload.order_id);
+    if (!found) throw new Error('Pedido no encontrado');
+    const statusCol = found.headers.indexOf('status');
+    const status = found.row[statusCol];
+    if (status !== 'pendiente' && status !== 'abandonado') {
+      throw new Error('Solo se pueden borrar pedidos pendientes o abandonados');
+    }
+    sheet_('PEDIDOS').deleteRow(found.rowIndex);
+    logAudit_(user.email, 'order.delete', 'PEDIDOS', payload.order_id, { status }, null);
+    return { ok: true };
+  });
+}
+
+function action_orderAssignDriver_(payload, user) {
+  return withLock_(() => {
+    const found = findOrderRow_(payload.order_id);
+    if (!found) throw new Error('Pedido no encontrado');
+    const sh = sheet_('PEDIDOS');
+    const driverCol = found.headers.indexOf('driver_id') + 1;
+    sh.getRange(found.rowIndex, driverCol).setValue(payload.driver_id);
+    logAudit_(user.email, 'order.assignDriver', 'PEDIDOS', payload.order_id, null, { driver_id: payload.driver_id });
+    return { ok: true };
+  });
+}
+
+function action_driverPingLocation_(payload, user) {
+  return withLock_(() => {
+    const found = findOrderRow_(payload.order_id);
+    if (!found) throw new Error('Pedido no encontrado');
+    const sh = sheet_('PEDIDOS');
+    const latCol = found.headers.indexOf('driver_lat') + 1;
+    const lngCol = found.headers.indexOf('driver_lng') + 1;
+    const pingCol = found.headers.indexOf('driver_ping_at') + 1;
+    sh.getRange(found.rowIndex, latCol).setValue(payload.lat);
+    sh.getRange(found.rowIndex, lngCol).setValue(payload.lng);
+    sh.getRange(found.rowIndex, pingCol).setValue(new Date().toISOString());
+    return { ok: true };
+  });
+}
+
+function action_orderList_(payload) {
+  const rows = readSheetAsObjects_('PEDIDOS');
+  const statusFilter = payload && payload.status;
+  const filtered = statusFilter ? rows.filter((r) => r.status === statusFilter) : rows;
+  return { orders: filtered };
+}
+
+function action_orderTrackingRead_(payload) {
+  const found = findOrderRow_(payload.order_id);
+  if (!found) throw new Error('Pedido no encontrado');
+  const phoneCol = found.headers.indexOf('customer_phone');
+  if (String(found.row[phoneCol]) !== String(payload.customer_phone)) {
+    throw new Error('No autorizado');
+  }
+  const obj = {};
+  found.headers.forEach((h, i) => { obj[h] = found.row[i]; });
+  return { order: obj };
+}
+
+function action_catalogUpdatePrice_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    const priceCol = headers.indexOf('price') + 1;
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) {
+        const before = values[i][priceCol - 1];
+        sh.getRange(i + 1, priceCol).setValue(payload.price);
+        logAudit_(user.email, 'catalog.updatePrice', 'CATALOGO', payload.product_id, { price: before }, { price: payload.price });
+        return { ok: true };
+      }
+    }
+    throw new Error('Producto no encontrado');
+  });
+}
+
+function action_catalogApprovePrice_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    const col = headers.indexOf('requiresValidation') + 1;
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) {
+        sh.getRange(i + 1, col).setValue(false);
+        logAudit_(user.email, 'catalog.approvePrice', 'CATALOGO', payload.product_id, { requiresValidation: true }, { requiresValidation: false });
+        return { ok: true };
+      }
+    }
+    throw new Error('Producto no encontrado');
+  });
+}
+
+function action_catalogToggleAvailability_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    const col = headers.indexOf('active') + 1;
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) {
+        sh.getRange(i + 1, col).setValue(payload.active);
+        logAudit_(user.email, 'catalog.toggleAvailability', 'CATALOGO', payload.product_id, null, { active: payload.active });
+        return { ok: true };
+      }
+    }
+    throw new Error('Producto no encontrado');
+  });
+}
+
+function action_clientUpsertProfile_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CLIENTES');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const emailCol = headers.indexOf('email');
+    const now = Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][emailCol]).toLowerCase() === user.email) {
+        headers.forEach((h, colIdx) => {
+          if (h === 'name' || h === 'phone' || h === 'address' || h === 'address_reference') {
+            if (payload[h] !== undefined) sh.getRange(i + 1, colIdx + 1).setValue(payload[h]);
+          }
+          if (h === 'updated_at') sh.getRange(i + 1, colIdx + 1).setValue(now);
+        });
+        return { ok: true, created: false };
+      }
+    }
+    appendRow_('CLIENTES', {
+      email: user.email,
+      name: payload.name || user.name,
+      phone: payload.phone || '',
+      address: payload.address || '',
+      address_reference: payload.address_reference || '',
+      marketing_opt_in: false,
+      created_at: now,
+      updated_at: now
+    }, ['email', 'name', 'phone', 'address', 'address_reference', 'marketing_opt_in', 'created_at', 'updated_at']);
+    return { ok: true, created: true };
+  });
+}
+
+function action_clientOptInMarketing_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CLIENTES');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const emailCol = headers.indexOf('email');
+    const optCol = headers.indexOf('marketing_opt_in') + 1;
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][emailCol]).toLowerCase() === user.email) {
+        sh.getRange(i + 1, optCol).setValue(!!payload.optIn);
+        return { ok: true };
+      }
+    }
+    throw new Error('Perfil de cliente no encontrado — llama client.upsertProfile primero');
+  });
+}
+
+function action_incidentReport_(payload, user) {
+  appendRow_('INCIDENCIAS', {
+    timestamp: Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss'),
+    order_id: payload.order_id,
+    driver_email: user.email,
+    reason: payload.reason,
+    resolved: false
+  }, ['timestamp', 'order_id', 'driver_email', 'reason', 'resolved']);
+  return { ok: true };
+}
+
+// TODO (fuera del scaffolding inicial, se completa en el segmento de analítica/CRM):
+// action_analyticsRead_, action_campaignSendEmail_, action_catalogUploadPhoto_
+
+// ---------------------------------------------------------------------------
+// Router
+// ---------------------------------------------------------------------------
+
+const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead'];
+
+function route_(action, payload, idToken, sessionId) {
+  switch (action) {
+    case 'catalog.read': return action_catalogRead_();
+    case 'config.read': return action_configRead_();
+    case 'order.create': return action_orderCreate_(payload, sessionId);
+    case 'order.trackingRead': return action_orderTrackingRead_(payload);
+
+    case 'catalog.readAll': return action_catalogReadAll_(requireRole_(idToken, 'STAFF'));
+    case 'config.update': return action_configUpdate_(payload, requireRole_(idToken, 'STAFF'));
+    case 'order.list': return action_orderList_(payload, requireRole_(idToken, 'STAFF'));
+    case 'order.updateStatus': return action_orderUpdateStatus_(payload, requireRole_(idToken, 'STAFF'));
+    case 'order.delete': return action_orderDelete_(payload, requireRole_(idToken, 'STAFF'));
+    case 'order.assignDriver': return action_orderAssignDriver_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.updatePrice': return action_catalogUpdatePrice_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));
+
+    case 'driver.pingLocation': return action_driverPingLocation_(payload, requireRole_(idToken, 'DRIVERS'));
+    case 'incident.report': return action_incidentReport_(payload, requireRole_(idToken, 'DRIVERS'));
+
+    case 'client.upsertProfile': return action_clientUpsertProfile_(payload, requireRole_(idToken, 'ANY'));
+    case 'client.optInMarketing': return action_clientOptInMarketing_(payload, requireRole_(idToken, 'ANY'));
+
+    default:
+      throw new Error('Acción no reconocida: ' + action);
+  }
+}
+
+function jsonResponse_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  try {
+    const action = e.parameter.action;
+    if (!PUBLIC_ACTIONS.includes(action)) throw new Error('Acción no permitida por GET');
+    const result = route_(action, e.parameter, null, e.parameter.sessionId);
+    return jsonResponse_({ ok: true, data: result });
+  } catch (err) {
+    return jsonResponse_({ ok: false, error: err.message });
+  }
+}
+
+function doPost(e) {
+  try {
+    const body = JSON.parse(e.postData.contents);
+    const result = route_(body.action, body.payload || {}, body.idToken, body.sessionId);
+    return jsonResponse_({ ok: true, data: result });
+  } catch (err) {
+    return jsonResponse_({ ok: false, error: err.message });
+  }
+}

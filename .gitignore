@@ -1,0 +1,22 @@
+# Ruflo local secrets and runtime data
+.env
+.env.local
+.env.*.local
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
+
+# IDE
+.idea/
+
+# Ruflo runtime/local state (not project source, churns every session)
+.swarm/
+.claude-flow/metrics/
+.claude-flow/security/
+.claude/settings.local.json
+
+# Build tooling
+node_modules/
+dist/
+.parcel-cache/
+*.log

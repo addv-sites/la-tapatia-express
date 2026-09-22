@@ -1,0 +1,15 @@
+{
+  "name": "la-tapatia-ahogadas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sitio La Tapatia Ahogadas - GitHub Pages + Google Sheets/Apps Script, sin backend tradicional.",
+  "scripts": {
+    "dev:css": "tailwindcss -i ./src/styles/input.css -o ./css/site.css --watch",
+    "build:css": "tailwindcss -i ./src/styles/input.css -o ./css/site.css --minify",
+    "serve": "python -m http.server 8080 --directory .",
+    "build": "npm run build:css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.13"
+  }
+}

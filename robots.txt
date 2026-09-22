@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://addv-sites.github.io/la-tapatia-express/sitemap.xml

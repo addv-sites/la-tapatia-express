@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tacos Ahogados en Morelia | La Tapatía Ahogadas</title>
+<meta name="description" content="Tacos, tortas, tostadas y antojitos mexicanos en Morelia. Conoce el menú de La Tapatía Ahogadas, visita nuestra ubicación y arma tu pedido.">
+<link rel="canonical" href="https://addv-sites.github.io/la-tapatia-express/">
+<meta property="og:title" content="Tacos Ahogados en Morelia | La Tapatía Ahogadas">
+<meta property="og:description" content="Tacos, tortas y tostadas ahogadas en Morelia. Arma tu pedido y pide por WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://addv-sites.github.io/la-tapatia-express/">
+<meta property="og:locale" content="es_MX">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#93000b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/site.css">
+<script defer src="src/config/site.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "La Tapatía Ahogadas",
+  "url": "https://addv-sites.github.io/la-tapatia-express/",
+  "telephone": "+524433288181",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Av. San Juanito Itzicuaro 171, Arboledas de Valladolid",
+    "addressLocality": "Morelia",
+    "addressRegion": "Michoacán",
+    "addressCountry": "MX"
+  },
+  "sameAs": [
+    "https://www.facebook.com/Latapatiaahogadas",
+    "https://www.tiktok.com/@ahogadas.la.tapat"
+  ]
+}
+</script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-between gap-space-sm">
+    <div class="flex items-center gap-space-sm min-w-0">
+      <div class="flex flex-col min-w-0">
+        <span class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">La Tapatía Ahogadas</span>
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-whatsapp-green animate-pulse" aria-hidden="true"></span>
+          <span class="font-label-sm text-label-sm text-tertiary font-bold">Abierto para pedidos</span>
+        </span>
+      </div>
+    </div>
+    <div class="flex items-center gap-space-xs shrink-0">
+      <button id="btn-install" type="button" class="hidden flex-shrink-0 items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm">
+        <svg class="w-4 h-4" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-plus"/></svg>
+        Instalar
+      </button>
+      <a href="menu/#pedido" aria-label="Ver pedido" class="relative w-11 h-11 flex items-center justify-center rounded-lg text-primary hover:bg-mustard-light transition-colors">
+        <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-cart"/></svg>
+        <span id="cart-badge" hidden class="absolute top-1.5 right-1.5 bg-primary text-on-primary font-label-sm text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 w-full bg-crema-bg pt-16 pb-24">
+<div class="flex flex-col w-full">
+
+  <aside aria-label="Aviso de servicio" class="w-full bg-mustard-light px-margin py-2.5 flex items-center justify-between gap-space-sm shadow-sm">
+    <div class="flex items-center gap-2 min-w-0">
+      <svg class="w-[18px] h-[18px] text-secondary shrink-0" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-pin"/></svg>
+      <p class="font-label-sm text-label-sm text-on-secondary-container truncate">Morelia, Michoacán • Pedidos directos a cocina por WhatsApp</p>
+    </div>
+    <span class="inline-flex items-center gap-1 shrink-0 px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] uppercase font-bold tracking-wider">En Vivo</span>
+  </aside>
+
+  <section aria-labelledby="hero-heading" class="relative w-full overflow-hidden px-margin pt-4 pb-2">
+    <div class="relative w-full rounded-2xl overflow-hidden shadow-lg bg-surface-container-highest">
+      <div class="relative w-full aspect-[4/3] xs:aspect-[16/11] bg-chile-dark">
+        <img alt="Torta ahogada tradicional de La Tapatía Ahogadas servida en plato hondo, bañada en salsa roja" width="800" height="600" fetchpriority="high" class="w-full h-full object-cover select-none" src="assets/img/hero-placeholder.svg">
+        <div class="absolute inset-0 bg-gradient-to-t from-chile-dark/95 via-chile-dark/40 to-transparent"></div>
+      </div>
+      <div class="p-4 xs:p-5 flex flex-col gap-3 bg-chile-dark text-on-primary">
+        <h1 class="font-display-hero-mobile text-display-hero-mobile leading-tight font-extrabold tracking-tight" id="hero-heading">El sabor tradicional de Guadalajara en Morelia</h1>
+        <p class="font-body-md text-body-md text-primary-fixed leading-snug">Birote salado crujiente, carnitas tiernas y la auténtica salsa de chile de árbol yahualica.</p>
+        <div class="pt-2 flex flex-col xs:flex-row gap-2.5">
+          <a id="whatsapp-hero-cta" class="w-full min-h-[48px] px-4 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-transform duration-150" href="#" rel="noopener noreferrer" target="_blank">
+            <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-whatsapp"/></svg>
+            <span>Pedir ahora por WhatsApp</span>
+          </a>
+          <a class="w-full min-h-[48px] px-4 rounded-xl bg-surface-container-lowest/15 backdrop-blur-sm font-label-md text-label-md flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform duration-150" href="menu/">
+            <span>Ver Menú Completo</span>
+            <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-arrow-right"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Categorías del Menú" class="w-full pt-4 pb-2">
+    <div class="px-margin flex items-center justify-between mb-2">
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">Explora por categoría</h2>
+      <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">6 secciones</span>
+    </div>
+    <div class="flex items-center gap-2.5 overflow-x-auto px-margin pb-2 pt-1 no-scrollbar scroll-smooth">
+      <a href="menu/#tortas" class="shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-primary text-on-primary shadow-sm font-label-md text-label-md active:scale-95 transition-transform">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-taco"/></svg><span>Tortas</span>
+      </a>
+      <a href="menu/#tacos" class="shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md active:scale-95 transition-transform">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-taco"/></svg><span>Tacos</span>
+      </a>
+      <a href="menu/#tostadas" class="shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md active:scale-95 transition-transform">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-tostada"/></svg><span>Tostadas</span>
+      </a>
+      <a href="menu/#combo-infantil" class="shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md active:scale-95 transition-transform">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-kid"/></svg><span>Combo infantil</span>
+      </a>
+      <a href="menu/#extras" class="shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md active:scale-95 transition-transform">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-soup"/></svg><span>Extras</span>
+      </a>
+      <a href="menu/#postres" class="shrink-0 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md active:scale-95 transition-transform">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-cake"/></svg><span>Postre</span>
+      </a>
+    </div>
+  </section>
+
+  <section aria-labelledby="favoritos-heading" class="w-full px-margin py-3">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <h2 class="font-headline-md text-headline-md text-on-surface" id="favoritos-heading">Favoritos de la Casa</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Los imperdibles de la cocina tapatía</p>
+      </div>
+      <a class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider" href="menu/">Ver todo</a>
+    </div>
+    <div id="favoritos-list" class="flex flex-col gap-4">
+      <div class="skeleton rounded-2xl h-64"></div>
+      <div class="skeleton rounded-2xl h-64"></div>
+      <div class="skeleton rounded-2xl h-64"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="proceso-heading" class="w-full px-margin py-4 mt-2">
+    <div class="bg-crema-surface rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+      <div>
+        <span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">Sin complicaciones</span>
+        <h2 class="font-headline-md text-headline-md text-on-surface mt-0.5" id="proceso-heading">Cómo funciona tu pedido</h2>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Directo de la cocina a tu mesa sin intermediarios</p>
+      </div>
+      <div class="flex flex-col gap-3.5">
+        <div class="flex items-start gap-3 bg-surface-container-lowest p-3.5 rounded-xl">
+          <div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed font-headline-sm text-headline-sm flex items-center justify-center shrink-0">1</div>
+          <div class="flex flex-col">
+            <h3 class="font-label-md text-label-md text-on-surface font-bold">Elige tus alimentos y salsa</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Selecciona tortas o tacos y define tu nivel de picante preferido.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-lowest p-3.5 rounded-xl">
+          <div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline-sm text-headline-sm flex items-center justify-center shrink-0">2</div>
+          <div class="flex flex-col">
+            <h3 class="font-label-md text-label-md text-on-surface font-bold">Se registra tu pedido</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">El sistema arma el mensaje limpio y desglosado con tu pedido.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-surface-container-lowest p-3.5 rounded-xl">
+          <div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-headline-sm text-headline-sm flex items-center justify-center shrink-0">3</div>
+          <div class="flex flex-col">
+            <h3 class="font-label-md text-label-md text-on-surface font-bold">Confirmación directa al instante</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Envías el mensaje por WhatsApp y el equipo de cocina te atiende.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="ubicacion-heading" class="w-full px-margin py-4">
+    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+          <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-storefront"/></svg>
+        </div>
+        <div>
+          <h2 class="font-headline-sm text-headline-sm text-on-surface" id="ubicacion-heading">Visítanos en Morelia</h2>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">Arboledas de Valladolid</span>
+        </div>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Av. San Juanito Itzicuaro 171, Arboledas de Valladolid, Morelia, Michoacán, México.</p>
+      <div class="flex flex-col xs:flex-row gap-2 pt-1">
+        <a class="flex-1 min-h-[44px] px-3 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform" href="ubicacion/">
+          <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-navigation"/></svg>
+          <span>Cómo llegar</span>
+        </a>
+        <a id="whatsapp-location-cta" class="flex-1 min-h-[44px] px-3 rounded-lg bg-whatsapp-green text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-transform" href="#" rel="noopener noreferrer" target="_blank">
+          <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-whatsapp"/></svg>
+          <span>WhatsApp 4433288181</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="w-full px-margin pt-2 pb-6 flex flex-col items-center text-center gap-3">
+    <div class="flex items-center gap-4">
+      <a aria-label="Facebook oficial La Tapatía Ahogadas" class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:text-primary transition-colors" href="https://www.facebook.com/Latapatiaahogadas" rel="noopener noreferrer" target="_blank">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-facebook"/></svg>
+      </a>
+      <a aria-label="TikTok oficial La Tapatía Ahogadas" class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:text-primary transition-colors" href="https://www.tiktok.com/@ahogadas.la.tapat" rel="noopener noreferrer" target="_blank">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-tiktok"/></svg>
+      </a>
+    </div>
+    <p class="font-body-sm text-[12px] text-on-surface-variant max-w-xs leading-relaxed">
+      Precios base de catálogo mostrados requieren validación de cocina antes del cobro final. La Tapatía Ahogadas • Sabor de Guadalajara en Morelia.
+    </p>
+  </footer>
+
+  <!-- Bottom sheet de personalización rápida -->
+  <div aria-hidden="true" class="fixed inset-0 z-50 pointer-events-none opacity-0 transition-opacity duration-200" id="customizer-drawer">
+    <div class="absolute inset-0 bg-inverse-surface/60" id="drawer-backdrop"></div>
+    <div class="absolute bottom-0 inset-x-0 bg-surface-container-lowest rounded-t-3xl p-5 shadow-2xl transform translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto" id="drawer-panel">
+      <div class="w-10 h-1 rounded-full bg-surface-container-highest mx-auto mb-4"></div>
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h3 class="font-headline-md text-headline-md text-on-surface" id="customizer-title">Personaliza tu platillo</h3>
+          <p class="font-price-md text-price-md text-primary font-bold" id="customizer-price">$0 MXN</p>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center" id="close-drawer" aria-label="Cerrar">
+          <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-close"/></svg>
+        </button>
+      </div>
+      <div class="mb-4">
+        <label class="block font-label-md text-label-md text-on-surface mb-2 font-bold">Nivel de salsa y chile:</label>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="flex flex-col items-center p-3 rounded-xl bg-surface-container-low text-center cursor-pointer has-[:checked]:bg-primary-fixed has-[:checked]:text-on-primary-fixed">
+            <input checked class="sr-only" name="salsa" type="radio" value="Ahogada (muy picante)">
+            <span class="font-label-sm text-[11px]">Ahogada</span>
+          </label>
+          <label class="flex flex-col items-center p-3 rounded-xl bg-surface-container-low text-center cursor-pointer has-[:checked]:bg-primary-fixed has-[:checked]:text-on-primary-fixed">
+            <input class="sr-only" name="salsa" type="radio" value="Media (poco picante)">
+            <span class="font-label-sm text-[11px]">Media</span>
+          </label>
+          <label class="flex flex-col items-center p-3 rounded-xl bg-surface-container-low text-center cursor-pointer has-[:checked]:bg-primary-fixed has-[:checked]:text-on-primary-fixed">
+            <input class="sr-only" name="salsa" type="radio" value="Salsa separada">
+            <span class="font-label-sm text-[11px]">Separada</span>
+          </label>
+        </div>
+      </div>
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform" id="confirm-customizer" type="button">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-plus"/></svg>
+        <span>Agregar al pedido</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal instrucciones instalar en iOS -->
+  <div id="ios-install-modal" style="display:none" class="fixed inset-0 z-50 bg-inverse-surface/60 items-center justify-center p-4">
+    <div class="bg-surface-container-lowest rounded-2xl w-full max-w-sm p-5 flex flex-col gap-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">Instalar en iPhone/iPad</h3>
+        <button id="close-ios-modal" class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center" aria-label="Cerrar">
+          <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-close"/></svg>
+        </button>
+      </div>
+      <p class="font-body-md text-body-md text-on-surface-variant">
+        Toca el botón <strong>Compartir</strong> de Safari y selecciona
+        <strong>"Agregar a inicio"</strong> para instalar La Tapatía Ahogadas
+        en tu pantalla de inicio.
+      </p>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-around">
+    <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 text-primary font-bold" href="./">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-fire"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Antojo</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="menu/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-menu"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Menú</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="menu/#pedido">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-cart"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Pedido</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="ubicacion/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-storefront"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Visítanos</span>
+    </a>
+  </div>
+</nav>
+
+<script src="src/js/cart.js"></script>
+<script src="src/js/catalog.js"></script>
+<script src="src/js/pwa-install.js"></script>
+<script>
+(function () {
+  function whatsappUrl(text) {
+    var cfg = window.SITE_CONFIG;
+    return 'https://wa.me/' + cfg.whatsapp + (text ? '?text=' + encodeURIComponent(text) : '');
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var greeting = 'Hola, quiero realizar un pedido en ' + window.SITE_CONFIG.businessName;
+    document.getElementById('whatsapp-hero-cta').href = whatsappUrl(greeting);
+    document.getElementById('whatsapp-location-cta').href = whatsappUrl();
+
+    // Service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+
+    // Instalar PWA
+    window.LTA_PWA_INSTALL.setup(document.getElementById('btn-install'), document.getElementById('ios-install-modal'));
+    document.getElementById('close-ios-modal').addEventListener('click', function () {
+      document.getElementById('ios-install-modal').style.display = 'none';
+    });
+
+    // Carrito: badge
+    function updateCartBadge() {
+      var n = window.LTA_CART.count();
+      var badge = document.getElementById('cart-badge');
+      badge.textContent = n;
+      badge.hidden = n === 0;
+    }
+    updateCartBadge();
+    document.addEventListener('cart-changed', updateCartBadge);
+
+    // Drawer de personalización
+    var drawer = document.getElementById('customizer-drawer');
+    var panel = document.getElementById('drawer-panel');
+    var backdrop = document.getElementById('drawer-backdrop');
+    var currentProduct = null;
+
+    function openDrawer(product) {
+      currentProduct = product;
+      document.getElementById('customizer-title').textContent = product.name;
+      document.getElementById('customizer-price').textContent = window.LTA_CATALOG.formatPrice(product.price);
+      drawer.classList.remove('pointer-events-none', 'opacity-0');
+      panel.classList.remove('translate-y-full');
+    }
+    function closeDrawer() {
+      drawer.classList.add('opacity-0', 'pointer-events-none');
+      panel.classList.add('translate-y-full');
+    }
+    backdrop.addEventListener('click', closeDrawer);
+    document.getElementById('close-drawer').addEventListener('click', closeDrawer);
+    document.getElementById('confirm-customizer').addEventListener('click', function () {
+      if (!currentProduct) return;
+      var salsa = document.querySelector('input[name="salsa"]:checked');
+      window.LTA_CART.addItem(currentProduct, { salsa: salsa ? salsa.value : null });
+      closeDrawer();
+    });
+
+    // Favoritos: cargar del snapshot
+    window.LTA_CATALOG.load().then(function (data) {
+      var featured = (data.products || []).filter(function (p) { return p.featured; }).slice(0, 3);
+      var list = document.getElementById('favoritos-list');
+      list.innerHTML = '';
+      featured.forEach(function (product) {
+        var article = document.createElement('article');
+        article.className = 'bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col';
+        var badge = product.requiresValidation
+          ? '<span class="inline-block px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] uppercase tracking-wider">Precio requiere validación</span>'
+          : '';
+        article.innerHTML =
+          '<div class="relative w-full aspect-[16/9] bg-surface-container-high"></div>' +
+          '<div class="p-4 flex flex-col gap-2">' +
+          '  <div class="flex items-start justify-between gap-2">' +
+          '    <h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">' + product.name + '</h3>' +
+          '    <span class="font-price-md text-price-md text-primary font-bold shrink-0">' + window.LTA_CATALOG.formatPrice(product.price) + '</span>' +
+          '  </div>' +
+          '  <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">' + (product.short_description || '') + '</p>' +
+          '  <div class="pt-1 flex items-center justify-between gap-2">' +
+          '    ' + badge +
+          '    <button aria-label="Agregar ' + product.name + ' al pedido" class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-sm active:scale-90 transition-transform ml-auto" type="button">' +
+          '      <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-plus"/></svg>' +
+          '    </button>' +
+          '  </div>' +
+          '</div>';
+        article.querySelector('button').addEventListener('click', function () { openDrawer(product); });
+        list.appendChild(article);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

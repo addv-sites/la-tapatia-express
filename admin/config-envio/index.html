@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración de Envío — La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between px-6">
+  <div class="flex items-center gap-3">
+    <span class="font-headline-sm text-headline-sm text-primary">La Tapatía Ahogadas</span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Configuración de Envío</span>
+  </div>
+  <div class="flex items-center gap-4 font-label-md text-label-md">
+    <a href="../catalogo/" class="text-on-surface-variant hover:text-primary">Catálogo</a>
+    <a href="../pedidos/" class="text-on-surface-variant hover:text-primary">Pedidos</a>
+  </div>
+</header>
+
+<main class="pt-16 min-h-screen">
+  <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
+
+  <div id="admin-content" class="hidden max-w-lg mx-auto px-6 py-8 flex flex-col gap-5">
+    <p class="font-body-sm text-body-sm text-on-surface-variant">
+      Esta pantalla no está en el diseño original — se agregó porque el pedido con entrega a domicilio necesita tarifa por zona configurable, decisión tomada durante el análisis del proyecto.
+    </p>
+
+    <label class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm">
+      <span class="font-label-md text-label-md font-bold">Entrega a domicilio habilitada</span>
+      <input id="cfg-delivery-enabled" type="checkbox" class="w-5 h-5">
+    </label>
+
+    <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+      <h2 class="font-headline-sm text-headline-sm">Zona 1</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Hasta (km)
+          <input id="cfg-z1-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo (MXN)
+          <input id="cfg-z1-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+      <h2 class="font-headline-sm text-headline-sm">Zona 2</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Hasta (km)
+          <input id="cfg-z2-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo (MXN)
+          <input id="cfg-z2-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+      <h2 class="font-headline-sm text-headline-sm">Zona 3</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Hasta (km)
+          <input id="cfg-z3-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo (MXN)
+          <input id="cfg-z3-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+      </div>
+    </div>
+
+    <label class="flex flex-col gap-1 font-label-sm text-label-sm bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+      Comisión fija por entrega para el repartidor (MXN)
+      <input id="cfg-driver-commission" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
+    </label>
+
+    <button id="save-config" class="min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm shadow-md">
+      Guardar configuración
+    </button>
+  </div>
+</main>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/auth.js"></script>
+<script src="../../src/js/admin-auth.js"></script>
+<script src="../../src/js/toast.js"></script>
+<script src="../../src/js/admin-config-envio.js"></script>
+</body>
+</html>

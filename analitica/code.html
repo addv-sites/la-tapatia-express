@@ -1,0 +1,683 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-background":"#1b1b1e","on-primary-fixed-variant":"#93000b","surface-container-highest":"#e4e1e6","on-error":"#ffffff","on-secondary-fixed":"#2f1500","tertiary-fixed-dim":"#79db8d","on-primary-fixed":"#410002","surface-container-lowest":"#ffffff","surface":"#fbf8fc","surface-container":"#f0edf1","primary":"#93000b","tertiary-fixed":"#95f8a7","on-primary":"#ffffff","surface-bright":"#fbf8fc","on-secondary":"#ffffff","inverse-on-surface":"#f3f0f4","crema-surface":"#F7F3EA","surface-dim":"#dcd9dd","outline-variant":"#e4beb9","primary-container":"#b91c1c","on-secondary-fixed-variant":"#6e3900","outline":"#8f6f6c","tertiary":"#005223","inverse-primary":"#ffb4ab","error":"#ba1a1a","background":"#fbf8fc","chile-dark":"#7F1D1D","secondary-fixed":"#ffdcc3","secondary":"#904d00","mustard-light":"#FEF3C7","whatsapp-green":"#25D366","on-tertiary-fixed-variant":"#005323","surface-container-low":"#f6f2f7","on-surface-variant":"#5b403d","primary-fixed-dim":"#ffb4ab","inverse-surface":"#303033","on-tertiary-container":"#8bed9d","surface-tint":"#b91c1c","on-surface":"#1b1b1e","tertiary-container":"#006d30","on-primary-container":"#ffcdc7","secondary-container":"#fe932c","error-container":"#ffdad6","crema-bg":"#FDFBF7","on-secondary-container":"#663500","surface-container-high":"#eae7eb","on-error-container":"#93000a","on-tertiary-fixed":"#00210a","surface-variant":"#e4e1e6","on-tertiary":"#ffffff","secondary-fixed-dim":"#ffb77d","primary-fixed":"#ffdad6"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-md":"1rem","space-xl":"2.5rem","space-sm":"0.5rem","gutter-desktop":"1.5rem","margin-desktop":"2.5rem","margin":"1rem","gutter":"1rem","space-xs":"0.25rem","space-lg":"1.5rem"},"fontFamily":{"headline-lg":["Epilogue"],"headline-sm":["Epilogue"],"body-lg":["Plus Jakarta Sans"],"price-md":["Epilogue"],"label-md":["Plus Jakarta Sans"],"headline-md":["Epilogue"],"body-md":["Plus Jakarta Sans"],"headline-lg-mobile":["Epilogue"],"label-sm":["Plus Jakarta Sans"],"price-lg":["Epilogue"],"display-hero-mobile":["Epilogue"],"display-hero":["Epilogue"],"body-sm":["Plus Jakarta Sans"]},"fontSize":{"headline-lg":["32px",{"lineHeight":"38px","fontWeight":"700"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"price-md":["18px",{"lineHeight":"22px","fontWeight":"700"}],"label-md":["14px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"600"}],"headline-md":["22px",{"lineHeight":"28px","fontWeight":"700"}],"body-md":["15px",{"lineHeight":"22px","fontWeight":"400"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"700"}],"price-lg":["24px",{"lineHeight":"28px","fontWeight":"800"}],"display-hero-mobile":["34px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"800"}],"display-hero":["48px",{"lineHeight":"54px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}]}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><div class=""><header class="fixed top-0 right-0 h-16 bg-surface/85 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)] flex items-center justify-between px-gutter-desktop"><div class="flex items-center gap-4"><div class="flex items-center gap-3"><img alt="Brand logo" class="h-9 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XSOlPp1VlMoCbtsebjXse13pQ39ixiBk7PquTWzOskoSuXeHFMAzA1Y_lIZJhBkZQA5h47Laf8MvT56HJnKjG1LJVPyaDYnMMNJnqkl17OI7MdZ3ExeafQXrrQ3JV6Tc7EifRg05yffMZ3Tx-9osPNKSzTpPHmmt7B2jWdWRKZEngrOwylRYkFgh1TTe6xsIuSjoar4-ANujrUb_N-uLD922g_AB3kMzI-L0GJVD_mb3vzHbOXKU20BmE"><div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">La Tapatía</span><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-[11px] font-bold uppercase tracking-wider">Business Intelligence</span></div><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Panel Ejecutivo de Analítica &amp; Cartografía</span></div></div><div class="h-6 w-[1px] bg-surface-container-highest hidden md:block"></div><div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface"><span class="material-symbols-outlined text-primary text-[18px]">storefront</span><div class="flex flex-col"><span class="font-label-md text-label-md font-bold leading-tight">Sucursal Morelia (Matriz)</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Av. San Juanito Itzícuaro 171</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px] ml-1">expand_more</span></div></div><div class="flex items-center gap-3"><div class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-mustard-light text-secondary font-label-sm text-label-sm font-bold"><span class="h-2 w-2 rounded-full bg-whatsapp-green animate-pulse"></span><span class="">Datos en Tiempo Real</span></div><button class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md shadow-sm" type="button"><span class="material-symbols-outlined text-[18px]">ios_share</span><span class="">Exportar Reportes</span></button><button class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><div class="h-6 w-[1px] bg-surface-container-highest"></div><div class="flex items-center gap-3 pl-1"><div class="text-right hidden sm:block"><div class="font-label-md text-label-md text-on-surface leading-tight font-bold">Carlos Mendoza</div><div class="font-label-sm text-label-sm text-on-surface-variant leading-none">Dirección General &amp; Operaciones</div></div><div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-md shadow-sm">CM</div></div></div></header><main class="relative pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="flex flex-col gap-8 px-gutter-desktop py-8 max-w-[1440px] mx-auto w-full">
+<!-- Header & Controls -->
+<header class="flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+<div class="flex flex-col gap-2 max-w-3xl">
+<div class="flex items-center gap-2 text-primary font-label-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-[18px]">satellite_alt</span>
+<span class="">Cartografía Operativa • Inteligencia Gastronómica</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Analítica Geoespacial, Mapa de Calor y Top Clientes
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Inteligencia de demanda en Morelia basada en coordenadas de Google Maps, pedidos por colonia y hábitos de consumo recurrente.
+        </p>
+</div>
+<!-- Action Bar -->
+<div class="flex flex-wrap items-center gap-3">
+<!-- Date Selector -->
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">calendar_today</span>
+<select class="bg-transparent font-label-md text-label-md text-on-surface focus:outline-none cursor-pointer" id="dateFilter">
+<option selected="" value="30d">Últimos 30 días</option>
+<option value="week">Esta semana</option>
+<option value="today">Hoy en vivo</option>
+<option value="custom">Rango Personalizado</option>
+</select>
+</div>
+<!-- Channel Filter -->
+<div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">tune</span>
+<select class="bg-transparent font-label-md text-label-md text-on-surface focus:outline-none cursor-pointer" id="channelFilter">
+<option selected="" value="all">Todos los canales</option>
+<option value="wa">WhatsApp Bot (+52)</option>
+<option value="web">Portal Web Google Auth</option>
+<option value="pos">Mostrador / Telefónico</option>
+</select>
+</div>
+<!-- Export Button -->
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary rounded-lg font-headline-sm text-label-md hover:bg-primary transition-all active:scale-[0.98] shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="">Exportar Geoespacial (CSV/KML)</span>
+</button>
+</div>
+</header>
+<!-- SECTION 1: Key Geo KPIs -->
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+<!-- KPI 1 -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(50,20,10,0.05)] relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-primary/5 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Pedidos Georreferenciados</span>
+<div class="w-8 h-8 rounded-lg bg-mustard-light flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">pin_drop</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface">1,248</span>
+<div class="flex items-center gap-2 flex-wrap">
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+<span class="">+18.4%</span>
+</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">94.2% con Google Maps pin</span>
+</div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(50,20,10,0.05)] relative overflow-hidden">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Radio Promedio Entrega</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface">3.4</span>
+<span class="font-headline-md text-headline-md text-primary">km</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">timer</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tiempo promedio: <strong class="text-on-surface">22 min</strong></span>
+</div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(50,20,10,0.05)] relative overflow-hidden">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Ticket Promedio Zona Top</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-1">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface">$285</span>
+<span class="font-label-md text-label-md text-on-surface-variant">MXN</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="h-2 w-2 rounded-full bg-primary"></span>
+<span class="font-body-sm text-body-sm truncate">Chapultepec Sur &amp; Arboledas</span>
+</div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="flex flex-col justify-between p-5 rounded-xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(50,20,10,0.05)] relative overflow-hidden">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm uppercase text-on-surface-variant tracking-wider">Tasa Recurrentes (LTV)</span>
+<div class="w-8 h-8 rounded-lg bg-mustard-light flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">loyalty</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface">62.8%</span>
+<div class="flex items-center gap-1.5 text-tertiary">
+<span class="material-symbols-outlined text-[16px]">repeat</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">&gt; 2 compras al mes</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: Interactive Heatmap Central Canvas -->
+<section class="flex flex-col gap-4 bg-surface-container-lowest p-6 rounded-2xl shadow-[0_8px_30px_rgba(50,20,10,0.06)]">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Mapa Térmico Cartográfico • Morelia</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm font-bold animate-pulse">Enlace Satelital Activo</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Densidad georreferenciada de entregas a domicilio y concentración de pedidos ahogados.</p>
+</div>
+<!-- Layer Toggles -->
+<div class="flex flex-wrap items-center gap-2 bg-surface-container p-1 rounded-xl">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm shadow-sm transition-all" id="btnToggleHeatmap" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">local_fire_department</span>
+<span class="">Capa de Calor</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-sm transition-all" id="btnToggleVip" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">stars</span>
+<span class="">Pines VIP</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-sm transition-all" id="btnTogglePolygons" type="button">
+<span class="material-symbols-outlined text-[16px] text-tertiary">polyline</span>
+<span class="">Tarifas Envío</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-sm transition-all" id="btnToggleRadius" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">trip_origin</span>
+<span class="">Radio 5km</span>
+</button>
+</div>
+</div>
+<!-- Map Viewport -->
+<div class="relative w-full h-[540px] rounded-xl overflow-hidden bg-surface-container-high shadow-inner">
+<!-- Static Map Component -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-location="Morelia, Michoacan, Mexico"></div>
+<!-- Map Gradient Overlays & Dynamic Heatmap Visual Simulation -->
+<div class="absolute inset-0 pointer-events-none transition-opacity duration-300" id="heatmapOverlay">
+<!-- Radial Heatspot 1: Matriz & San Juanito Itzícuaro (High Density) -->
+<div class="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-gradient-to-r from-primary/60 via-secondary-container/40 to-transparent blur-2xl"></div>
+<!-- Radial Heatspot 2: Chapultepec Sur / Camelinas -->
+<div class="absolute left-[62%] top-[54%] -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full bg-gradient-to-r from-primary-container/50 via-mustard-light/35 to-transparent blur-2xl"></div>
+<!-- Radial Heatspot 3: Centro Histórico -->
+<div class="absolute left-[51%] top-[38%] -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-gradient-to-r from-secondary-container/50 via-primary/30 to-transparent blur-2xl"></div>
+<!-- Radial Heatspot 4: Altozano -->
+<div class="absolute left-[68%] top-[78%] -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-mustard-light/50 via-tertiary-fixed-dim/20 to-transparent blur-xl"></div>
+<!-- Radial Heatspot 5: Manantiales -->
+<div class="absolute left-[24%] top-[34%] -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full bg-gradient-to-r from-secondary-container/40 via-tertiary-fixed/25 to-transparent blur-xl"></div>
+<!-- Coverage 5km dashed perimeter circle from matriz -->
+<div class="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full border-2 border-dashed border-primary/40 pointer-events-none flex items-center justify-center" id="radiusCircle">
+<span class="bg-surface-container-lowest/90 px-2 py-0.5 rounded text-[10px] font-bold text-primary shadow">Perímetro 5.0 km Base</span>
+</div>
+</div>
+<!-- Matriz Floating Pin -->
+<div class="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-full z-20 flex flex-col items-center group cursor-pointer">
+<div class="bg-primary text-on-primary px-3 py-1.5 rounded-lg shadow-xl font-label-md flex items-center gap-1.5 whitespace-nowrap animate-bounce">
+<span class="material-symbols-outlined text-[16px]">restaurant</span>
+<span class="">Matriz: San Juanito Itzícuaro 171</span>
+</div>
+<div class="w-3 h-3 bg-primary rotate-45 -mt-1.5"></div>
+<div class="w-3 h-3 rounded-full bg-primary/40 -mt-1 blur-[1px]"></div>
+</div>
+<!-- Hotspot interactive badges on map -->
+<!-- Hotspot 1 -->
+<div class="absolute left-[33%] top-[56%] z-10 bg-surface-container-lowest/95 backdrop-blur-md px-3 py-1 rounded-lg shadow-md flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-ping"></span>
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] text-on-surface font-bold">Arboledas / Itzícuaro</span>
+<span class="text-[10px] text-on-surface-variant">420 pedidos (33.6%)</span>
+</div>
+</div>
+<!-- Hotspot 2 -->
+<div class="absolute left-[64%] top-[46%] z-10 bg-surface-container-lowest/95 backdrop-blur-md px-3 py-1 rounded-lg shadow-md flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] text-on-surface font-bold">Chapultepec • Camelinas</span>
+<span class="text-[10px] text-on-surface-variant">315 pedidos (25.2%)</span>
+</div>
+</div>
+<!-- Hotspot 3 -->
+<div class="absolute left-[48%] top-[30%] z-10 bg-surface-container-lowest/95 backdrop-blur-md px-3 py-1 rounded-lg shadow-md flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] text-on-surface font-bold">Centro Histórico</span>
+<span class="text-[10px] text-on-surface-variant">210 pedidos (16.8%)</span>
+</div>
+</div>
+<!-- Hotspot 4 -->
+<div class="absolute left-[70%] top-[70%] z-10 bg-surface-container-lowest/95 backdrop-blur-md px-3 py-1 rounded-lg shadow-md flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed-dim"></span>
+<div class="flex flex-col">
+<span class="font-label-sm text-[11px] text-on-surface font-bold">Altozano / Santa María</span>
+<span class="text-[10px] text-on-surface-variant">145 pedidos (11.6%)</span>
+</div>
+</div>
+<!-- Map Controls GUI -->
+<div class="absolute right-4 top-4 z-20 flex flex-col gap-1.5 bg-surface-container-lowest/90 backdrop-blur-md p-1 rounded-lg shadow">
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded text-on-surface"><span class="material-symbols-outlined text-[18px]">add</span></button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded text-on-surface"><span class="material-symbols-outlined text-[18px]">remove</span></button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded text-on-surface"><span class="material-symbols-outlined text-[18px]">my_location</span></button>
+</div>
+<!-- Density Legend -->
+<div class="absolute left-4 bottom-4 z-20 bg-surface-container-lowest/95 backdrop-blur-md p-3.5 rounded-xl shadow-lg max-w-xs">
+<span class="font-label-sm uppercase text-on-surface-variant tracking-wider block mb-2 font-bold">Escala Térmica de Demanda</span>
+<div class="h-2.5 w-full rounded-full bg-gradient-to-r from-tertiary-fixed via-mustard-light via-secondary-container to-primary mb-2"></div>
+<div class="flex justify-between text-[11px] font-label-sm text-on-surface-variant">
+<span class="">Baja (&lt;10)</span>
+<span class="">Media (10-40)</span>
+<span class="">Alta (40-100)</span>
+<span class="text-primary font-bold">Crítica (&gt;100)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: Two Columns Layout (Top Colonias vs Top VIP Customers) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- LEFT COLUMN: Colonias Ranking (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">apartment</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Zonas de Mayor Densidad en Morelia</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Volumen de ventas, facturación bruta y tiempos logísticos.</p>
+</div>
+</div>
+<span class="font-label-sm text-primary font-bold">5 de 42 Colonias</span>
+</div>
+<!-- Ranking List Items -->
+<div class="flex flex-col gap-3">
+<!-- Item 1 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary font-bold text-[12px] flex items-center justify-center">1</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Arboledas de Valladolid &amp; Itzícuaro</span>
+<span class="px-2 py-0.5 rounded-full bg-mustard-light text-secondary font-label-sm font-bold">Matriz</span>
+</div>
+<span class="font-price-md text-price-md text-primary">$117,600 MXN</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-primary h-full rounded-full" style="width: 100%;"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">shopping_bag</span>
+<span class=""><strong>420</strong> órdenes</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">route</span>
+<span class="">Prom: <strong>1.2 km</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span class="">Prom: <strong>14 min</strong></span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[12px] flex items-center justify-center">2</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Chapultepec Sur / Camelinas</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm font-bold">+24% vs mes ant.</span>
+</div>
+<span class="font-price-md text-price-md text-primary">$91,350 MXN</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-secondary-container h-full rounded-full" style="width: 75%;"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">shopping_bag</span>
+<span class=""><strong>315</strong> órdenes</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">route</span>
+<span class="">Prom: <strong>4.8 km</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span class="">Prom: <strong>26 min</strong></span>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[12px] flex items-center justify-center">3</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Centro Histórico</span>
+</div>
+<span class="font-price-md text-price-md text-on-surface">$58,800 MXN</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-secondary-container h-full rounded-full" style="width: 50%;"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">shopping_bag</span>
+<span class=""><strong>210</strong> órdenes</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">route</span>
+<span class="">Prom: <strong>3.9 km</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span class="">Prom: <strong>22 min</strong></span>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[12px] flex items-center justify-center">4</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Manantiales</span>
+</div>
+<span class="font-price-md text-price-md text-on-surface">$42,660 MXN</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-secondary h-full rounded-full" style="width: 37%;"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">shopping_bag</span>
+<span class=""><strong>158</strong> órdenes</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">route</span>
+<span class="">Prom: <strong>2.7 km</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span class="">Prom: <strong>18 min</strong></span>
+</div>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface font-bold text-[12px] flex items-center justify-center">5</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Altozano (Zona Alta)</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm font-bold">Mayor Ticket Prom: $315</span>
+</div>
+<span class="font-price-md text-price-md text-primary">$45,675 MXN</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-tertiary h-full rounded-full" style="width: 34%;"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">shopping_bag</span>
+<span class=""><strong>145</strong> órdenes</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">route</span>
+<span class="">Prom: <strong>7.2 km</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span class="">Prom: <strong>33 min</strong></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Strategic Alert / Insight Box -->
+<div class="p-4 rounded-xl bg-crema-surface flex items-start gap-3.5 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[24px] mt-0.5">lightbulb</span>
+<div class="flex flex-col gap-1">
+<span class="font-headline-sm text-label-md text-secondary font-bold">Oportunidad de Expansión Logística</span>
+<p class="font-body-sm text-body-sm text-on-surface">
+              Sugerencia: Abrir punto de reparto rápido (Dark Kitchen o enlace de motos) en zona <strong>Camelinas/Chapultepec</strong> para reducir <strong>9 minutos</strong> de entrega y capturar $34,000 MXN adicionales mensuales.
+            </p>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Top Clientes & Fidelidad (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Top Clientes • Fidelidad LTV</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Comensales de alta recurrencia identificados.</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[20px]">stars</span>
+</div>
+<div class="flex flex-col gap-3.5">
+<!-- Client #1: Platino -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(50,20,10,0.06)] relative flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-sm font-bold shadow">
+                  CV
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface">Carlos Villaseñor</span>
+<span class="text-secondary text-[14px]">🏆</span>
+</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant">carlos.villa@gmail.com</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-mustard-light text-secondary font-label-sm font-bold">Platino</span>
+</div>
+<div class="grid grid-cols-3 gap-2 bg-surface-container-low p-2.5 rounded-lg text-center">
+<div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase block">Pedidos</span>
+<span class="font-headline-sm text-headline-sm text-primary">16</span>
+</div>
+<div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase block">Gasto Total</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">$4,480</span>
+</div>
+<div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase block">Ticket Prom</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">$280</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 text-[13px] text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">restaurant_menu</span>
+<span class="">Favorito: <strong>Torta Especial (Carnitas + Buche)</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="truncate">Itzícuaro 171 (a 1.8 km de Matriz)</span>
+</div>
+</div>
+<a class="w-full mt-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-whatsapp-green text-surface-container-lowest font-headline-sm text-label-md hover:opacity-95 transition-all shadow-sm" href="https://wa.me/524432057711" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span class="">Enviar Cupón Cortesía WhatsApp</span>
+</a>
+</div>
+<!-- Client #2: Oro -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] flex flex-col gap-2.5">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-sm font-bold">
+                  MR
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-label-md text-on-surface font-bold">Mariana Rangel</span>
+<span class="">🥈</span>
+</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant">mariana.rangel@gmail.com</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm font-bold">Oro</span>
+</div>
+<div class="flex items-center justify-between text-[13px] px-1 text-on-surface-variant">
+<span class=""><strong>12 pedidos</strong> este mes</span>
+<span class="">Gasto: <strong class="text-primary">$2,820 MXN</strong></span>
+<span class="">Ticket: $235 MXN</span>
+</div>
+<div class="text-[12px] text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-primary">favorite</span>
+<span class="">Torta combinada (bien ahogada) + Jericalla</span>
+</div>
+</div>
+<!-- Client #3: Oro -->
+<div class="p-4 rounded-xl bg-surface-container-lowest shadow-[0_2px_12px_rgba(50,20,10,0.04)] flex flex-col gap-2.5">
+<div class="flex items-start justify-between gap-2">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center font-headline-sm font-bold">
+                  AP
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-label-md text-on-surface font-bold">Alejandro Ponce</span>
+<span class="">🥉</span>
+</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant">ponce.alejandro@gmail.com</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm font-bold">Oro</span>
+</div>
+<div class="flex items-center justify-between text-[13px] px-1 text-on-surface-variant">
+<span class=""><strong>10 pedidos</strong></span>
+<span class="">Gasto: <strong class="text-primary">$2,250 MXN</strong></span>
+<span class="">Ticket: $225 MXN</span>
+</div>
+<div class="text-[12px] text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px]">pin_drop</span>
+<span class="">Blvd. García de León • Torta lomo + Refresco</span>
+</div>
+</div>
+<!-- Client #4 & #5 Compact Rollup -->
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 rounded-lg bg-surface-container-low flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-[13px] font-bold text-on-surface truncate">#4 Sofía Mendoza</span>
+<span class="text-[11px] text-secondary font-bold">8 ped.</span>
+</div>
+<span class="text-[12px] text-on-surface-variant">$1,720 MXN • Mostrador &amp; Domicilio</span>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-low flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-[13px] font-bold text-on-surface truncate">#5 Roberto Solís</span>
+<span class="text-[11px] text-secondary font-bold">7 ped.</span>
+</div>
+<span class="text-[12px] text-on-surface-variant">$1,490 MXN • Fan tacos dorados</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: Predictive Metrics & Hourly Consumption Patterns -->
+<section class="grid grid-cols-1 xl:grid-cols-12 gap-8 pb-10">
+<!-- Peak Hours Heatmap Chart (7 cols) -->
+<div class="xl:col-span-7 p-6 rounded-2xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(50,20,10,0.05)] flex flex-col justify-between gap-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Matriz Horaria de Demanda en Morelia</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Picos de concentración para asignación proactiva de repartidores.</p>
+</div>
+<span class="px-2.5 py-1 rounded bg-mustard-light text-secondary font-label-sm font-bold self-start">Pico Crítico: 13:00 - 16:30 hrs</span>
+</div>
+<!-- Inline SVG Hourly Heatmap / Demand Frequency Curve -->
+<div class="w-full flex flex-col gap-2">
+<svg class="w-full h-44 text-primary" fill="none" preserveAspectRatio="none" viewBox="0 0 600 160">
+<defs>
+<linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#b91c1c" stop-opacity="0.35"></stop>
+<stop offset="100%" stop-color="#b91c1c" stop-opacity="0.0"></stop>
+</linearGradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#e4e1e6" stroke-dasharray="4 4" x1="0" x2="600" y1="40" y2="40"></line>
+<line stroke="#e4e1e6" stroke-dasharray="4 4" x1="0" x2="600" y1="80" y2="80"></line>
+<line stroke="#e4e1e6" stroke-dasharray="4 4" x1="0" x2="600" y1="120" y2="120"></line>
+<!-- Smooth Filled Area -->
+<path d="M0,150 L30,145 L70,135 L120,110 L170,90 L220,45 L270,15 L320,10 L370,30 L420,70 L480,115 L540,140 L600,150 L600,160 L0,160 Z" fill="url(#chartGradient)"></path>
+<!-- Smooth Main Line -->
+<path d="M0,150 L30,145 L70,135 L120,110 L170,90 L220,45 L270,15 L320,10 L370,30 L420,70 L480,115 L540,140 L600,150" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5"></path>
+<!-- Peak Hotspot Marker at 14:30 hrs -->
+<circle cx="320" cy="10" fill="#93000b" r="5"></circle>
+<circle cx="320" cy="10" opacity="0.4" r="10" stroke="#93000b" stroke-width="2"></circle>
+</svg>
+<!-- Timeline Labels -->
+<div class="flex justify-between text-on-surface-variant font-label-sm text-[11px] pt-1">
+<span class="">09:00</span>
+<span class="">11:00</span>
+<span class="">12:30</span>
+<span class="text-primary font-bold">14:00 (Pico Máx)</span>
+<span class="">15:30</span>
+<span class="">17:00</span>
+<span class="">18:30 Cierre</span>
+</div>
+</div>
+<div class="flex items-center gap-4 text-[13px] text-on-surface-variant pt-2">
+<div class="flex items-center gap-1.5">
+<span class="h-2.5 w-2.5 rounded-full bg-primary"></span>
+<span class="">Fin de semana (+64% volumen)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="h-2.5 w-2.5 rounded-full bg-secondary"></span>
+<span class="">Viernes godín / corporativo</span>
+</div>
+</div>
+</div>
+<!-- Distance vs Cost Delivery Optimization (5 cols) -->
+<div class="xl:col-span-5 p-6 rounded-2xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(50,20,10,0.05)] flex flex-col justify-between gap-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Calibración de Tarifas por Radio</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Equilibrio entre costo de gasolina/tiempo y conversión de pedidos.</p>
+</div>
+<!-- Tariff matrix tier blocks -->
+<div class="flex flex-col gap-2.5">
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-[12px]">Z1</span>
+<div>
+<span class="font-label-md text-on-surface block">Radio 0 a 2.5 km</span>
+<span class="text-[12px] text-on-surface-variant">Itzícuaro, Arboledas, Manantiales</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-price-md text-price-md text-tertiary">$25 MXN</span>
+<span class="text-[11px] text-tertiary font-bold block">Óptimo (12 min)</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-mustard-light text-secondary flex items-center justify-center font-bold text-[12px]">Z2</span>
+<div>
+<span class="font-label-md text-on-surface block">Radio 2.5 a 5.0 km</span>
+<span class="text-[12px] text-on-surface-variant">Centro Histórico, Ventura Puente</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-price-md text-price-md text-on-surface">$40 MXN</span>
+<span class="text-[11px] text-on-surface-variant block">Estable (22 min)</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-[12px]">Z3</span>
+<div>
+<span class="font-label-md text-on-surface block">Radio 5.0 a 8.5 km</span>
+<span class="text-[12px] text-on-surface-variant">Altozano, Chapultepec Sur, Tres Marías</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-price-md text-price-md text-primary">$65 MXN</span>
+<span class="text-[11px] text-primary font-bold block">Tarifa Dinámica</span>
+</div>
+</div>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between text-[12px] text-on-surface-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span class="">Margen logístico cubierto: 98.4%</span>
+</span>
+<button class="font-label-sm text-primary font-bold hover:underline">Reconfigurar Radios</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<script>
+  // Simple interactive layer toggle controls for geospatial presentation
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnToggleHeatmap = document.getElementById('btnToggleHeatmap');
+    const heatmapOverlay = document.getElementById('heatmapOverlay');
+    const btnToggleRadius = document.getElementById('btnToggleRadius');
+    const radiusCircle = document.getElementById('radiusCircle');
+
+    let heatmapVisible = true;
+    let radiusVisible = true;
+
+    if (btnToggleHeatmap && heatmapOverlay) {
+      btnToggleHeatmap.addEventListener('click', () => {
+        heatmapVisible = !heatmapVisible;
+        heatmapOverlay.style.opacity = heatmapVisible ? '1' : '0';
+        btnToggleHeatmap.classList.toggle('bg-surface-container-lowest', heatmapVisible);
+        btnToggleHeatmap.classList.toggle('shadow-sm', heatmapVisible);
+      });
+    }
+
+    if (btnToggleRadius && radiusCircle) {
+      btnToggleRadius.addEventListener('click', () => {
+        radiusVisible = !radiusVisible;
+        radiusCircle.style.display = radiusVisible ? 'flex' : 'none';
+        btnToggleRadius.classList.toggle('bg-surface-container-lowest', radiusVisible);
+        btnToggleRadius.classList.toggle('shadow-sm', radiusVisible);
+      });
+    }
+  });
+</script></main></div>
+
+</body></html>

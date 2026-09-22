@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-fixed": "#410002", "surface-bright": "#fbf8fc", "surface-tint": "#b91c1c", "primary-container": "#b91c1c", "inverse-on-surface": "#f3f0f4", "mustard-light": "#FEF3C7", "secondary-container": "#fe932c", "on-tertiary-fixed-variant": "#005323", "on-background": "#1b1b1e", "secondary-fixed": "#ffdcc3", "primary-fixed": "#ffdad6", "tertiary-fixed-dim": "#79db8d", "on-tertiary-container": "#8bed9d", "tertiary-fixed": "#95f8a7", "on-secondary": "#ffffff", "surface": "#fbf8fc", "crema-bg": "#FDFBF7", "secondary-fixed-dim": "#ffb77d", "on-primary": "#ffffff", "on-secondary-fixed": "#2f1500", "on-surface": "#1b1b1e", "outline-variant": "#e4beb9", "whatsapp-green": "#25D366", "surface-variant": "#e4e1e6", "error": "#ba1a1a", "surface-dim": "#dcd9dd", "on-surface-variant": "#5b403d", "tertiary-container": "#006d30", "secondary": "#904d00", "crema-surface": "#F7F3EA", "surface-container-low": "#f6f2f7", "chile-dark": "#7F1D1D", "outline": "#8f6f6c", "tertiary": "#005223", "surface-container": "#f0edf1", "surface-container-high": "#eae7eb", "on-secondary-container": "#663500", "inverse-primary": "#ffb4ab", "primary": "#93000b", "error-container": "#ffdad6", "inverse-surface": "#303033", "primary-fixed-dim": "#ffb4ab", "on-error": "#ffffff", "on-primary-container": "#ffcdc7", "surface-container-highest": "#e4e1e6", "on-secondary-fixed-variant": "#6e3900", "background": "#fbf8fc", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#93000b", "on-tertiary-fixed": "#00210a", "surface-container-lowest": "#ffffff", "on-error-container": "#93000a" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-xl": "2.5rem", "gutter-desktop": "1.5rem", "gutter": "1rem", "margin": "1rem", "margin-desktop": "2.5rem" }, "fontFamily": { "headline-lg": [ "Epilogue" ], "price-md": [ "Epilogue" ], "body-sm": [ "Plus Jakarta Sans" ], "label-md": [ "Plus Jakarta Sans" ], "display-hero-mobile": [ "Epilogue" ], "label-sm": [ "Plus Jakarta Sans" ], "headline-lg-mobile": [ "Epilogue" ], "body-md": [ "Plus Jakarta Sans" ], "body-lg": [ "Plus Jakarta Sans" ], "headline-md": [ "Epilogue" ], "headline-sm": [ "Epilogue" ], "display-hero": [ "Epilogue" ], "price-lg": [ "Epilogue" ] }, "fontSize": { "headline-lg": [ "32px", { "lineHeight": "38px", "fontWeight": "700" } ], "price-md": [ "18px", { "lineHeight": "22px", "fontWeight": "700" } ], "body-sm": [ "13px", { "lineHeight": "18px", "fontWeight": "400" } ], "label-md": [ "14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" } ], "display-hero-mobile": [ "34px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800" } ], "label-sm": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" } ], "headline-lg-mobile": [ "26px", { "lineHeight": "32px", "fontWeight": "700" } ], "body-md": [ "15px", { "lineHeight": "22px", "fontWeight": "400" } ], "body-lg": [ "18px", { "lineHeight": "28px", "fontWeight": "400" } ], "headline-md": [ "22px", { "lineHeight": "28px", "fontWeight": "700" } ], "headline-sm": [ "18px", { "lineHeight": "24px", "fontWeight": "600" } ], "display-hero": [ "48px", { "lineHeight": "54px", "letterSpacing": "-0.02em", "fontWeight": "800" } ], "price-lg": [ "24px", { "lineHeight": "28px", "fontWeight": "800" } ] } } } }</script></head><body class="bg-crema-bg font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(50,20,10,0.06)] z-50 flex items-center justify-between px-6"><div class="flex items-center gap-4"><img alt="Brand logo. - Primary color: #b91c1c
+- Font: epilogue
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XSOlPp1VlMoCbtsebjXse13pQ39ixiBk7PquTWzOskoSuXeHFMAzA1Y_lIZJhBkZQA5h47Laf8MvT56HJnKjG1LJVPyaDYnMMNJnqkl17OI7MdZ3ExeafQXrrQ3JV6Tc7EifRg05yffMZ3Tx-9osPNKSzTpPHmmt7B2jWdWRKZEngrOwylRYkFgh1TTe6xsIuSjoar4-ANujrUb_N-uLD922g_AB3kMzI-L0GJVD_mb3vzHbOXKU20BmE"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary leading-none">La Tapatía Ahogadas</span><span class="font-label-sm text-label-sm text-on-surface-variant">Gestor de Catálogo &amp; Precios</span></div><div class="h-6 w-px bg-surface-container-high mx-2"></div><div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg"><span class="material-symbols-outlined text-primary text-[18px]">storefront</span><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface font-bold leading-none">Sucursal Morelia</span><span class="text-[10px] text-on-surface-variant leading-tight">Av. San Juanito Itzicuaro</span></div><span class="material-symbols-outlined text-on-surface-variant text-[16px]">expand_more</span></div></div><div class="flex items-center gap-4"><div class="flex items-center gap-2 bg-crema-surface px-3 py-1.5 rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.03)]"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed-dim opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span></span><span class="font-label-sm text-label-sm text-tertiary font-bold">En Vivo con Menú Público</span></div><a class="flex items-center gap-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface px-3 py-1.5 rounded-lg transition-colors font-label-md text-label-md" href="#"><span class="material-symbols-outlined text-[18px]">visibility</span><span>Ver Tienda</span></a><div class="flex items-center gap-3 pl-2"><div class="flex flex-col text-right"><span class="font-label-md text-label-md text-on-surface leading-tight">Carlos Mendoza</span><span class="font-label-sm text-label-sm text-on-surface-variant">Administrador Restaurante</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-crema-surface/95 backdrop-blur-md shadow-[0_1px_8px_rgba(50,20,10,0.04)] z-40 flex flex-col justify-between py-6 px-4"><div class="space-y-6"><div class="px-3"><p class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Operación Menú</p></div><nav class="space-y-1.5" data-active-classes="bg-primary-container text-on-primary font-bold shadow-[0_4px_12px_rgba(185,28,28,0.2)]"><a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md" data-path="catalogo-precios" href="#"><span class="material-symbols-outlined text-[20px]">menu_book</span><span>Catálogo &amp; Precios</span></a><a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md" data-path="fotografias-medios" href="#"><span class="material-symbols-outlined text-[20px]">photo_library</span><span>Fotografías &amp; Medios</span></a><a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md" data-path="disponibilidad-agotados" href="#"><span class="material-symbols-outlined text-[20px]">toggle_on</span><span>Disponibilidad / Agotados</span></a><a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md" data-path="configuracion-whatsapp" href="#"><span class="material-symbols-outlined text-[20px]">chat</span><span>Configuración WhatsApp</span></a></nav></div><div class="space-y-4 px-2"><div class="p-3.5 bg-mustard-light rounded-xl"><div class="flex items-center gap-2 mb-1.5"><span class="material-symbols-outlined text-secondary text-[20px]">notifications_active</span><span class="font-label-sm text-label-sm text-secondary font-bold">Revisión de Precios</span></div><p class="font-body-sm text-body-sm text-on-secondary-container leading-snug">Hay 2 artículos con precio sugerido pendiente de validación.</p></div><div class="pt-2"><div class="flex items-center gap-2 px-2 text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">schedule</span><span class="font-label-sm text-label-sm">Horario: Mar - Dom 9:00 - 17:00</span></div></div></div></aside><div class="pl-64"><main class="relative w-full pt-16 bg-crema-bg min-h-screen px-8 py-8"><div class="flex flex-col w-full">
+<!-- Toast Notification Dynamic Feedback -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 bg-inverse-surface text-inverse-on-surface px-5 py-3.5 rounded-xl shadow-2xl" id="toastNotification">
+<span class="material-symbols-outlined text-whatsapp-green text-[22px]">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md leading-tight" id="toastMessage">Cambios guardados con éxito</span>
+<span class="font-body-sm text-body-sm text-surface-variant/80">Sincronizado con WhatsApp y Menú Web</span>
+</div>
+</div>
+<!-- Header Context & Quick Actions -->
+<div class="flex flex-col gap-6 mb-8">
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+<div class="flex flex-col space-y-1">
+<div class="flex items-center gap-2.5">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Gestión de Catálogo, Precios y Fotografías</h1>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm uppercase font-bold">En Edición</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span>Sucursal Morelia (Av. San Juanito Itzicuaro 171)</span>
+<span class="text-outline/40">•</span>
+<span class="text-outline">Los cambios aprobados se reflejan inmediatamente en la carta pública de WhatsApp y web</span>
+</p>
+</div>
+<div class="flex items-center gap-3 self-start lg:self-auto">
+<a class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md shadow-sm transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">store</span>
+<span>Ver Tienda en Vivo</span>
+</a>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md shadow-md hover:shadow-lg active:scale-95 transition-all duration-150" id="btnSaveAll" onclick="triggerBatchSave()">
+<span class="material-symbols-outlined text-[20px]">save</span>
+<span>Guardar Cambios</span>
+</button>
+</div>
+</div>
+<!-- Status Metric Strip -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">restaurant_menu</span>
+</div>
+<div class="flex flex-col">
+<span class="font-price-lg text-price-lg text-on-surface leading-tight">16</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Platillos registrados</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-mustard-light flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">price_change</span>
+</div>
+<div class="flex flex-col">
+<span class="font-price-lg text-price-lg text-secondary leading-tight">4</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Precios pendientes</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-secondary-container">
+<span class="material-symbols-outlined text-[24px]">add_a_photo</span>
+</div>
+<div class="flex flex-col">
+<span class="font-price-lg text-price-lg text-on-surface leading-tight">2</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fotos por actualizar HD</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[24px]">sync</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight">14:32 hrs</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">Última sincronización</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Validation Alert Banner -->
+<div class="mb-6 p-4 rounded-xl bg-mustard-light shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<span class="material-symbols-outlined text-secondary text-[24px] mt-0.5">warning</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-secondary-container font-bold">Validación de precios requerida</span>
+<p class="font-body-sm text-body-sm text-on-secondary-container/90 mt-0.5">
+          El catálogo actual tiene precios sugeridos base. Confirma o ajusta los montos en MXN para retirar el badge provisional de <span class="font-bold bg-white/70 px-1.5 py-0.5 rounded text-[11px] text-chile-dark uppercase">PRECIO REQUIERE VALIDACIÓN</span> de la página de clientes y el bot de WhatsApp.
+        </p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+<button class="px-3.5 py-2 rounded-lg bg-secondary text-on-secondary font-label-sm text-label-sm hover:opacity-90 transition-opacity" onclick="approveAllPending()">
+        Aprobar Todos los Sugeridos
+      </button>
+</div>
+</div>
+<!-- Search and Filtering Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+<!-- Category pills -->
+<div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
+<button class="category-pill active px-3.5 py-1.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-bold shadow-sm transition-all whitespace-nowrap" onclick="filterCategory('todos', this)">
+        Todos (16)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium transition-all whitespace-nowrap" onclick="filterCategory('tortas', this)">
+        Tortas (5)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium transition-all whitespace-nowrap" onclick="filterCategory('tacos', this)">
+        Tacos (3)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium transition-all whitespace-nowrap" onclick="filterCategory('tostadas', this)">
+        Tostadas (2)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium transition-all whitespace-nowrap" onclick="filterCategory('combo', this)">
+        Combo infantil (2)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium transition-all whitespace-nowrap" onclick="filterCategory('extras', this)">
+        Extras (2)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-medium transition-all whitespace-nowrap" onclick="filterCategory('postres', this)">
+        Postres (2)
+      </button>
+<button class="category-pill px-3.5 py-1.5 rounded-full bg-mustard-light text-secondary font-label-sm text-label-sm font-bold transition-all whitespace-nowrap flex items-center gap-1" onclick="filterCategory('alerta', this)">
+<span class="material-symbols-outlined text-[14px]">error</span>
+<span>Con alerta de precio (4)</span>
+</button>
+</div>
+<!-- Quick Search Input -->
+<div class="relative min-w-[260px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20" id="dishSearch" onkeyup="searchDishes()" placeholder="Buscar por platillo, ingrediente..." type="text"/>
+</div>
+</div>
+<!-- Workspace Grid: Products Table + Media Inspector Drawer -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- Left / Center: Interactive Product Table (xl:col-span-8) -->
+<div class="xl:col-span-8 flex flex-col gap-4">
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="productsTable">
+<thead>
+<tr class="bg-crema-surface text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3.5 px-4 font-bold">Platillo &amp; Imagen</th>
+<th class="py-3.5 px-3 font-bold">Categoría</th>
+<th class="py-3.5 px-3 font-bold w-36">Precio (MXN)</th>
+<th class="py-3.5 px-3 font-bold text-center">Validación</th>
+<th class="py-3.5 px-3 font-bold text-center">Disponibilidad</th>
+<th class="py-3.5 px-4 text-right font-bold">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low font-body-sm text-body-sm text-on-surface">
+<!-- Item 1: Torta Combinada -->
+<tr class="dish-row hover:bg-crema-surface/60 transition-colors" data-category="tortas" data-name="torta combinada">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3.5">
+<div class="relative group w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-inner cursor-pointer" onclick="selectDishForInspection('Torta combinada', 'Tortas', '65', '1200x896 px • Calidad Óptima', 'Birote salado tapatío con carnitas de cerdo combinadas, bañado en salsa clásica de jitomate sazonada con orégano y un toque de chile de árbol, servido en cazuela de barro tradicional.')">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="Traditional Mexican torta ahogada served in a rustic clay cazuela dish, filled with slow-cooked shredded pork carnitas, drenched in vibrant red chile de árbol and tomato salsa, garnished with pickled red onions and fresh oregano sprigs, high resolution gastronomy food photography with warm studio lighting and soft steam." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnK9VovtFJmbx5d5ySxG8sE9yiMz6WOjVHHJNMYGrOJ_8tp1dyBTBCtNqflRHXYhF1ts-nuHzrOXNFBQP6_I-kneOMXtKCyzfH1E1aiE7Q9lwRzWuuWOR12_m10kDwhrZqPTP4x9n1bycvlDnbBP2m0zDWLbHsJZTn6JZJnYWcP9t8NbPDCLiYEmXpphYAfhl1a8rRL1jldTlB6uvy73TR3FV2LrgWcb2Fjn2jRlJbFI2VuQwD_Kcv7g"/>
+<div class="absolute inset-0 bg-chile-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate">Torta combinada</span>
+<span class="text-[11px] text-tertiary font-medium flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                        1200x896 px • HD Óptima
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Tortas</span>
+</td>
+<td class="py-3 px-3">
+<div class="relative flex items-center">
+<span class="absolute left-2.5 text-on-surface font-bold text-[14px]">$</span>
+<input class="w-24 pl-6 pr-2 py-1.5 bg-surface-container-low font-headline-sm text-headline-sm text-on-surface rounded-md focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/30 outline-none text-right font-bold" onchange="markDirty(this)" type="number" value="65"/>
+</div>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[11px] font-bold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                    Oficial
+                  </span>
+</td>
+<td class="py-3 px-3 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="toggleAvailability(this, 'Torta combinada')" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" onclick="quickSaveRow(this, 'Torta combinada')" title="Guardar">
+<span class="material-symbols-outlined text-[20px]">save</span>
+</button>
+</td>
+</tr>
+<!-- Item 2: Tacos (3 piezas) -->
+<tr class="dish-row hover:bg-crema-surface/60 transition-colors" data-category="tacos" data-name="tacos dorados tres piezas">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3.5">
+<div class="relative group w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-inner cursor-pointer" onclick="selectDishForInspection('Tacos (3 piezas)', 'Tacos', '50', '800x600 px • Requiere HD', 'Tres tacos dorados crujientes rellenos de papa y carne, bañados en salsa suave de jitomate con col fresca picada y rodajas de rábano.')">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="Crispy Mexican golden tacos dorados topped with finely shredded cabbage, sliced radishes, cotija cheese, and fresh tomato broth on an artisan glazed ceramic plate, warm restaurant atmosphere with rustic wooden backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANyhK03Xdp8ZfibEiz2X3NP61QeG2FzUxM2nRCeUHrmiRPY6VGCELAD2Q79Rj2NEEuFKJpbDP7riP4aBjpb0xJKlPd4Vxn-1MkWiMX5jV2BBL-nwc909qcSOwWtKx3QlNlsvTFbc3-s9mbGdpkArijp1L2dyhEDGMGadEdESRwHjBMzoR923PhqMhZwoL9QWvROw9mQ_xBSjwtcd3qxjhvVbNXFFgY19CxJI03b77CfQ3gRinjjoFC-g"/>
+<div class="absolute inset-0 bg-chile-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate">Tacos (3 piezas)</span>
+<span class="text-[11px] text-secondary font-medium flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                        800x600 px • Subir HD
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Tacos</span>
+</td>
+<td class="py-3 px-3">
+<div class="relative flex items-center">
+<span class="absolute left-2.5 text-on-surface font-bold text-[14px]">$</span>
+<input class="w-24 pl-6 pr-2 py-1.5 bg-surface-container-low font-headline-sm text-headline-sm text-on-surface rounded-md focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/30 outline-none text-right font-bold" onchange="markDirty(this)" type="number" value="50"/>
+</div>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[11px] font-bold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                    Oficial
+                  </span>
+</td>
+<td class="py-3 px-3 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="toggleAvailability(this, 'Tacos 3 piezas')" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" onclick="quickSaveRow(this, 'Tacos 3 piezas')" title="Guardar">
+<span class="material-symbols-outlined text-[20px]">save</span>
+</button>
+</td>
+</tr>
+<!-- Item 3: Torta Especial (Alert pending validation) -->
+<tr class="dish-row bg-mustard-light/25 hover:bg-mustard-light/40 transition-colors" data-category="tortas alerta" data-name="torta especial">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3.5">
+<div class="relative group w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-inner cursor-pointer" onclick="selectDishForInspection('Torta especial', 'Tortas', '70', '1080x1080 px • Óptima', 'Birote salado relleno de doble porción de lomo y carnitas con queso gratinado, sumergida por completo en salsa extra picante.')">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="Close-up mouthwatering Mexican drowned sandwich torta ahogada with melted cheese and double carnitas filling, fiery red chili sauce cascading over the crusty birote bread, served in deep earthenware bowl." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIlevEoNUCTBQDoc74v8FmkQcMNC0ELLURmolOMtjvQumD0_oOqz90YygyyWSeRFMIHndygChPV8U951oVXlIRJYJXKpvEOGT1kVxBpQcynj3ndvnrPlORbwuMDj928zS13PAV79Bq8Mm1B3l2oOHHjvP7xYj5WJ6rqkAYPN-WDwrN9EeJiFsGjYvVt5sOVSxQJZrp_jIH5wkJeCAZPQEK3Vxw204ShckqCTV00Uc2I297I6rNAWtBLg"/>
+<div class="absolute inset-0 bg-chile-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate">Torta especial</span>
+<span class="text-[11px] text-error font-bold flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                        Requiere confirmación
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Tortas</span>
+</td>
+<td class="py-3 px-3">
+<div class="relative flex items-center">
+<span class="absolute left-2.5 text-on-surface font-bold text-[14px]">$</span>
+<input class="w-24 pl-6 pr-2 py-1.5 bg-mustard-light font-headline-sm text-headline-sm text-secondary rounded-md border border-secondary/30 focus:ring-2 focus:ring-secondary/40 outline-none text-right font-bold" onchange="markDirty(this)" type="number" value="70"/>
+</div>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold hover:bg-secondary hover:text-on-secondary transition-all" onclick="approveSinglePrice(this)">
+<span class="material-symbols-outlined text-[14px]">check</span>
+                    Validar
+                  </button>
+</td>
+<td class="py-3 px-3 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="toggleAvailability(this, 'Torta especial')" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" onclick="quickSaveRow(this, 'Torta especial')" title="Guardar">
+<span class="material-symbols-outlined text-[20px]">save</span>
+</button>
+</td>
+</tr>
+<!-- Item 4: Quecas de Jamón (Combo infantil - Pending) -->
+<tr class="dish-row bg-mustard-light/25 hover:bg-mustard-light/40 transition-colors" data-category="combo alerta" data-name="quecas de jamon">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3.5">
+<div class="relative group w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-inner cursor-pointer" onclick="selectDishForInspection('Quecas de jamón (2 piezas)', 'Combo infantil', '69', '1200x900 px • Óptima', 'Quesadillas en tortilla de maíz suave con queso asadero fundido y jamón de pavo artesanal, incluye agua fresca infantil.')">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="Two warm folded quesadillas with melted Mexican string cheese and ham filling, accompanied by a small side of fresh tomato sauce and a glass of fresh horchata, kid-friendly culinary presentation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3rlSgFzxPWaoWXdfaDXOXLeJ3AU3VL1sfOX5cwzl_l6K5svzAwytiZGiG25aZK6Ow73n9FDvWb7Bv6kitRBCVQQTFuohhVHfdu78q5pKIle1O9UysemBI66P7EE6XKx2ebG4k0fCGdknP7HzK9NFYtwfICMWViwnnyzSx45bDFnueRIiu885V6c4TjYDMYLgL0UUo6gdgHHea4pp91ezZayB0kPGp8BZveDGs9m2kvLfPxHgfTvfVTg"/>
+<div class="absolute inset-0 bg-chile-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate">Quecas de jamón (2 pcs)</span>
+<span class="text-[11px] text-secondary font-medium flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                        Precio sugerido por validar
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Combo infantil</span>
+</td>
+<td class="py-3 px-3">
+<div class="relative flex items-center">
+<span class="absolute left-2.5 text-on-surface font-bold text-[14px]">$</span>
+<input class="w-24 pl-6 pr-2 py-1.5 bg-mustard-light font-headline-sm text-headline-sm text-secondary rounded-md border border-secondary/30 focus:ring-2 focus:ring-secondary/40 outline-none text-right font-bold" onchange="markDirty(this)" type="number" value="69"/>
+</div>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold hover:bg-secondary hover:text-on-secondary transition-all" onclick="approveSinglePrice(this)">
+<span class="material-symbols-outlined text-[14px]">check</span>
+                    Validar
+                  </button>
+</td>
+<td class="py-3 px-3 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="toggleAvailability(this, 'Quecas de jamon')" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" onclick="quickSaveRow(this, 'Quecas de jamon')" title="Guardar">
+<span class="material-symbols-outlined text-[20px]">save</span>
+</button>
+</td>
+</tr>
+<!-- Item 5: Jericalla Tradicional -->
+<tr class="dish-row hover:bg-crema-surface/60 transition-colors" data-category="postres" data-name="jericalla tradicional postre">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3.5">
+<div class="relative group w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-inner cursor-pointer" onclick="selectDishForInspection('Jericalla tradicional', 'Postres', '35', '1200x800 px • Óptima', 'Tradicional jericalla horneada al estilo Guadalajara con costra ligeramente tostada, canela, leche y vainilla natural.')">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="Authentic traditional Mexican jericalla dessert in a small glass dish with characteristic caramel browned baked top, dusted with hints of cinnamon, ambient warm Mexican bakery light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX4G2Sp0MglTUOgjM1IvsPgkjCSNOD0IvSG9LYTa22hcGsfbot3tz48f-P2YUHMvzDwNJ7CZ8zrq36K3PWlNuKYT77VuMJfSyV4zo1Utq5gOLESEf7cjhd-5rU52QuG7vv6LHBj13KxwWGc4KxBCMqIpqg7C2RIpNRRknsV2VErrO_z2YmMwbekJI-DjQ_0UfejrEWtph0CniML0xb8y7difknqK4xrZSh5dz7Tc7TbZhYxIggKed3yA"/>
+<div class="absolute inset-0 bg-chile-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate">Jericalla tradicional</span>
+<span class="text-[11px] text-tertiary font-medium flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                        1200x800 px • HD Óptima
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Postres</span>
+</td>
+<td class="py-3 px-3">
+<div class="relative flex items-center">
+<span class="absolute left-2.5 text-on-surface font-bold text-[14px]">$</span>
+<input class="w-24 pl-6 pr-2 py-1.5 bg-surface-container-low font-headline-sm text-headline-sm text-on-surface rounded-md focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/30 outline-none text-right font-bold" onchange="markDirty(this)" type="number" value="35"/>
+</div>
+</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[11px] font-bold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                    Oficial
+                  </span>
+</td>
+<td class="py-3 px-3 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="toggleAvailability(this, 'Jericalla')" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" onclick="quickSaveRow(this, 'Jericalla')" title="Guardar">
+<span class="material-symbols-outlined text-[20px]">save</span>
+</button>
+</td>
+</tr>
+<!-- Item 6: Extras - Aguacate & Caldillo -->
+<tr class="dish-row hover:bg-crema-surface/60 transition-colors" data-category="extras alerta" data-name="aguacate extra guarnicion">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3.5">
+<div class="relative group w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-inner cursor-pointer" onclick="selectDishForInspection('Aguacate extra', 'Extras', '15', '1024x768 px • Óptima', 'Porción generosa de rebanadas de aguacate michoacano fresco sazonado con sal marina.')">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" data-alt="Freshly sliced Hass avocado from Michoacan neatly fanned out in a small Mexican clay bowl with pinch of sea salt and lime wedge." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUfwfmZDxVLoudKVILnUK80p56kDJdmEnP4ECF27kgjYfCH7cOyelts581g5bmNSOpcwkbPUg4k8XnyEEHeHuojS5bS8uB0Ui5EO9pRTsU8mLPo3LZYe5ACd0uTm0rIecHw5qBZSd3ZSqA5yEK-e2yI1N90LcaBwumYJIxaV7j1x1zXlm2A9UlJ3wrXBMuv6OHYxCYgA0zkQ6H-TqEGy68hOGFixhXvKtxACuubS7ho3r1XnYurwgwow"/>
+<div class="absolute inset-0 bg-chile-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate">Aguacate extra</span>
+<span class="text-[11px] text-secondary font-medium flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                        Precio sugerido por validar
+                      </span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Extras</span>
+</td>
+<td class="py-3 px-3">
+<div class="relative flex items-center">
+<span class="absolute left-2.5 text-on-surface font-bold text-[14px]">$</span>
+<input class="w-24 pl-6 pr-2 py-1.5 bg-mustard-light font-headline-sm text-headline-sm text-secondary rounded-md border border-secondary/30 focus:ring-2 focus:ring-secondary/40 outline-none text-right font-bold" onchange="markDirty(this)" type="number" value="15"/>
+</div>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[11px] font-bold hover:bg-secondary hover:text-on-secondary transition-all" onclick="approveSinglePrice(this)">
+<span class="material-symbols-outlined text-[14px]">check</span>
+                    Validar
+                  </button>
+</td>
+<td class="py-3 px-3 text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" onchange="toggleAvailability(this, 'Aguacate extra')" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-tertiary"></div>
+</label>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors" onclick="quickSaveRow(this, 'Aguacate extra')" title="Guardar">
+<span class="material-symbols-outlined text-[20px]">save</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-crema-surface/60 flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span id="showingCountText">Mostrando 6 de 16 platillos registrados</span>
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-40" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<span class="px-2 py-0.5 rounded bg-surface-container-lowest font-bold text-on-surface">1</span>
+<button class="p-1 rounded hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Audit History & Sync Log -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[20px]">history</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Historial de Actualizaciones Recientes</h3>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Sucursal Morelia</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-start justify-between py-2 border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-whatsapp-green mt-1.5"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Sincronización WhatsApp Bot ejecutada</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Menú interactivo actualizado con 14 artículos disponibles</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Hoy 14:32</span>
+</div>
+<div class="flex items-start justify-between py-2 border-b border-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary mt-1.5"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Ajuste de precio en 'Torta combinada'</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Modificado de $60 a $65 MXN por Carlos Mendoza</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Ayer 18:15</span>
+</div>
+<div class="flex items-start justify-between py-2">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary-container mt-1.5"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Nueva fotografía en alta resolución cargada</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">'Torta combinada' cazuela tradicional Guadalajara</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Ayer 12:40</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Media Inspector & Quick Photo Replacement (xl:col-span-4) -->
+<div class="xl:col-span-4 flex flex-col gap-6 sticky top-20">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-md flex flex-col">
+<div class="flex items-center justify-between pb-4 border-b border-surface-container-low mb-4">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase text-outline tracking-wider">Inspector Multimedia</span>
+<h3 class="font-headline-md text-headline-md text-on-surface leading-snug" id="inspectorTitle">Torta combinada</h3>
+</div>
+<span class="px-2.5 py-1 rounded bg-crema-surface font-label-sm text-label-sm text-on-surface-variant font-bold" id="inspectorCategoryBadge">Tortas</span>
+</div>
+<!-- Featured Dish Image Canvas -->
+<div class="relative w-full aspect-video rounded-xl overflow-hidden bg-surface-container shadow-inner mb-4 group">
+<img class="w-full h-full object-cover" data-alt="Traditional Mexican torta ahogada served in a rustic clay cazuela dish, filled with slow-cooked shredded pork carnitas, drenched in vibrant red chile de árbol and tomato salsa, garnished with pickled red onions and fresh oregano sprigs, high resolution gastronomy food photography with warm studio lighting and soft steam." id="inspectorImage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD0Lwb6tIWQM565fVfI8hALTE6qGqNrHAlVXCdR9ZMbeE1rEAUDApKiHprPXcVjsgiMOySxAcQHl_Q52wKXvrqFiGmvJTKF3QjqUNFYsbQjk13VtFD7d5oHIijsM7pB0873rLKHMZGUL3MFBnsAv7yjtzkgv4c8PpJgwpYNFgKaEXjLV8b_9sDC209a3wdGoRO_8FcFNQ0vuI_96s_j8p6jruYaCAq5vyFiNTOLSnmtpQSgPu5xYtkOg"/>
+<div class="absolute bottom-2 left-2 bg-inverse-surface/85 backdrop-blur-md px-2.5 py-1 rounded text-inverse-on-surface font-label-sm text-[11px] flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-tertiary-fixed">verified</span>
+<span id="inspectorResolution">1200x896 px • Calidad Óptima</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4" id="inspectorDescription">
+          Birote salado tapatío con carnitas de cerdo combinadas, bañado en salsa clásica de jitomate sazonada con orégano y un toque de chile de árbol, servido en cazuela de barro tradicional.
+        </p>
+<!-- Drag and Drop Upload Zone -->
+<div class="relative border-2 border-dashed border-outline/30 hover:border-primary/60 bg-crema-surface/50 hover:bg-crema-surface transition-all rounded-xl p-5 text-center flex flex-col items-center justify-center cursor-pointer mb-5" onclick="simulateUpload()">
+<input accept="image/*" class="hidden" id="fileUploader" onchange="handleFileChosen(event)" type="file"/>
+<div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-[26px]">cloud_upload</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-bold">Arrastra la fotografía gastronómica aquí</span>
+<span class="font-body-sm text-body-sm text-outline mt-1">O haz clic para explorar archivos (JPG, PNG, WebP)</span>
+<span class="mt-2 text-[11px] font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded">Recomendado: 1200x900px</span>
+</div>
+<!-- Food Photography Best Practices Guide -->
+<div class="bg-surface-container-low p-4 rounded-xl mb-5">
+<div class="flex items-center gap-2 mb-2 text-on-surface font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-secondary text-[18px]">lightbulb</span>
+<span>Recomendaciones de Fotografía</span>
+</div>
+<ul class="space-y-1.5 text-[12px] font-body-sm text-on-surface-variant">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[14px]">check_circle</span>
+<span>Formato horizontal 4:3 o 3:2 centrado.</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[14px]">check_circle</span>
+<span>Cazuela de barro visible y vapor de salsa caliente.</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[14px]">check_circle</span>
+<span>Sin textos, stickers o marcas de agua superpuestas.</span>
+</li>
+</ul>
+</div>
+<!-- Image Action Buttons -->
+<div class="flex items-center gap-3">
+<button class="flex-1 py-2.5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md text-center shadow-md active:scale-98 transition-all" onclick="simulateUpload()">
+            Actualizar Fotografía
+          </button>
+<button class="p-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors" onclick="previewInStore()" title="Ver recorte">
+<span class="material-symbols-outlined text-[20px]">crop</span>
+</button>
+</div>
+</div>
+<!-- Quick WhatsApp Sync Card -->
+<div class="bg-whatsapp-green/10 p-5 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-whatsapp-green text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-bold">Bot de Pedidos WhatsApp</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sincronización automática activada</span>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded bg-whatsapp-green hover:bg-[#1EBE5D] text-white font-label-sm text-label-sm font-bold shadow-sm transition-all" onclick="forceSync()">
+          Sincronizar Ya
+        </button>
+</div>
+</div>
+</div>
+<!-- Vanilla JavaScript for Interaction & Micro-behaviors -->
+<script>
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3200);
+    }
+
+    function markDirty(input) {
+      input.classList.add('bg-mustard-light', 'text-secondary');
+      showToast('Precio modificado. Recuerda hacer clic en Guardar.');
+    }
+
+    function triggerBatchSave() {
+      const btn = document.getElementById('btnSaveAll');
+      if (btn) {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>Guardando...</span>`;
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          showToast('¡Todos los precios y cambios fueron guardados exitosamente!');
+        }, 800);
+      }
+    }
+
+    function quickSaveRow(btn, dishName) {
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.textContent = 'check';
+        icon.classList.add('text-tertiary');
+        setTimeout(() => {
+          icon.textContent = 'save';
+          icon.classList.remove('text-tertiary');
+        }, 1800);
+      }
+      showToast(`'${dishName}' guardado correctamente.`);
+    }
+
+    function approveSinglePrice(btn) {
+      const cell = btn.parentElement;
+      cell.innerHTML = `
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[11px] font-bold animate-fadeIn">
+          <span class="material-symbols-outlined text-[14px]">verified</span>
+          Oficial
+        </span>
+      `;
+      showToast('Precio validado y oficializado en catálogo.');
+    }
+
+    function approveAllPending() {
+      const buttons = document.querySelectorAll('button[onclick="approveSinglePrice(this)"]');
+      buttons.forEach(btn => approveSinglePrice(btn));
+      showToast('Todos los precios pendientes fueron validados.');
+    }
+
+    function toggleAvailability(checkbox, dishName) {
+      const state = checkbox.checked ? 'Disponible' : 'Agotado';
+      showToast(`'${dishName}' marcado como ${state}.`);
+    }
+
+    function selectDishForInspection(name, category, price, res, desc) {
+      document.getElementById('inspectorTitle').textContent = name;
+      document.getElementById('inspectorCategoryBadge').textContent = category;
+      document.getElementById('inspectorResolution').textContent = res;
+      document.getElementById('inspectorDescription').textContent = desc;
+      showToast(`Inspeccionando '${name}'`);
+    }
+
+    function simulateUpload() {
+      const input = document.getElementById('fileUploader');
+      if (input) input.click();
+    }
+
+    function handleFileChosen(event) {
+      if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        showToast(`Fotografía '${file.name}' cargada en cola de procesamiento.`);
+      }
+    }
+
+    function previewInStore() {
+      showToast('Abriendo vista previa en encuadre de menú digital...');
+    }
+
+    function forceSync() {
+      showToast('Menú sincronizado inmediatamente con WhatsApp API.');
+    }
+
+    function filterCategory(category, button) {
+      // Toggle active classes
+      document.querySelectorAll('.category-pill').forEach(btn => {
+        btn.classList.remove('active', 'bg-primary-container', 'text-on-primary');
+        btn.classList.add('bg-surface-container', 'text-on-surface');
+      });
+      button.classList.add('active', 'bg-primary-container', 'text-on-primary');
+      button.classList.remove('bg-surface-container', 'text-on-surface');
+
+      const rows = document.querySelectorAll('#productsTable tbody tr.dish-row');
+      let visible = 0;
+      rows.forEach(row => {
+        const itemCat = row.getAttribute('data-category') || '';
+        if (category === 'todos' || itemCat.includes(category)) {
+          row.style.display = '';
+          visible++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      document.getElementById('showingCountText').textContent = `Mostrando ${visible} de 16 platillos registrados`;
+    }
+
+    function searchDishes() {
+      const val = document.getElementById('dishSearch').value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#productsTable tbody tr.dish-row');
+      let count = 0;
+      rows.forEach(row => {
+        const text = (row.getAttribute('data-name') || '') + ' ' + row.textContent.toLowerCase();
+        if (text.includes(val)) {
+          row.style.display = '';
+          count++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      document.getElementById('showingCountText').textContent = `Mostrando ${count} de 16 platillos registrados`;
+    }
+  </script>
+</div></main></div></body></html>

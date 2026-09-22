@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Menú | La Tapatía Ahogadas — Morelia</title>
+<meta name="description" content="Menú completo de La Tapatía Ahogadas: tortas, tacos, tostadas, combo infantil, extras y postres. Arma tu pedido y pide por WhatsApp.">
+<link rel="canonical" href="https://addv-sites.github.io/la-tapatia-express/menu/">
+<meta property="og:title" content="Menú | La Tapatía Ahogadas">
+<meta property="og:description" content="Tortas, tacos, tostadas y más. Arma tu pedido y pide por WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://addv-sites.github.io/la-tapatia-express/menu/">
+<meta name="theme-color" content="#93000b">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="../css/site.css">
+<script defer src="../src/config/site.js"></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-between gap-space-sm">
+    <a href="../" class="font-headline-sm text-headline-sm text-primary tracking-tight">La Tapatía Ahogadas</a>
+    <button id="btn-install" type="button" class="hidden flex-shrink-0 items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm">Instalar</button>
+  </div>
+  <div class="flex items-center gap-2 overflow-x-auto px-margin pb-2.5 pt-1 no-scrollbar">
+    <a href="#tortas" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tortas</a>
+    <a href="#tacos" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tacos</a>
+    <a href="#tostadas" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tostadas</a>
+    <a href="#combo-infantil" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Combo infantil</a>
+    <a href="#extras" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Extras</a>
+    <a href="#postres" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Postres</a>
+    <a href="#pedido" class="shrink-0 px-3 py-1.5 rounded-full bg-primary text-on-primary shadow-sm font-label-md text-label-md">Mi pedido</a>
+  </div>
+</header>
+
+<main class="flex-1 w-full bg-crema-bg pt-28 pb-24">
+  <h1 class="sr-only">Menú completo de La Tapatía Ahogadas</h1>
+
+  <div id="category-sections">
+    <div class="px-margin py-6 flex flex-col gap-3">
+      <div class="skeleton rounded-2xl h-16"></div>
+      <div class="skeleton rounded-2xl h-16"></div>
+      <div class="skeleton rounded-2xl h-16"></div>
+    </div>
+  </div>
+
+  <section id="pedido" class="px-margin py-4 scroll-mt-32">
+    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-4">
+      <h2 class="font-headline-md text-headline-md text-on-surface">Tu pedido</h2>
+
+      <div id="cart-empty" class="font-body-sm text-body-sm text-on-surface-variant py-4 text-center">
+        Tu carrito está vacío. Agrega algo del menú de arriba.
+      </div>
+      <div id="cart-list" class="flex flex-col gap-2"></div>
+
+      <div class="flex flex-col gap-1 pt-2 border-t border-surface-container-high">
+        <div class="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
+          <span>Subtotal</span><span id="cart-subtotal">$0 MXN</span>
+        </div>
+        <div id="delivery-fee-row" class="hidden justify-between font-body-sm text-body-sm text-on-surface-variant">
+          <span>Envío</span><span id="delivery-fee-value">Se calcula al enviar</span>
+        </div>
+        <div class="flex justify-between font-headline-sm text-headline-sm text-primary pt-1">
+          <span>Total</span><span id="cart-total">$0 MXN</span>
+        </div>
+      </div>
+
+      <form id="checkout-form" class="flex flex-col gap-3 pt-2">
+        <div id="delivery-option" class="hidden grid-cols-2 gap-2 p-1 bg-surface-container-low rounded-lg">
+          <label class="flex items-center justify-center gap-1.5 py-2 rounded-lg cursor-pointer has-[:checked]:bg-primary has-[:checked]:text-on-primary font-label-md text-label-md">
+            <input class="sr-only" type="radio" name="order_type" value="pickup" checked>
+            Para llevar
+          </label>
+          <label class="flex items-center justify-center gap-1.5 py-2 rounded-lg cursor-pointer has-[:checked]:bg-primary has-[:checked]:text-on-primary font-label-md text-label-md">
+            <input class="sr-only" type="radio" name="order_type" value="delivery">
+            A domicilio
+          </label>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-name">Nombre completo</label>
+          <input id="field-name" required class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" autocomplete="name">
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-phone">Teléfono / WhatsApp</label>
+          <input id="field-phone" required class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="tel" autocomplete="tel">
+        </div>
+        <div id="field-address" class="hidden flex-col gap-1">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-address-input">Dirección de entrega</label>
+          <input id="field-address-input" class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" autocomplete="street-address">
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-notes">Notas (opcional)</label>
+          <textarea id="field-notes" class="w-full px-3 py-2 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" rows="2"></textarea>
+        </div>
+
+        <button id="submit-order" disabled type="submit" class="w-full min-h-[48px] rounded-xl bg-whatsapp-green text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-transform disabled:opacity-50">
+          Continuar por WhatsApp
+        </button>
+        <p class="font-body-sm text-[12px] text-on-surface-variant text-center">
+          Vas a revisar el mensaje antes de enviarlo — nada se manda automáticamente.
+        </p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script src="../src/js/cart.js"></script>
+<script src="../src/js/catalog.js"></script>
+<script src="../src/js/api.js"></script>
+<script src="../src/js/pwa-install.js"></script>
+<script src="../src/js/menu-page.js"></script>
+</body>
+</html>

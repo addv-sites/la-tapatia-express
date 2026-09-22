@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Pedidos — La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between px-6">
+  <div class="flex items-center gap-3">
+    <span class="font-headline-sm text-headline-sm text-primary">La Tapatía Ahogadas</span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Comandas &amp; Pedidos en Tiempo Real</span>
+  </div>
+  <div class="flex items-center gap-4 font-label-md text-label-md">
+    <a href="../catalogo/" class="text-on-surface-variant hover:text-primary">Catálogo</a>
+    <a href="../config-envio/" class="text-on-surface-variant hover:text-primary">Config. Envío</a>
+  </div>
+</header>
+
+<main class="pt-16 min-h-screen">
+  <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
+
+  <div id="admin-content" class="hidden max-w-6xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section class="flex flex-col gap-3">
+        <div class="flex items-center justify-between bg-mustard-light/60 px-3.5 py-2.5 rounded-lg">
+          <span class="font-label-md text-label-md font-bold text-on-secondary-container">Por Confirmar</span>
+          <span id="count-pendiente" class="px-2 py-0.5 rounded-full bg-secondary-container text-white font-label-sm text-label-sm font-bold">0</span>
+        </div>
+        <div id="col-pendiente" class="flex flex-col gap-3"></div>
+      </section>
+      <section class="flex flex-col gap-3">
+        <div class="flex items-center justify-between bg-primary-fixed/50 px-3.5 py-2.5 rounded-lg">
+          <span class="font-label-md text-label-md font-bold text-chile-dark">En Cocina</span>
+          <span id="count-cocina" class="px-2 py-0.5 rounded-full bg-primary text-white font-label-sm text-label-sm font-bold">0</span>
+        </div>
+        <div id="col-cocina" class="flex flex-col gap-3"></div>
+      </section>
+      <section class="flex flex-col gap-3">
+        <div class="flex items-center justify-between bg-tertiary-container/15 px-3.5 py-2.5 rounded-lg">
+          <span class="font-label-md text-label-md font-bold text-tertiary">Listo / En Reparto</span>
+          <span id="count-listo" class="px-2 py-0.5 rounded-full bg-tertiary text-white font-label-sm text-label-sm font-bold">0</span>
+        </div>
+        <div id="col-listo" class="flex flex-col gap-3"></div>
+      </section>
+    </div>
+    <p class="font-body-sm text-[12px] text-on-surface-variant pt-6">
+      El tablero se actualiza solo cada 15 segundos (no es push en vivo — Google Sheets/Apps Script no soporta websockets). Asignación de repartidor y detalle de comanda completo quedan para la siguiente iteración.
+    </p>
+  </div>
+</main>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/auth.js"></script>
+<script src="../../src/js/admin-auth.js"></script>
+<script src="../../src/js/toast.js"></script>
+<script src="../../src/js/catalog.js"></script>
+<script src="../../src/js/admin-pedidos.js"></script>
+</body>
+</html>
