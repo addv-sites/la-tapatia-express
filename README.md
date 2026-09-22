@@ -58,9 +58,12 @@ Variables pendientes de llenar al desplegar:
 
 Esquema completo de hojas (`CATALOGO`, `PEDIDOS`, `SUCURSALES`, `CONFIG`, `STAFF`, `DRIVERS`, `CLIENTES`, `LOG`, `INCIDENCIAS`) documentado en [`docs/apps-script-contract.md`](./docs/apps-script-contract.md). Todos los precios nacen marcados `requiresValidation: true` hasta que el negocio los confirme desde el admin.
 
-## Apps Script
+## Apps Script — puesta en marcha completa
 
-1. Crear el Google Sheet con las hojas del esquema anterior.
+Guía paso a paso (encabezados exactos de cada hoja, despliegue del Web App, OAuth Client ID, y checklist de verificación funcional): **[`docs/google-sheets-setup.md`](./docs/google-sheets-setup.md)**.
+
+Resumen rápido:
+1. Crear el Google Sheet con las 9 hojas del esquema.
 2. Extensiones → Apps Script, pegar el contenido de `apps-script/Code.gs`.
 3. Llenar `SPREADSHEET_ID` en el propio script.
 4. Desplegar como Web App (ejecutar como "Yo", acceso "Cualquier usuario").

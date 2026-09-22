@@ -74,7 +74,11 @@
   - MVP: un pedido activo a la vez por repartidor (el mock mostraba una comanda enfocada, coincide). Subida de foto de entrega y "cambio a entregar" (billete grande) quedan fuera de este pase.
   - **Bug propio corregido antes de probar:** un `<div>` envolvía los botones de acción con `hidden` estático que nunca se quitaba — los botones habrían quedado invisibles para siempre sin importar el estado del pedido. Detectado por inspección, no hizo falta el navegador esta vez.
   - Verificado en navegador: las 4 pantallas cargan sin errores de consola, gate correcto. Sin Apps Script desplegado no se pudo probar el flujo real de GPS/entrega.
-- [ ] Segmento 7 — Pruebas + verificación funcional.
+- [x] **Segmento 7 — Pruebas + verificación funcional** (2026-09-22): `docs/google-sheets-setup.md` — guía paso a paso completa (nombres de hoja y encabezados exactos extraídos de `apps-script/Code.gs`, no redactados a mano; despliegue del Web App; OAuth Client ID; checklist de verificación funcional de las 6 superficies). Enlazada desde `README.md`.
+  - Barrido de regresión: las 23 rutas/assets construidos responden 200. Chequeo estático de enlaces (script propio) sobre los 22 HTML: **encontró y corrigió** links rotos reales en `reparto/app/index.html` (nav a Entregas/Ganancias/Perfil usaba `../` de más). Sintaxis de los 12 archivos `src/js/*.js` + `scripts/build-snapshot.mjs` + `apps-script/Code.gs` verificada sin errores.
+  - Auditoría dirigida del bug de `hidden` nativo + clase `flex`/`grid` (el mismo que salió 3 veces en segmentos anteriores) sobre **todo** el proyecto: encontró **un caso más** que se había pasado — el badge del carrito en `index.html` (`#cart-badge`) tenía `hidden` nativo + `flex` en el mismo elemento, por lo que mostraba "0" en el header aunque el carrito estuviera vacío. Corregido con el mismo patrón (clase Tailwind `hidden` + `classList.toggle`, nunca el atributo nativo cuando hay una clase de `display` en el mismo elemento).
+  - `npm run build` y `node scripts/build-snapshot.mjs` corridos de punta a punta sin errores (el segundo confirma su comportamiento "best-effort" sin Apps Script desplegado, y sí actualiza `lastmod` en `sitemap.xml`).
+  - **No se pudo completar** la verificación visual/consola en navegador real de este segmento — la extensión de Chrome se desconectó a medio pase y no volvió a conectar; no se insistió más de 2 intentos. Queda pendiente repetir el barrido visual cuando la extensión esté disponible, y sobre todo, ejecutar el checklist de `docs/google-sheets-setup.md` con Apps Script real desplegado — eso no se puede simular sin credenciales reales.
 
 ## Pendiente de que el usuario provea/despliegue (bloquea producción, no bloquea seguir construyendo)
 
@@ -85,4 +89,4 @@
 
 ## Próximo paso
 
-Continuar con el Segmento 2 (sitio público) siguiendo `buildClaude.md`.
+Los 7 segmentos de construcción están completos. Lo que falta es todo del lado del usuario, no de código — seguir `docs/google-sheets-setup.md` para desplegar Apps Script/Sheets/OAuth y correr el checklist de verificación funcional con datos reales. Después de eso: validar precios/horarios reales con el negocio, subir fotografía real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, asignación de repartidor desde el Kanban, vínculo retroactivo de pedido-invitado a cuenta, etc.).
