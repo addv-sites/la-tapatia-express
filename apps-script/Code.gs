@@ -78,6 +78,14 @@ function requireRole_(idToken, role) {
 }
 
 /** Rate limit simple por sesión usando CacheService. */
+function requireAnyRole_(idToken, roles) {
+  let lastErr = null;
+  for (const role of roles) {
+    try { return requireRole_(idToken, role); } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('No autorizado');
+}
+
 function checkRateLimit_(sessionId) {
   const cache = CacheService.getScriptCache();
   const key = 'rl_' + sessionId;
@@ -207,11 +215,14 @@ function action_orderCreate_(payload, sessionId, idToken) {
   const folio = nextFolio_();
   let deliveryFee = 0;
   let deliveryZone = '';
+  let deliveryLat = '';
+  let deliveryLng = '';
 
   if (payload.order_type === 'delivery') {
     const config = action_configRead_().config;
     const branch = readSheetAsObjects_('SUCURSALES').find((b) => b.branch_id === payload.branch_id);
     const dest = geocodeAddress_(payload.delivery_address);
+    if (dest) { deliveryLat = dest.lat; deliveryLng = dest.lng; }
     if (branch && dest && branch.latitude && branch.longitude) {
       const km = distanceKm_(Number(branch.latitude), Number(branch.longitude), dest.lat, dest.lng);
       const zoneInfo = resolveDeliveryZone_(km, config);
@@ -236,6 +247,8 @@ function action_orderCreate_(payload, sessionId, idToken) {
     order_type: payload.order_type || 'pickup',
     delivery_address: payload.delivery_address || '',
     delivery_zone: deliveryZone,
+    delivery_lat: deliveryLat,
+    delivery_lng: deliveryLng,
     cash_denomination: payload.cash_denomination || '',
     branch_id: payload.branch_id || '',
     status: 'pendiente',
@@ -248,7 +261,7 @@ function action_orderCreate_(payload, sessionId, idToken) {
     internal_notes: ''
   };
 
-  const headers = ['order_id', 'created_at', 'customer_name', 'customer_phone', 'customer_email', 'items', 'subtotal', 'delivery_fee', 'total', 'notes', 'order_type', 'delivery_address', 'delivery_zone', 'cash_denomination', 'branch_id', 'status', 'driver_id', 'driver_lat', 'driver_lng', 'driver_ping_at', 'source', 'whatsapp_sent', 'internal_notes'];
+  const headers = ['order_id', 'created_at', 'customer_name', 'customer_phone', 'customer_email', 'items', 'subtotal', 'delivery_fee', 'total', 'notes', 'order_type', 'delivery_address', 'delivery_zone', 'delivery_lat', 'delivery_lng', 'cash_denomination', 'branch_id', 'status', 'driver_id', 'driver_lat', 'driver_lng', 'driver_ping_at', 'source', 'whatsapp_sent', 'internal_notes'];
   appendRow_('PEDIDOS', order, headers);
   logAudit_(payload.customer_email || 'invitado', 'order.create', 'PEDIDOS', folio, null, order);
 
@@ -304,6 +317,23 @@ function action_orderAssignDriver_(payload, user) {
     logAudit_(user.email, 'order.assignDriver', 'PEDIDOS', payload.order_id, null, { driver_id: payload.driver_id });
     return { ok: true };
   });
+}
+
+function action_driverMyOrders_(user) {
+  const rows = readSheetAsObjects_('PEDIDOS');
+  const mine = rows.filter((r) =>
+    String(r.driver_id || '').toLowerCase() === user.email &&
+    (r.status === 'listo' || r.status === 'en_reparto')
+  );
+  return { orders: mine };
+}
+
+function action_driverMyDeliveries_(user) {
+  const rows = readSheetAsObjects_('PEDIDOS');
+  const mine = rows.filter((r) =>
+    String(r.driver_id || '').toLowerCase() === user.email && r.status === 'entregado'
+  );
+  return { orders: mine };
 }
 
 function action_driverPingLocation_(payload, user) {
@@ -467,8 +497,71 @@ function action_incidentReport_(payload, user) {
   return { ok: true };
 }
 
-// TODO (fuera del scaffolding inicial, se completa en el segmento de analítica/CRM):
-// action_analyticsRead_, action_campaignSendEmail_, action_catalogUploadPhoto_
+function action_analyticsRead_(payload) {
+  const orders = readSheetAsObjects_('PEDIDOS').filter((o) => o.status !== 'cancelado' && o.status !== 'abandonado');
+  const clients = readSheetAsObjects_('CLIENTES');
+  const rangeDays = { today: 1, week: 7, '30d': 30 }[payload && payload.range] || 30;
+  const cutoff = new Date(Date.now() - rangeDays * 24 * 60 * 60 * 1000);
+  const inRange = orders.filter((o) => new Date(o.created_at) >= cutoff);
+
+  const deliveryOrders = inRange.filter((o) => o.order_type === 'delivery');
+  const withPin = deliveryOrders.filter((o) => o.delivery_lat && o.delivery_lng);
+
+  const zoneStats = {};
+  ['Z1', 'Z2', 'Z3'].forEach((z) => { zoneStats[z] = { zone: z, orders: 0, revenue: 0 }; });
+  deliveryOrders.forEach((o) => {
+    const z = zoneStats[o.delivery_zone];
+    if (z) { z.orders += 1; z.revenue += Number(o.total || 0); }
+  });
+  Object.values(zoneStats).forEach((z) => { z.avgTicket = z.orders ? Math.round(z.revenue / z.orders) : 0; });
+
+  const byClient = {};
+  inRange.forEach((o) => {
+    if (!o.customer_email) return;
+    if (!byClient[o.customer_email]) byClient[o.customer_email] = { email: o.customer_email, orders: 0, spend: 0 };
+    byClient[o.customer_email].orders += 1;
+    byClient[o.customer_email].spend += Number(o.total || 0);
+  });
+  const topClients = Object.values(byClient)
+    .sort((a, b) => b.spend - a.spend)
+    .slice(0, 5)
+    .map((c) => {
+      const profile = clients.find((cl) => String(cl.email).toLowerCase() === c.email);
+      return { email: c.email, name: (profile && profile.name) || c.email, orders: c.orders, spend: c.spend };
+    });
+
+  const hourly = new Array(24).fill(0);
+  inRange.forEach((o) => {
+    const h = new Date(o.created_at).getHours();
+    if (!isNaN(h)) hourly[h] += 1;
+  });
+
+  const points = withPin.map((o) => ({ lat: Number(o.delivery_lat), lng: Number(o.delivery_lng), total: Number(o.total || 0) }));
+
+  const revenue = inRange.reduce((sum, o) => sum + Number(o.total || 0), 0);
+  const recurringEmails = Object.values(byClient).filter((c) => c.orders > 1).length;
+  const totalClientsInRange = Object.keys(byClient).length;
+
+  return {
+    range_days: rangeDays,
+    kpis: {
+      total_orders: inRange.length,
+      delivery_orders: deliveryOrders.length,
+      delivery_orders_with_pin: withPin.length,
+      delivery_pin_rate: deliveryOrders.length ? Math.round((withPin.length / deliveryOrders.length) * 100) : 0,
+      revenue: revenue,
+      avg_ticket: inRange.length ? Math.round(revenue / inRange.length) : 0,
+      recurring_client_rate: totalClientsInRange ? Math.round((recurringEmails / totalClientsInRange) * 100) : 0
+    },
+    zones: Object.values(zoneStats),
+    top_clients: topClients,
+    hourly_demand: hourly,
+    points: points
+  };
+}
+
+// TODO (fuera del scaffolding inicial, se completa en un pase de CRM):
+// action_campaignSendEmail_, action_catalogUploadPhoto_
 
 // ---------------------------------------------------------------------------
 // Router
@@ -487,14 +580,17 @@ function route_(action, payload, idToken, sessionId) {
 
     case 'catalog.readAll': return action_catalogReadAll_(requireRole_(idToken, 'STAFF'));
     case 'config.update': return action_configUpdate_(payload, requireRole_(idToken, 'STAFF'));
+    case 'analytics.read': return action_analyticsRead_(payload, requireRole_(idToken, 'ADDV'));
     case 'order.list': return action_orderList_(payload, requireRole_(idToken, 'STAFF'));
-    case 'order.updateStatus': return action_orderUpdateStatus_(payload, requireRole_(idToken, 'STAFF'));
+    case 'order.updateStatus': return action_orderUpdateStatus_(payload, requireAnyRole_(idToken, ['STAFF', 'DRIVERS']));
     case 'order.delete': return action_orderDelete_(payload, requireRole_(idToken, 'STAFF'));
     case 'order.assignDriver': return action_orderAssignDriver_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.updatePrice': return action_catalogUpdatePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));
 
+    case 'driver.myOrders': return action_driverMyOrders_(requireRole_(idToken, 'DRIVERS'));
+    case 'driver.myDeliveries': return action_driverMyDeliveries_(requireRole_(idToken, 'DRIVERS'));
     case 'driver.pingLocation': return action_driverPingLocation_(payload, requireRole_(idToken, 'DRIVERS'));
     case 'incident.report': return action_incidentReport_(payload, requireRole_(idToken, 'DRIVERS'));
 

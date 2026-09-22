@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Entregas | Repartidor La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../../css/site.css">
+<script defer src="../../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-sm">
+  <div class="h-16 px-gutter flex items-center justify-between">
+    <a href="../" class="font-headline-sm text-headline-sm text-primary">← Ruta Activa</a>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Mis Entregas</span>
+  </div>
+</header>
+
+<main class="pt-20 pb-8 px-gutter max-w-md mx-auto w-full">
+  <div id="auth-gate" class="min-h-[60vh] flex items-center justify-center"></div>
+  <div id="content" class="hidden flex flex-col gap-3">
+    <p id="empty" class="hidden font-body-sm text-body-sm text-on-surface-variant text-center py-6">Aún no tienes entregas completadas.</p>
+    <div id="deliveries-list" class="flex flex-col gap-3"></div>
+  </div>
+</main>
+
+<script src="../../../src/js/api.js"></script>
+<script src="../../../src/js/auth.js"></script>
+<script src="../../../src/js/auth-gate.js"></script>
+<script src="../../../src/js/catalog.js"></script>
+<script src="../../../src/js/toast.js"></script>
+<script src="../../../src/js/reparto-entregas.js"></script>
+</body>
+</html>

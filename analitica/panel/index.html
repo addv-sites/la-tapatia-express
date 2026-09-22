@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analítica — La Tapatía Ahogadas (ADDV)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between px-6">
+  <div class="flex items-center gap-3">
+    <span class="font-headline-sm text-headline-sm text-primary">La Tapatía Ahogadas</span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Analítica · ADDV</span>
+  </div>
+  <select id="range-select" class="hidden bg-surface-container-low px-3 py-1.5 rounded-lg font-label-sm text-label-sm">
+    <option value="today">Hoy</option>
+    <option value="week">Esta semana</option>
+    <option value="30d" selected>Últimos 30 días</option>
+  </select>
+</header>
+
+<main class="pt-16 min-h-screen">
+  <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
+
+  <div id="panel-content" class="hidden max-w-6xl mx-auto px-6 py-8 flex flex-col gap-6">
+    <div class="flex justify-end">
+      <button id="export-csv" class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary rounded-lg font-label-md text-label-md">
+        Exportar CSV
+      </button>
+    </div>
+
+    <section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg" id="kpi-orders">0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Pedidos</p>
+      </div>
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg" id="kpi-delivery">0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">A domicilio</p>
+      </div>
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg text-tertiary" id="kpi-pin-rate">0%</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Con ubicación geocodificada</p>
+      </div>
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg text-primary" id="kpi-revenue">$0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Ingresos periodo</p>
+      </div>
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg" id="kpi-avg-ticket">$0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Ticket promedio</p>
+      </div>
+      <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm">
+        <span class="font-price-lg text-price-lg text-secondary" id="kpi-recurring">0%</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Clientes recurrentes</p>
+      </div>
+    </section>
+
+    <section class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm">
+      <h2 class="font-headline-md text-headline-md mb-3">Mapa de pedidos a domicilio geocodificados</h2>
+      <div id="heatmap" class="w-full h-96 rounded-xl overflow-hidden"></div>
+      <p class="font-body-sm text-[12px] text-on-surface-variant mt-2">
+        OpenStreetMap, sin costo. Solo se ubican pedidos con dirección geocodificada correctamente — no todos los pedidos a domicilio tienen pin.
+      </p>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm">
+        <h2 class="font-headline-md text-headline-md mb-3">Por zona de envío</h2>
+        <div id="zones-table" class="flex flex-col gap-2"></div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm">
+        <h2 class="font-headline-md text-headline-md mb-3">Top clientes (cuentas registradas)</h2>
+        <div id="top-clients" class="flex flex-col gap-2"></div>
+      </div>
+    </section>
+
+    <section class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm">
+      <h2 class="font-headline-md text-headline-md mb-3">Demanda por hora</h2>
+      <div id="hourly-chart" class="flex items-end gap-1 h-32"></div>
+    </section>
+
+    <p class="font-body-sm text-[12px] text-on-surface-variant">
+      "Colonias" del mock original se reemplazaron por zona de envío (Z1/Z2/Z3) — es el único dato geográfico agregado que el sistema realmente calcula hoy; nombrar colonias específicas hubiera significado inventar datos que no tenemos.
+    </p>
+  </div>
+</main>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/auth.js"></script>
+<script src="../../src/js/auth-gate.js"></script>
+<script src="../../src/js/catalog.js"></script>
+<script src="../../src/js/analitica-panel.js"></script>
+</body>
+</html>

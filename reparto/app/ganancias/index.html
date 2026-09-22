@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ganancias | Repartidor La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../../css/site.css">
+<script defer src="../../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-sm">
+  <div class="h-16 px-gutter flex items-center justify-between">
+    <a href="../" class="font-headline-sm text-headline-sm text-primary">← Ruta Activa</a>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Ganancias</span>
+  </div>
+</header>
+
+<main class="pt-20 pb-8 px-gutter max-w-md mx-auto w-full">
+  <div id="auth-gate" class="min-h-[60vh] flex items-center justify-center"></div>
+  <div id="content" class="hidden flex flex-col gap-4">
+    <div class="bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm">
+      <span class="font-display-hero-mobile text-display-hero-mobile text-primary" id="total-earned">$0</span>
+      <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Total acumulado (comisión fija por entrega)</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm text-center">
+        <span class="font-price-lg text-price-lg" id="count-deliveries">0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Entregas completadas</p>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm text-center">
+        <span class="font-price-lg text-price-lg" id="commission-each">$0</span>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Por entrega</p>
+      </div>
+    </div>
+    <p class="font-body-sm text-[12px] text-on-surface-variant text-center">
+      Cálculo informativo — el pago real se acuerda y liquida con el negocio directamente.
+    </p>
+  </div>
+</main>
+
+<script src="../../../src/js/api.js"></script>
+<script src="../../../src/js/auth.js"></script>
+<script src="../../../src/js/auth-gate.js"></script>
+<script src="../../../src/js/catalog.js"></script>
+<script src="../../../src/js/toast.js"></script>
+<script src="../../../src/js/reparto-ganancias.js"></script>
+</body>
+</html>

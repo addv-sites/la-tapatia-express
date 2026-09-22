@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil | Repartidor La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../../css/site.css">
+<script defer src="../../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-sm">
+  <div class="h-16 px-gutter flex items-center justify-between">
+    <a href="../" class="font-headline-sm text-headline-sm text-primary">← Ruta Activa</a>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Perfil</span>
+  </div>
+</header>
+
+<main class="pt-20 pb-8 px-gutter max-w-md mx-auto w-full">
+  <div id="auth-gate" class="min-h-[60vh] flex items-center justify-center"></div>
+  <div id="content" class="hidden flex-col gap-4 items-center text-center">
+    <div class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-lg text-headline-lg" id="avatar"></div>
+    <p class="font-headline-sm text-headline-sm" id="driver-name"></p>
+    <p class="font-body-sm text-body-sm text-on-surface-variant" id="driver-email"></p>
+    <button id="btn-signout" class="min-h-[44px] px-6 rounded-lg bg-surface-container font-label-md text-label-md">Cerrar sesión</button>
+  </div>
+</main>
+
+<script src="../../../src/js/api.js"></script>
+<script src="../../../src/js/auth.js"></script>
+<script src="../../../src/js/auth-gate.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('btn-signout').addEventListener('click', function () {
+    sessionStorage.removeItem('lta_id_token');
+    window.LTA_AUTH.signOut();
+    location.href = '../';
+  });
+  window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
+    title: 'Perfil',
+    subtitle: 'Acceso solo para repartidores autorizados.',
+    onSignedIn: function (token, profile) {
+      document.getElementById('auth-gate').classList.add('hidden');
+      document.getElementById('content').classList.remove('hidden');
+      document.getElementById('content').classList.add('flex');
+      document.getElementById('driver-name').textContent = profile.name || '';
+      document.getElementById('driver-email').textContent = profile.email || '';
+      document.getElementById('avatar').textContent = (profile.name || '?').charAt(0).toUpperCase();
+    }
+  });
+});
+</script>
+</body>
+</html>

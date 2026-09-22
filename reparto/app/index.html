@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>App Repartidor | La Tapatía Ahogadas</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="../../manifest.webmanifest">
+<meta name="theme-color" content="#93000b">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="../../css/site.css">
+<script defer src="../../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
+
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-sm">
+  <div class="h-16 px-gutter flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="font-headline-sm text-headline-sm text-primary">La Tapatía</span>
+      <span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/10 text-tertiary font-label-sm text-[11px]">
+        <span class="w-1.5 h-1.5 rounded-full bg-whatsapp-green animate-pulse"></span>Repartidor
+      </span>
+    </div>
+    <nav class="flex items-center gap-3 font-label-sm text-label-sm">
+      <a href="../entregas/" class="text-on-surface-variant hover:text-primary">Entregas</a>
+      <a href="../ganancias/" class="text-on-surface-variant hover:text-primary">Ganancias</a>
+      <a href="../perfil/" class="text-on-surface-variant hover:text-primary">Perfil</a>
+    </nav>
+  </div>
+</header>
+
+<main class="flex-1 w-full pt-20 pb-8 px-gutter max-w-md mx-auto w-full">
+  <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
+
+  <div id="app-content" class="hidden flex-col gap-4">
+    <div id="empty-state" class="hidden bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm">
+      <p class="font-headline-sm text-headline-sm text-on-surface">Sin pedidos asignados</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Cuando el restaurante te asigne una entrega, aparece aquí.</p>
+    </div>
+
+    <div id="order-card" class="hidden flex flex-col gap-3">
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <span class="px-2.5 py-1 rounded-md bg-primary text-on-primary font-headline-sm text-headline-sm" id="order-folio"></span>
+          <span class="font-price-md text-price-md text-primary font-bold" id="order-total"></span>
+        </div>
+        <div>
+          <p class="font-label-md text-label-md font-bold" id="order-customer"></p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant" id="order-address"></p>
+        </div>
+        <p id="order-notes" class="hidden font-body-sm text-body-sm bg-mustard-light/70 p-2 rounded-lg"></p>
+        <div id="order-items" class="bg-crema-surface p-2.5 rounded-lg flex flex-col gap-1"></div>
+        <div class="flex items-center gap-2">
+          <a id="wa-customer" href="#" target="_blank" rel="noopener" class="flex-1 min-h-[44px] rounded-lg bg-whatsapp-green text-on-primary flex items-center justify-center gap-2 font-label-md text-label-md">WhatsApp</a>
+          <a id="call-customer" href="#" class="flex-1 min-h-[44px] rounded-lg bg-surface-container flex items-center justify-center gap-2 font-label-md text-label-md">Llamar</a>
+        </div>
+      </div>
+
+      <a id="nav-google" href="#" target="_blank" rel="noopener" class="min-h-[56px] rounded-xl bg-primary text-on-primary flex items-center justify-center gap-2 font-headline-sm text-headline-sm shadow-md">
+        Navegar con Google Maps
+      </a>
+      <a id="nav-waze" href="#" target="_blank" rel="noopener" class="min-h-[44px] rounded-lg bg-surface-container-lowest flex items-center justify-center gap-2 font-label-md text-label-md shadow-sm">
+        Abrir en Waze
+      </a>
+
+      <div id="route-map" class="hidden w-full h-48 rounded-xl overflow-hidden shadow-sm"></div>
+
+      <button id="btn-start-route" class="hidden min-h-[52px] rounded-xl bg-secondary text-on-secondary font-headline-sm text-headline-sm shadow-md">
+        Salir a Repartir
+      </button>
+
+      <div class="flex flex-col gap-2">
+        <button id="btn-mark-delivered" class="hidden min-h-[52px] rounded-xl bg-whatsapp-green text-on-primary font-headline-sm text-headline-sm shadow-md">
+          Marcar como Entregado
+        </button>
+        <button id="btn-incident" class="min-h-[44px] rounded-lg bg-surface-container text-error font-label-md text-label-md">
+          Reportar Incidencia
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal confirmar entrega -->
+<div id="modal-confirm" class="hidden fixed inset-0 z-50 bg-inverse-surface/60 items-center justify-center p-4">
+  <div class="bg-surface-container-lowest rounded-2xl w-full max-w-sm p-5 flex flex-col gap-4">
+    <h3 class="font-headline-sm text-headline-sm">Confirmar entrega</h3>
+    <p class="font-body-sm text-body-sm text-on-surface-variant">¿Ya entregaste el pedido y recibiste el pago?</p>
+    <div class="flex gap-2">
+      <button id="modal-confirm-cancel" class="flex-1 py-3 rounded-lg bg-surface-container font-label-md text-label-md">Cancelar</button>
+      <button id="modal-confirm-ok" class="flex-1 py-3 rounded-lg bg-whatsapp-green text-on-primary font-headline-sm text-headline-sm">Sí, finalizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal incidencia -->
+<div id="modal-incident" class="hidden fixed inset-0 z-50 bg-inverse-surface/60 items-center justify-center p-4">
+  <div class="bg-surface-container-lowest rounded-2xl w-full max-w-sm p-5 flex flex-col gap-3">
+    <h3 class="font-headline-sm text-headline-sm">Reportar incidencia</h3>
+    <button class="incident-reason text-left p-3 bg-surface-container-low rounded-lg" data-reason="El cliente no contesta timbre ni teléfono">El cliente no contesta timbre ni teléfono</button>
+    <button class="incident-reason text-left p-3 bg-surface-container-low rounded-lg" data-reason="Dirección no encontrada / número inexistente">Dirección no encontrada / número inexistente</button>
+    <button class="incident-reason text-left p-3 bg-surface-container-low rounded-lg" data-reason="Derrame de empaque o producto dañado">Derrame de empaque o producto dañado</button>
+    <button id="modal-incident-cancel" class="py-2 font-label-md text-label-md text-on-surface-variant">Cancelar</button>
+  </div>
+</div>
+
+<script src="../../src/js/api.js"></script>
+<script src="../../src/js/auth.js"></script>
+<script src="../../src/js/auth-gate.js"></script>
+<script src="../../src/js/catalog.js"></script>
+<script src="../../src/js/toast.js"></script>
+<script src="../../src/js/reparto-app.js"></script>
+</body>
+</html>

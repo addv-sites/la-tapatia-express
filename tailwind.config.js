@@ -11,6 +11,8 @@ module.exports = {
     './cuenta/rastreo/**/*.html',
     './cuenta/perfil/**/*.html',
     './cuenta/historial/**/*.html',
+    './analitica/panel/**/*.html',
+    './reparto/app/**/*.html',
     './src/js/**/*.js'
   ],
   theme: {

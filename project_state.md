@@ -64,8 +64,16 @@
   - Ícono de cuenta agregado al header de Home y Menú, enlazando a `cuenta/perfil/`.
   - Verificado en navegador real: las 3 pantallas cargan sin errores; flujo completo de checkout probado de punta a punta (agregar productos, llenar formulario, enviar) — carrito se vacía, WhatsApp abre con mensaje correcto, estado de éxito muestra folio y link de seguimiento, búsqueda de rastreo muestra el error esperado sin backend desplegado.
   - Pendiente (no bloqueante): vincular retroactivamente un pedido de invitado a la cuenta si se registra en la invitación post-pedido (hoy solo guarda el perfil para el próximo pedido, no reetiqueta el que ya se envió).
-- [ ] Segmento 5 — Analítica ADDV.
-- [ ] Segmento 6 — App repartidor.
+- [x] **Segmento 5 — Analítica ADDV** (2026-09-22): `analitica/panel/` (real, en subcarpeta nueva ya que `analitica/` raíz la ocupa el mockup) — KPIs, mapa con Leaflet+OpenStreetMap (gratis, sin Google Maps), desglose por zona de envío, top clientes registrados, demanda por hora, exportar CSV, selector de rango (hoy/semana/30 días), gate por dominio `@addv.mx`.
+  - **Corrección deliberada al mock:** el mock mostraba colonias con nombre inventado ("Arboledas de Valladolid", "Chapultepec Sur"...) — el sistema real no tiene esos nombres, solo zona de envío (Z1/Z2/Z3) calculada por distancia. Se reemplazó "colonias" por zona para no inventar datos geográficos que no existen.
+  - Cambios de esquema/backend: `PEDIDOS` gana `delivery_lat`/`delivery_lng` (se geocodifican una sola vez al crear el pedido — antes no se guardaban, sin eso no había mapa real posible). Nueva acción `analytics.read` (rol ADDV) — calcula todo server-side, nunca manda el histórico crudo al cliente.
+  - KPIs que el mock prometía pero se omitieron a propósito por no ser calculables honestamente con los datos que el sistema realmente guarda: "radio promedio de entrega" y "tiempo promedio de entrega" (no hay timestamp de entrega real, solo el status actual) — no se inventaron.
+  - Verificado en navegador: Leaflet carga bien, sin errores de consola, gate "backend aún no configurado" correcto. No se pudo probar el render con datos reales (requiere Apps Script desplegado + cuenta @addv.mx real).
+- [x] **Segmento 6 — App repartidor** (2026-09-22): `reparto/app/` (Ruta Activa: pedido asignado, GPS real vía `watchPosition` con throttle de 20s, deep-links Google Maps/Waze, mapa Leaflet+OSM del destino, marcar entregado, reportar incidencia) + `entregas/`, `ganancias/` (informativo, comisión fija × entregas), `perfil/`.
+  - Cambios de backend: `order.updateStatus` ahora acepta STAFF **o** DRIVERS (antes solo STAFF — el repartidor necesita auto-avanzar su propio pedido). Nuevas acciones `driver.myOrders` / `driver.myDeliveries`, filtradas por `driver_id === email verificado del repartidor` (así que `driver_id` en el admin debe asignarse como el email del repartidor, no un ID arbitrario).
+  - MVP: un pedido activo a la vez por repartidor (el mock mostraba una comanda enfocada, coincide). Subida de foto de entrega y "cambio a entregar" (billete grande) quedan fuera de este pase.
+  - **Bug propio corregido antes de probar:** un `<div>` envolvía los botones de acción con `hidden` estático que nunca se quitaba — los botones habrían quedado invisibles para siempre sin importar el estado del pedido. Detectado por inspección, no hizo falta el navegador esta vez.
+  - Verificado en navegador: las 4 pantallas cargan sin errores de consola, gate correcto. Sin Apps Script desplegado no se pudo probar el flujo real de GPS/entrega.
 - [ ] Segmento 7 — Pruebas + verificación funcional.
 
 ## Pendiente de que el usuario provea/despliegue (bloquea producción, no bloquea seguir construyendo)

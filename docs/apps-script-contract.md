@@ -36,7 +36,9 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `config.read` | GET | ninguna | Config pública (tarifas de envío por zona, `delivery_enabled`, mensajes) |
 | `config.update` | POST | STAFF | Actualiza cualquier campo de la fila única de CONFIG (tarifas por zona, comisión repartidor, etc.) |
 | `order.create` | POST | ninguna (cliente puede ser invitado) | Crea fila `pendiente` en `PEDIDOS`, regresa folio |
-| `order.updateStatus` | POST | STAFF o DRIVERS (según transición) | Avanza status del pedido |
+| `order.updateStatus` | POST | STAFF o DRIVERS | Avanza status del pedido |
+| `driver.myOrders` | POST | DRIVERS (filtra por su propio email como `driver_id`) | Pedidos activos asignados a este repartidor (`listo`/`en_reparto`) |
+| `driver.myDeliveries` | POST | DRIVERS | Entregas completadas por este repartidor (historial + base de ganancias) |
 | `order.delete` | POST | STAFF | Borra un pedido `pendiente`/`abandonado` no concretado |
 | `order.assignDriver` | POST | STAFF | Asigna `driver_id` a un pedido listo para despacho |
 | `order.trackingRead` | GET | ninguna (folio + teléfono como clave de acceso) | Estado + última posición GPS para el portal cliente |
@@ -50,7 +52,7 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `client.upsertProfile` | POST | Cliente (su propio email) | Crea/actualiza `CLIENTES`, guarda dirección/teléfono |
 | `client.optInMarketing` | POST | Cliente | Guarda consentimiento explícito (LFPDPPP) |
 | `incident.report` | POST | DRIVERS | Escribe en hoja `INCIDENCIAS` |
-| `analytics.read` | GET | ADDV (`@addv.mx`) | Agregados geoespaciales/CRM ya calculados server-side (nunca manda el histórico crudo completo al cliente) |
+| `analytics.read` | POST | ADDV (`@addv.mx`) | Agregados geoespaciales/CRM ya calculados server-side (KPIs, por zona, top clientes, demanda por hora, puntos de mapa) — nunca manda el histórico crudo completo al cliente |
 | `campaign.sendEmail` | POST | STAFF o ADDV | Envío vía `MailApp`/`GmailApp` (cuota gratuita de la cuenta) |
 
 ## Hojas de Google Sheets
@@ -59,7 +61,7 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 `product_id, category_id, category, name, short_description, description, price, image, active, featured, sort_order, tags, options, extras, branch_id, requiresValidation`
 
 ### `PEDIDOS`
-`order_id (folio #TA-0001), created_at, customer_name, customer_phone, customer_email (opcional), items (JSON con snapshot de precio), subtotal, delivery_fee, total, notes, order_type (pickup|delivery|mostrador), delivery_address, delivery_zone (Z1|Z2|Z3), cash_denomination (opcional), branch_id, status, driver_id (opcional), driver_lat, driver_lng, driver_ping_at, source, whatsapp_sent, internal_notes`
+`order_id (folio #TA-0001), created_at, customer_name, customer_phone, customer_email (opcional), items (JSON con snapshot de precio), subtotal, delivery_fee, total, notes, order_type (pickup|delivery|mostrador), delivery_address, delivery_zone (Z1|Z2|Z3), delivery_lat, delivery_lng (geocodificados una sola vez al crear el pedido, usados por el mapa de calor de analítica), cash_denomination (opcional), branch_id, status, driver_id (opcional), driver_lat, driver_lng, driver_ping_at, source, whatsapp_sent, internal_notes`
 
 Enum `status`: `pendiente → confirmado → en_cocina → listo → en_reparto → entregado`, ramas `cancelado` / `abandonado`.
 
