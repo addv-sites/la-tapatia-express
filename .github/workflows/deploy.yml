@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '*/20 9-19 * * 2-0' # cada 20 min en horario de operación aprox. (revisar cron vs huso horario del runner, que es UTC)
+    - cron: '*/20 9-19 * * 0,2-6' # cada 20 min en horario de operación aprox., cierra lunes (UTC del runner — ver nota de huso horario abajo)
   workflow_dispatch: {}
 
 permissions:
