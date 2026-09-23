@@ -57,6 +57,16 @@ function appendRow_(sheetName, obj, headers) {
   sh.appendRow(row);
 }
 
+/** Normaliza un nombre a slug ascii-kebab para usarlo como product_id legible. */
+function slugify_(text) {
+  const combiningMarks = new RegExp('[\u0300-\u036f]', 'g');
+  return String(text)
+    .normalize('NFD').replace(combiningMarks, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 /** Verifica el ID token de Google Sign-In contra el endpoint oficial de Google. Nunca confiar en el email declarado por el cliente sin esto. */
 function verifyIdToken_(idToken) {
   if (!idToken) return null;
@@ -476,6 +486,63 @@ function action_catalogSeed_(payload, user) {
   });
 }
 
+function action_catalogCreate_(payload, user) {
+  return withLock_(() => {
+    const name = String(payload.name || '').trim();
+    const categoryId = String(payload.category_id || '').trim();
+    const category = String(payload.category || '').trim();
+    const price = Number(payload.price);
+    if (!name) throw new Error('Falta el nombre del platillo');
+    if (!categoryId || !category) throw new Error('Falta la categoría');
+    if (!price || price <= 0) throw new Error('Precio inválido');
+
+    const headers = ['product_id', 'category_id', 'category', 'name', 'short_description', 'description', 'price', 'image', 'active', 'featured', 'sort_order', 'tags', 'options', 'extras', 'branch_id', 'requiresValidation'];
+    const existing = readSheetAsObjects_('CATALOGO');
+    const existingIds = existing.map((r) => r.product_id);
+
+    const baseSlug = slugify_(name);
+    if (!baseSlug) throw new Error('Nombre inválido');
+    let productId = baseSlug;
+    let suffix = 2;
+    while (existingIds.indexOf(productId) !== -1) {
+      productId = baseSlug + '-' + suffix;
+      suffix++;
+    }
+
+    const sameCategory = existing.filter((r) => r.category_id === categoryId);
+    const maxSort = sameCategory.reduce((max, r) => Math.max(max, Number(r.sort_order) || 0), 0);
+
+    const product = {
+      product_id: productId,
+      category_id: categoryId,
+      category: category,
+      name: name,
+      short_description: String(payload.short_description || ''),
+      description: String(payload.description || ''),
+      price: price,
+      image: String(payload.image || ''),
+      active: true,
+      featured: false,
+      sort_order: maxSort + 1,
+      tags: [],
+      options: [],
+      extras: [],
+      branch_id: payload.branch_id || (existing.length ? existing[0].branch_id : 'morelia-san-juanito'),
+      requiresValidation: true
+    };
+
+    const sh = sheet_('CATALOGO');
+    const row = headers.map((h) => {
+      const v = product[h];
+      return Array.isArray(v) ? JSON.stringify(v) : v;
+    });
+    sh.appendRow(row);
+
+    logAudit_(user.email, 'catalog.create', 'CATALOGO', productId, null, product);
+    return { ok: true, product: product };
+  });
+}
+
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024; // 3MB decoded — el cliente redimensiona/comprime antes de mandar
 const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -673,6 +740,7 @@ function route_(action, payload, idToken, sessionId) {
     case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.seed': return action_catalogSeed_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.create': return action_catalogCreate_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.uploadPhoto': return action_catalogUploadPhoto_(payload, requireRole_(idToken, 'STAFF'));
 
     case 'driver.myOrders': return action_driverMyOrders_(requireRole_(idToken, 'DRIVERS'));

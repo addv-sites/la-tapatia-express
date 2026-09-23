@@ -49,9 +49,9 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `catalog.readAll` | POST | STAFF | Catálogo completo (incluye inactivos) para el admin |
 | `catalog.updatePrice` / `catalog.approvePrice` / `catalog.toggleAvailability` | POST | STAFF | Admin catálogo |
 | `catalog.seed` | POST | STAFF | Carga productos (`payload.products`, mismo shape que `data/catalog.json`) a la hoja `CATALOGO`, ignora los `product_id` que ya existen — no duplica |
+| `catalog.create` | POST | STAFF | Da de alta un platillo nuevo (`name`, `category_id`, `category`, `price`, opcional `short_description`/`description`/`image`). Genera `product_id` slug desde el nombre (agrega sufijo `-2`, `-3`... si ya existe), `requiresValidation: true` |
 | `catalog.uploadPhoto` | POST | STAFF | Sube una foto (`payload.base64Data`, máx 3MB decodificado, jpeg/png/webp) a una carpeta de Drive ("La Tapatía Ahogadas - Fotos Catálogo"), la hace pública por link, y actualiza la columna `image` de `CATALOGO` |
 | `order.list` | POST | STAFF | Lista pedidos (opcionalmente filtrada por `status`) para el gestor/KDS — se llama por polling cada 10-15s |
-| `catalog.uploadPhoto` | POST | STAFF | Sube imagen (base64) a carpeta de Drive, regresa URL, actualiza `image` |
 | `client.upsertProfile` | POST | Cliente (su propio email) | Crea/actualiza `CLIENTES`, guarda dirección/teléfono |
 | `client.optInMarketing` | POST | Cliente | Guarda consentimiento explícito (LFPDPPP) |
 | `incident.report` | POST | DRIVERS | Escribe en hoja `INCIDENCIAS` |

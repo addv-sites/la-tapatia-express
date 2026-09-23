@@ -45,7 +45,10 @@
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
-      <input id="dish-search" class="w-full md:w-64 px-4 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm shadow-sm" type="text" placeholder="Buscar por platillo...">
+      <div class="flex items-center gap-3 shrink-0">
+        <input id="dish-search" class="w-full md:w-64 px-4 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm shadow-sm" type="text" placeholder="Buscar por platillo...">
+        <button id="btn-add-dish" class="shrink-0 min-h-[44px] px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md">+ Agregar platillo</button>
+      </div>
     </div>
 
     <div id="catalog-table-wrap" class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
@@ -73,6 +76,56 @@
     </p>
   </div>
 </main>
+
+<div id="add-dish-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40">
+  <div class="w-full max-w-md bg-surface rounded-2xl shadow-lg p-6 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h2 class="font-headline-md text-headline-md text-on-surface">Agregar platillo</h2>
+      <button id="btn-close-add-dish" type="button" class="p-1.5 rounded-full text-on-surface-variant hover:bg-surface-container" aria-label="Cerrar">
+        <svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-close"/></svg>
+      </button>
+    </div>
+    <form id="add-dish-form" class="flex flex-col gap-3">
+      <label class="flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Nombre del platillo</span>
+        <input id="add-dish-name" required class="px-3 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm" type="text" placeholder="Ej. Torta ahogada" maxlength="120">
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Categoría</span>
+        <select id="add-dish-category" required class="px-3 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm">
+          <option value="">Selecciona…</option>
+          <option value="__nueva__">+ Nueva categoría</option>
+        </select>
+      </label>
+
+      <div id="add-dish-new-category-wrap" class="hidden flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Nombre de la categoría nueva</span>
+        <input id="add-dish-new-category" class="px-3 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm" type="text" placeholder="Ej. Bebidas" maxlength="60">
+      </div>
+
+      <label class="flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Precio (MXN)</span>
+        <input id="add-dish-price" required class="px-3 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm" type="number" min="1" step="1" placeholder="0">
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Descripción corta (opcional)</span>
+        <input id="add-dish-description" class="px-3 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm" type="text" maxlength="200">
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Foto (opcional, máx 4MB)</span>
+        <input id="add-dish-photo" class="font-body-sm text-body-sm" type="file" accept="image/*">
+      </label>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="btn-cancel-add-dish" type="button" class="min-h-[44px] px-4 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container">Cancelar</button>
+        <button id="btn-submit-add-dish" type="submit" class="min-h-[44px] px-5 rounded-lg bg-primary text-on-primary font-label-md text-label-md">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script src="../../src/js/api.js"></script>
 <script src="../../src/js/auth.js"></script>

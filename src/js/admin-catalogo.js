@@ -1,7 +1,15 @@
 (function () {
+  const MAX_PHOTO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4MB — validación en front antes de leer/redimensionar el archivo
+
   let idToken = null;
   let allProducts = [];
   let activeCategory = 'todos';
+
+  function assertPhotoSize_(file) {
+    if (file.size > MAX_PHOTO_UPLOAD_BYTES) {
+      throw new Error('La imagen pesa más de 4MB, elige una más ligera.');
+    }
+  }
 
   function render() {
     const tbody = document.getElementById('catalog-tbody');
@@ -94,6 +102,7 @@
         const file = photoInput.files[0];
         if (!file) return;
         try {
+          assertPhotoSize_(file);
           const base64Data = await resizeImageToBase64_(file, 800, 0.8);
           const result = await window.LTA_API.callAction('catalog.uploadPhoto', {
             product_id: p.product_id,
@@ -168,7 +177,7 @@
 
   async function loadCatalog() {
     const data = await window.LTA_API.callAction('catalog.readAll', {}, idToken);
-    allProducts = data.products;
+    allProducts = data.products || [];
     document.getElementById('empty-state').classList.toggle('hidden', allProducts.length > 0);
     document.getElementById('catalog-table-wrap').classList.toggle('hidden', allProducts.length === 0);
     renderCategoryPills();
@@ -191,10 +200,112 @@
     }
   }
 
+  function populateAddDishCategorySelect_() {
+    const select = document.getElementById('add-dish-category');
+    const categories = Array.from(new Set(allProducts.map((p) => p.category_id)));
+    select.innerHTML = '<option value="">Selecciona…</option>';
+    categories.forEach((id) => {
+      const product = allProducts.find((p) => p.category_id === id);
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = product.category;
+      select.appendChild(opt);
+    });
+    const newOpt = document.createElement('option');
+    newOpt.value = '__nueva__';
+    newOpt.textContent = '+ Nueva categoría';
+    select.appendChild(newOpt);
+  }
+
+  function openAddDishModal_() {
+    populateAddDishCategorySelect_();
+    document.getElementById('add-dish-form').reset();
+    document.getElementById('add-dish-new-category-wrap').classList.add('hidden');
+    document.getElementById('add-dish-modal').classList.remove('hidden');
+    document.getElementById('add-dish-name').focus();
+  }
+
+  function closeAddDishModal_() {
+    document.getElementById('add-dish-modal').classList.add('hidden');
+  }
+
+  async function submitAddDish_() {
+    const submitBtn = document.getElementById('btn-submit-add-dish');
+    const name = document.getElementById('add-dish-name').value.trim();
+    const price = Number(document.getElementById('add-dish-price').value);
+    const description = document.getElementById('add-dish-description').value.trim();
+    const categorySelect = document.getElementById('add-dish-category');
+    const isNewCategory = categorySelect.value === '__nueva__';
+    const categoryLabel = isNewCategory
+      ? document.getElementById('add-dish-new-category').value.trim()
+      : (categorySelect.selectedOptions[0] ? categorySelect.selectedOptions[0].textContent : '');
+    const categoryId = isNewCategory ? slugify_(categoryLabel) : categorySelect.value;
+    const photoFile = document.getElementById('add-dish-photo').files[0];
+
+    if (!name) { window.LTA_TOAST.show('Falta el nombre del platillo.', 'error'); return; }
+    if (!categoryId || !categoryLabel) { window.LTA_TOAST.show('Falta la categoría.', 'error'); return; }
+    if (!price || price <= 0) { window.LTA_TOAST.show('Precio inválido.', 'error'); return; }
+    if (photoFile) {
+      try {
+        assertPhotoSize_(photoFile);
+      } catch (err) {
+        window.LTA_TOAST.show(err.message, 'error');
+        return;
+      }
+    }
+
+    submitBtn.disabled = true;
+    try {
+      const result = await window.LTA_API.callAction('catalog.create', {
+        name,
+        category_id: categoryId,
+        category: categoryLabel,
+        price,
+        short_description: description
+      }, idToken);
+
+      if (photoFile) {
+        const base64Data = await resizeImageToBase64_(photoFile, 800, 0.8);
+        await window.LTA_API.callAction('catalog.uploadPhoto', {
+          product_id: result.product.product_id,
+          mimeType: 'image/jpeg',
+          base64Data
+        }, idToken);
+      }
+
+      window.LTA_TOAST.show('"' + name + '" agregado al catálogo.');
+      closeAddDishModal_();
+      await loadCatalog();
+    } catch (err) {
+      window.LTA_TOAST.show('Error: ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+
+  function slugify_(text) {
+    return String(text)
+      .normalize('NFD').replace(new RegExp('[\u0300-\u036f]', 'g'), '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dish-search').addEventListener('keyup', render);
     document.getElementById('btn-seed-catalog').addEventListener('click', seedCatalog);
     window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
+
+    document.getElementById('btn-add-dish').addEventListener('click', openAddDishModal_);
+    document.getElementById('btn-close-add-dish').addEventListener('click', closeAddDishModal_);
+    document.getElementById('btn-cancel-add-dish').addEventListener('click', closeAddDishModal_);
+    document.getElementById('add-dish-category').addEventListener('change', (e) => {
+      document.getElementById('add-dish-new-category-wrap').classList.toggle('hidden', e.target.value !== '__nueva__');
+    });
+    document.getElementById('add-dish-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitAddDish_();
+    });
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestor de Catálogo',
