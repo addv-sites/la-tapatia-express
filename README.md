@@ -1,6 +1,6 @@
-# La Tapatía Ahogadas
+# Ahogadas La Tapatía Express
 
-Sitio web, panel administrativo, portal de cliente, panel de analítica y app de repartidor de **La Tapatía Ahogadas** (Morelia, Michoacán). Arquitectura 100% estática: **GitHub Pages + Google Sheets + Google Apps Script**, sin backend tradicional, sin servidor propio, sin base de datos propia.
+Sitio web, panel administrativo, portal de cliente, panel de analítica y app de repartidor de **Ahogadas La Tapatía Express** (Morelia, Michoacán). Arquitectura 100% estática: **GitHub Pages + Google Sheets + Google Apps Script**, sin backend tradicional, sin servidor propio, sin base de datos propia.
 
 > Estado del proyecto y decisiones tomadas: ver [`project_state.md`](./project_state.md). Contexto operativo persistente: [`CLAUDE.md`](./CLAUDE.md).
 

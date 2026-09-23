@@ -107,7 +107,7 @@
     document.getElementById('range-select').addEventListener('change', (e) => load(e.target.value));
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
-      title: 'Analítica La Tapatía Ahogadas',
+      title: 'Analítica Ahogadas La Tapatía Express',
       subtitle: 'Acceso restringido a personal de ADDV (@addv.mx).',
       onSignedIn: async (token) => {
         idToken = token;
