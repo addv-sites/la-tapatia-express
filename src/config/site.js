@@ -38,7 +38,7 @@ window.SITE_CONFIG = {
     // Se llena al desplegar el Web App de Apps Script (ver docs/apps-script-contract.md).
     // Es una URL pública de invocación, no un secreto — la autorización real
     // ocurre server-side verificando el ID token de Google en cada request.
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbwlim9CvMxuE442RxsGmNCKxU8Plu-X_K4XiuE2CSoZNyg9p73Ai3YndENrstO022wc/exec'
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbzcWVjK6aPn3jJ8VZdzB05Dl6bodGSfOjVYmY8ZU0BYzErq4BbDU4xk_3QZgBVCfb6T/exec'
   },
   featureFlags: {
     deliveryEnabled: true, // se reconfirma en runtime contra la hoja CONFIG

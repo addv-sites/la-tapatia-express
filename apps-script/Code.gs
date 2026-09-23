@@ -67,10 +67,13 @@ function getOrCreateFolderPath_(pathParts) {
   return folder;
 }
 
-/** Prueba manual: selecciónala en el dropdown del editor y dale Ejecutar para disparar el diálogo de autorización de Drive. Se puede borrar después de usarla. */
+/** Prueba manual: selecciónala en el dropdown del editor y dale Ejecutar para disparar el diálogo de autorización de Drive. Crea y borra un archivo de prueba para forzar el scope de escritura (drive), no solo lectura. Se puede borrar después de usarla. */
 function testDriveAuth_() {
   const folder = getOrCreateFolderPath_(['laTapatia', 'imagenes', 'catalogo']);
-  Logger.log('OK: ' + folder.getName() + ' (' + folder.getUrl() + ')');
+  const testFile = folder.createFile('test-auth.txt', 'ok', MimeType.PLAIN_TEXT);
+  Logger.log('OK: ' + folder.getName() + ' — archivo creado: ' + testFile.getId());
+  testFile.setTrashed(true);
+  Logger.log('Archivo de prueba borrado.');
 }
 
 /** Normaliza un nombre a slug ascii-kebab para usarlo como product_id legible. */
