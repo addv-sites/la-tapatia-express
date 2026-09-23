@@ -57,6 +57,22 @@ function appendRow_(sheetName, obj, headers) {
   sh.appendRow(row);
 }
 
+/** Navega (o crea) una ruta anidada de carpetas en Drive, ej. ['laTapatia', 'imagenes', 'catalogo']. */
+function getOrCreateFolderPath_(pathParts) {
+  let folder = DriveApp.getRootFolder();
+  pathParts.forEach((name) => {
+    const existing = folder.getFoldersByName(name);
+    folder = existing.hasNext() ? existing.next() : folder.createFolder(name);
+  });
+  return folder;
+}
+
+/** Prueba manual: selecciónala en el dropdown del editor y dale Ejecutar para disparar el diálogo de autorización de Drive. Se puede borrar después de usarla. */
+function testDriveAuth_() {
+  const folder = getOrCreateFolderPath_(['laTapatia', 'imagenes', 'catalogo']);
+  Logger.log('OK: ' + folder.getName() + ' (' + folder.getUrl() + ')');
+}
+
 /** Normaliza un nombre a slug ascii-kebab para usarlo como product_id legible. */
 function slugify_(text) {
   const combiningMarks = new RegExp('[\u0300-\u036f]', 'g');
@@ -566,9 +582,7 @@ function action_catalogUploadPhoto_(payload, user) {
     }
     if (rowIndex === -1) throw new Error('Producto no encontrado');
 
-    const folderName = 'La Tapatía Ahogadas - Fotos Catálogo';
-    const folders = DriveApp.getFoldersByName(folderName);
-    const folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+    const folder = getOrCreateFolderPath_(['laTapatia', 'imagenes', 'catalogo']);
 
     const blob = Utilities.newBlob(bytes, mimeType, payload.product_id + '-' + Date.now());
     const file = folder.createFile(blob);
