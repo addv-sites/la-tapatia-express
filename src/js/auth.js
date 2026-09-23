@@ -24,24 +24,39 @@
     }
   }
 
+  function whenGoogleReady_(fn) {
+    if (window.google && window.google.accounts) { fn(); return; }
+    // El script de accounts.google.com/gsi/client carga async — puede no
+    // estar listo todavía cuando esta página intenta pintar el botón.
+    const t = setInterval(() => {
+      if (window.google && window.google.accounts) {
+        clearInterval(t);
+        fn();
+      }
+    }, 100);
+    setTimeout(() => clearInterval(t), 10000);
+  }
+
   function init() {
     if (!window.SITE_CONFIG.googleClientId) return;
-    if (!window.google || !window.google.accounts) return;
-    window.google.accounts.id.initialize({
-      client_id: window.SITE_CONFIG.googleClientId,
-      callback: onCredentialResponse,
-      auto_select: false
+    whenGoogleReady_(() => {
+      window.google.accounts.id.initialize({
+        client_id: window.SITE_CONFIG.googleClientId,
+        callback: onCredentialResponse,
+        auto_select: false
+      });
     });
   }
 
   function renderButton(container, options) {
-    if (!window.google || !window.google.accounts) return;
-    window.google.accounts.id.renderButton(container, Object.assign({
-      theme: 'outline',
-      size: 'large',
-      text: 'continue_with',
-      locale: 'es_MX'
-    }, options || {}));
+    whenGoogleReady_(() => {
+      window.google.accounts.id.renderButton(container, Object.assign({
+        theme: 'outline',
+        size: 'large',
+        text: 'continue_with',
+        locale: 'es_MX'
+      }, options || {}));
+    });
   }
 
   function signOut() {

@@ -1,6 +1,5 @@
 {
-  "_comment": "Snapshot de ejemplo generado a mano a partir de buildClaude.md #4. TODOS los precios están marcados requiresValidation=true por instrucción explícita — no se confirman hasta que el negocio los valide en el admin. En producción este archivo lo regenera el GitHub Action leyendo la hoja CATALOGO vía Apps Script (docs/apps-script-contract.md).",
-  "generated_at": null,
+  "_comment": "Semilla manual para el botón 'Precargar catálogo' del admin. A diferencia de data/catalog.json, este archivo NO lo toca scripts/build-snapshot.mjs — así el CI no lo pisa con el estado (posiblemente vacío) del Sheet CATALOGO antes de que el negocio alcance a sembrarlo. TODOS los precios están marcados requiresValidation=true por instrucción explícita — no se confirman hasta que el negocio los valide en el admin.",
   "branch_id": "morelia-san-juanito",
   "products": [
     { "product_id": "tacos-3pz", "category_id": "tacos", "category": "Tacos", "name": "Tacos (3 piezas)", "short_description": "Tres tacos dorados con relleno casero.", "description": "", "price": 50, "image": "/assets/img/catalogo/tacos.svg", "active": true, "featured": true, "sort_order": 1, "tags": [], "options": [], "extras": [], "branch_id": "morelia-san-juanito", "requiresValidation": true },

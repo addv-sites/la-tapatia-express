@@ -7,9 +7,12 @@
     "dev:css": "tailwindcss -i ./src/styles/input.css -o ./css/site.css --watch",
     "build:css": "tailwindcss -i ./src/styles/input.css -o ./css/site.css --minify",
     "serve": "python -m http.server 8080 --directory .",
-    "build": "npm run build:css"
+    "build": "npm run build:css",
+    "test:e2e": "playwright test --project=mobile-chrome",
+    "test:e2e:ui": "playwright test --ui --project=mobile-chrome"
   },
   "devDependencies": {
+    "@playwright/test": "1.50.1",
     "tailwindcss": "^3.4.13"
   }
 }

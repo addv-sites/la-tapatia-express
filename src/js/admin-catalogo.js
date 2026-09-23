@@ -179,7 +179,7 @@
     const btn = document.getElementById('btn-seed-catalog');
     btn.disabled = true;
     try {
-      const res = await fetch('../../data/catalog.json', { cache: 'no-store' });
+      const res = await fetch('../../data/catalog.seed.json', { cache: 'no-store' });
       const snapshot = await res.json();
       const result = await window.LTA_API.callAction('catalog.seed', { products: snapshot.products || [] }, idToken);
       window.LTA_TOAST.show(result.added + ' productos precargados.');

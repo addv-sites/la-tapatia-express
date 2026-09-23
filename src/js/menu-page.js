@@ -35,12 +35,18 @@
       ? '<span class="inline-block px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] uppercase tracking-wider">Precio requiere validación</span>'
       : '<span></span>';
     const unavailable = product.active === false;
+    const thumb = product.image
+      ? '<img class="w-14 h-14 rounded-xl object-cover shrink-0" src="' + product.image + '" alt="" loading="lazy">'
+      : '';
     article.innerHTML =
       '<div class="p-4 flex items-center justify-between gap-3' + (unavailable ? ' opacity-50' : '') + '">' +
+      '  <div class="flex items-center gap-3 min-w-0">' +
+      thumb +
       '  <div class="min-w-0">' +
       '    <h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">' + product.name + '</h3>' +
       '    <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">' + (product.short_description || '') + '</p>' +
       '    <div class="pt-1">' + badge + '</div>' +
+      '  </div>' +
       '  </div>' +
       '  <div class="flex flex-col items-end gap-1.5 shrink-0">' +
       '    <span class="font-price-md text-price-md text-primary font-bold">' + window.LTA_CATALOG.formatPrice(product.price) + '</span>' +
@@ -156,6 +162,9 @@
       } else {
         cartEmpty.hidden = true;
         submitBtn.disabled = false;
+        form.classList.remove('hidden');
+        document.getElementById('order-success').classList.add('hidden');
+        document.getElementById('order-success').classList.remove('flex');
         items.forEach((item, i) => cartList.appendChild(renderCartLine(item, i, (idx) => {
           window.LTA_CART.removeAt(idx);
           renderCart();

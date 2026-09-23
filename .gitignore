@@ -21,5 +21,9 @@ dist/
 .parcel-cache/
 *.log
 
+# Playwright output
+test-results/
+playwright-report/
+
 # Referencia local, no se sincroniza (pedido explícito: solo vive en esta máquina)
 /local/

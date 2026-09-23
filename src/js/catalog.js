@@ -6,9 +6,20 @@
 (function () {
   let cachePromise = null;
 
+  function resolveSnapshotPath() {
+    const configured = window.SITE_CONFIG.catalogSnapshotPath || '/data/catalog.json';
+    if (!configured.startsWith('/')) return configured;
+    try {
+      const base = new URL(window.SITE_CONFIG.siteUrl).pathname.replace(/\/$/, '');
+      return base + configured;
+    } catch (e) {
+      return configured;
+    }
+  }
+
   function load() {
     if (!cachePromise) {
-      cachePromise = fetch(window.SITE_CONFIG.catalogSnapshotPath || '/data/catalog.json')
+      cachePromise = fetch(resolveSnapshotPath(), { cache: 'no-store' })
         .then((r) => r.json())
         .catch(() => ({ products: [], config: null }));
     }

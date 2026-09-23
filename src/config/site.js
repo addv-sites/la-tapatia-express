@@ -10,7 +10,7 @@ window.SITE_CONFIG = {
   branchId: 'morelia-san-juanito',
   branchName: 'Sucursal Morelia',
   phone: '4433288181',
-  whatsapp: '524433288181',
+  whatsapp: '523339567559',
   address: 'Av. San Juanito Itzicuaro 171, Arboledas de Valladolid, Morelia, Michoacán, México.',
   googleMapsUrl: 'https://maps.app.goo.gl/Cb7RmeSY7idKGYyk9?g_st=ic',
   coordinates: {
