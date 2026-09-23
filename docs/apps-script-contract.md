@@ -48,6 +48,8 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `driver.pingLocation` | POST | DRIVERS | Actualiza lat/lng/timestamp del repartidor en ruta |
 | `catalog.readAll` | POST | STAFF | Catálogo completo (incluye inactivos) para el admin |
 | `catalog.updatePrice` / `catalog.approvePrice` / `catalog.toggleAvailability` | POST | STAFF | Admin catálogo |
+| `catalog.seed` | POST | STAFF | Carga productos (`payload.products`, mismo shape que `data/catalog.json`) a la hoja `CATALOGO`, ignora los `product_id` que ya existen — no duplica |
+| `catalog.uploadPhoto` | POST | STAFF | Sube una foto (`payload.base64Data`, máx 3MB decodificado, jpeg/png/webp) a una carpeta de Drive ("La Tapatía Ahogadas - Fotos Catálogo"), la hace pública por link, y actualiza la columna `image` de `CATALOGO` |
 | `order.list` | POST | STAFF | Lista pedidos (opcionalmente filtrada por `status`) para el gestor/KDS — se llama por polling cada 10-15s |
 | `catalog.uploadPhoto` | POST | STAFF | Sube imagen (base64) a carpeta de Drive, regresa URL, actualiza `image` |
 | `client.upsertProfile` | POST | Cliente (su propio email) | Crea/actualiza `CLIENTES`, guarda dirección/teléfono |

@@ -99,6 +99,14 @@
 - **Pendiente del usuario:** repegar `apps-script/Code.gs` actualizado en el editor de Apps Script real y volver a desplegar — el Web App en vivo todavía no reconoce `driver.list` hasta ese paso manual. Sin eso, el selector cargará vacío/con error en producción (el resto de la página sigue funcionando igual).
 - No se pudo probar el flujo end-to-end contra el backend real por lo anterior; sí se verificó visualmente el layout de la tarjeta (selector + botón, sin overlap) con un harness temporal usando el CSS/íconos reales del proyecto, y la sintaxis del JS.
 
+## Precarga de catálogo + subida de fotos a Drive (2026-09-22)
+
+- [x] Implementado: la hoja `CATALOGO` real estaba vacía (nunca se llenó a mano como pedía la guía) — se agregó botón "Precargar catálogo desde data/catalog.json" en `admin/catalogo/`, visible solo cuando la tabla está vacía. Llama a la nueva acción `catalog.seed` (STAFF), idempotente — no duplica productos que ya existan por `product_id`.
+- [x] Implementado: subida de foto real por producto en `admin/catalogo/` — botón "+" sobre la miniatura, redimensiona/comprime la imagen en el navegador (máx 800px, JPEG calidad 0.8) antes de mandarla. Backend: nueva acción `catalog.uploadPhoto` (STAFF) sube a una carpeta de Google Drive ("La Tapatía Ahogadas - Fotos Catálogo"), la hace pública por link (necesario para `<img>`), límite de 3MB decodificado, y actualiza la columna `image` de `CATALOGO`. `catalogUploadPhoto` solo existía como comentario TODO desde el scaffolding inicial — nunca se había implementado.
+- Documentado en `docs/apps-script-contract.md`.
+- **Pendiente del usuario:** repegar `apps-script/Code.gs` y hacer "Nueva versión" en Implementar → Administrar implementaciones (ya sabe el paso, lo hizo para `driver.list`).
+- Verificado visualmente el layout (miniatura + botón, banner de precarga) con un harness temporal usando el CSS/sprite reales; no probado end-to-end contra el backend real (pendiente redeploy + login STAFF real del usuario).
+
 ## Próximo paso
 
 Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).

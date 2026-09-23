@@ -453,6 +453,67 @@ function action_catalogToggleAvailability_(payload, user) {
   });
 }
 
+function action_catalogSeed_(payload, user) {
+  return withLock_(() => {
+    const products = payload.products || [];
+    if (!products.length) throw new Error('Sin productos que precargar');
+    const headers = ['product_id', 'category_id', 'category', 'name', 'short_description', 'description', 'price', 'image', 'active', 'featured', 'sort_order', 'tags', 'options', 'extras', 'branch_id', 'requiresValidation'];
+    const sh = sheet_('CATALOGO');
+    const existingIds = readSheetAsObjects_('CATALOGO').map((r) => r.product_id);
+    let added = 0;
+    products.forEach((p) => {
+      if (existingIds.indexOf(p.product_id) !== -1) return;
+      const row = headers.map((h) => {
+        const v = p[h];
+        if (v === undefined || v === null) return '';
+        return Array.isArray(v) ? JSON.stringify(v) : v;
+      });
+      sh.appendRow(row);
+      added++;
+    });
+    logAudit_(user.email, 'catalog.seed', 'CATALOGO', 'bulk', null, { added: added });
+    return { ok: true, added: added };
+  });
+}
+
+const MAX_PHOTO_BYTES = 3 * 1024 * 1024; // 3MB decoded — el cliente redimensiona/comprime antes de mandar
+const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+function action_catalogUploadPhoto_(payload, user) {
+  return withLock_(() => {
+    if (!payload.product_id || !payload.base64Data) throw new Error('Falta product_id o imagen');
+    const mimeType = payload.mimeType || 'image/jpeg';
+    if (ALLOWED_PHOTO_MIME_TYPES.indexOf(mimeType) === -1) throw new Error('Formato de imagen no permitido');
+
+    const bytes = Utilities.base64Decode(payload.base64Data);
+    if (bytes.length > MAX_PHOTO_BYTES) throw new Error('Imagen demasiado pesada (máx 3MB)');
+
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    const imgCol = headers.indexOf('image') + 1;
+    let rowIndex = -1;
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) { rowIndex = i + 1; break; }
+    }
+    if (rowIndex === -1) throw new Error('Producto no encontrado');
+
+    const folderName = 'La Tapatía Ahogadas - Fotos Catálogo';
+    const folders = DriveApp.getFoldersByName(folderName);
+    const folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+
+    const blob = Utilities.newBlob(bytes, mimeType, payload.product_id + '-' + Date.now());
+    const file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    const imageUrl = 'https://drive.google.com/uc?export=view&id=' + file.getId();
+
+    sh.getRange(rowIndex, imgCol).setValue(imageUrl);
+    logAudit_(user.email, 'catalog.uploadPhoto', 'CATALOGO', payload.product_id, null, { image: imageUrl });
+    return { ok: true, imageUrl: imageUrl };
+  });
+}
+
 function action_clientGetProfile_(user) {
   const rows = readSheetAsObjects_('CLIENTES');
   const match = rows.find((r) => String(r.email).toLowerCase() === user.email);
@@ -583,7 +644,7 @@ function action_analyticsRead_(payload) {
 }
 
 // TODO (fuera del scaffolding inicial, se completa en un pase de CRM):
-// action_campaignSendEmail_, action_catalogUploadPhoto_
+// action_campaignSendEmail_
 
 // ---------------------------------------------------------------------------
 // Router
@@ -611,6 +672,8 @@ function route_(action, payload, idToken, sessionId) {
     case 'catalog.updatePrice': return action_catalogUpdatePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.seed': return action_catalogSeed_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.uploadPhoto': return action_catalogUploadPhoto_(payload, requireRole_(idToken, 'STAFF'));
 
     case 'driver.myOrders': return action_driverMyOrders_(requireRole_(idToken, 'DRIVERS'));
     case 'driver.myDeliveries': return action_driverMyDeliveries_(requireRole_(idToken, 'DRIVERS'));

@@ -18,6 +18,15 @@
       const tr = document.createElement('tr');
       tr.className = 'dish-row hover:bg-crema-surface/60 transition-colors' + (p.requiresValidation ? ' bg-mustard-light/25' : '');
       tr.innerHTML =
+        '<td class="py-3 px-4">' +
+        '  <div class="relative w-12 h-12 shrink-0">' +
+        '    <img class="thumb-img w-12 h-12 rounded-lg object-cover bg-surface-container-high" src="' + (p.image || '') + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+        '    <input type="file" accept="image/*" class="photo-input hidden">' +
+        '    <button class="photo-btn absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center" title="Cambiar foto">' +
+        '      <svg class="w-3 h-3" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-plus"/></svg>' +
+        '    </button>' +
+        '  </div>' +
+        '</td>' +
         '<td class="py-3 px-4"><span class="font-headline-sm text-headline-sm text-on-surface">' + p.name + '</span></td>' +
         '<td class="py-3 px-3"><span class="px-2.5 py-1 rounded-md bg-surface-container font-label-sm text-label-sm text-on-surface-variant">' + p.category + '</span></td>' +
         '<td class="py-3 px-3">' +
@@ -79,6 +88,29 @@
         tr.querySelector('.price-input').dispatchEvent(new Event('change'));
       });
 
+      const photoInput = tr.querySelector('.photo-input');
+      tr.querySelector('.photo-btn').addEventListener('click', () => photoInput.click());
+      photoInput.addEventListener('change', async () => {
+        const file = photoInput.files[0];
+        if (!file) return;
+        try {
+          const base64Data = await resizeImageToBase64_(file, 800, 0.8);
+          const result = await window.LTA_API.callAction('catalog.uploadPhoto', {
+            product_id: p.product_id,
+            mimeType: 'image/jpeg',
+            base64Data
+          }, idToken);
+          p.image = result.imageUrl;
+          tr.querySelector('.thumb-img').src = result.imageUrl;
+          tr.querySelector('.thumb-img').style.visibility = 'visible';
+          window.LTA_TOAST.show('Foto de "' + p.name + '" actualizada.');
+        } catch (err) {
+          window.LTA_TOAST.show('Error: ' + err.message, 'error');
+        } finally {
+          photoInput.value = '';
+        }
+      });
+
       tbody.appendChild(tr);
     });
 
@@ -107,15 +139,61 @@
     });
   }
 
+  function resizeImageToBase64_(file, maxDim, quality) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Archivo de imagen inválido'));
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            const scale = maxDim / Math.max(width, height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality).split(',')[1]);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function loadCatalog() {
     const data = await window.LTA_API.callAction('catalog.readAll', {}, idToken);
     allProducts = data.products;
+    document.getElementById('empty-state').classList.toggle('hidden', allProducts.length > 0);
+    document.getElementById('catalog-table-wrap').classList.toggle('hidden', allProducts.length === 0);
     renderCategoryPills();
     render();
   }
 
+  async function seedCatalog() {
+    const btn = document.getElementById('btn-seed-catalog');
+    btn.disabled = true;
+    try {
+      const res = await fetch('../../data/catalog.json', { cache: 'no-store' });
+      const snapshot = await res.json();
+      const result = await window.LTA_API.callAction('catalog.seed', { products: snapshot.products || [] }, idToken);
+      window.LTA_TOAST.show(result.added + ' productos precargados.');
+      await loadCatalog();
+    } catch (err) {
+      window.LTA_TOAST.show('Error: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dish-search').addEventListener('keyup', render);
+    document.getElementById('btn-seed-catalog').addEventListener('click', seedCatalog);
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestor de Catálogo',

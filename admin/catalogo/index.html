@@ -37,16 +37,22 @@
       </div>
     </div>
 
+    <div id="empty-state" class="hidden bg-surface-container-lowest rounded-xl shadow-sm p-6 flex flex-col items-center gap-3 text-center">
+      <p class="font-body-md text-body-md text-on-surface-variant">La hoja CATALOGO todavía no tiene productos.</p>
+      <button id="btn-seed-catalog" class="min-h-[44px] px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md">Precargar catálogo desde data/catalog.json</button>
+    </div>
+
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
       <input id="dish-search" class="w-full md:w-64 px-4 py-2 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm shadow-sm" type="text" placeholder="Buscar por platillo...">
     </div>
 
-    <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+    <div id="catalog-table-wrap" class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-crema-surface text-on-surface-variant font-label-sm text-label-sm uppercase">
+              <th class="py-3.5 px-4 w-20">Foto</th>
               <th class="py-3.5 px-4">Platillo</th>
               <th class="py-3.5 px-3">Categoría</th>
               <th class="py-3.5 px-3 w-36">Precio (MXN)</th>
