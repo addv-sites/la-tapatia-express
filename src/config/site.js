@@ -5,6 +5,7 @@
  * server-side vía verificación del ID token de Google).
  */
 window.SITE_CONFIG = {
+  siteUrl: 'https://addv-sites.github.io/la-tapatia-express', // dominio real de producción (GitHub Pages) — debe coincidir con los Authorized JavaScript origins del OAuth Client ID
   businessName: 'La Tapatía Ahogadas',
   branchId: 'morelia-san-juanito',
   branchName: 'Sucursal Morelia',
@@ -32,12 +33,12 @@ window.SITE_CONFIG = {
     gaMeasurementId: null,
     gtmContainerId: null
   },
-  googleClientId: '', // OAuth 2.0 Client ID (Google Cloud Console, proyecto de ADDV) — no es secreto, es público por diseño de Google Identity Services
+  googleClientId: '310299979506-4l63meciq33tdpf3mo0ktooe90pl3kfm.apps.googleusercontent.com', // OAuth 2.0 Client ID (Google Cloud Console, proyecto de ADDV) — no es secreto, es público por diseño de Google Identity Services
   appsScript: {
     // Se llena al desplegar el Web App de Apps Script (ver docs/apps-script-contract.md).
     // Es una URL pública de invocación, no un secreto — la autorización real
     // ocurre server-side verificando el ID token de Google en cada request.
-    webAppUrl: ''
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbz8c_YXW2h49oYcImM-nFRWbR8sARP8kWcauiKZ8OwZtZvOBO03q3ipGqpaUbYrsKC4/exec'
   },
   featureFlags: {
     deliveryEnabled: true, // se reconfirma en runtime contra la hoja CONFIG
