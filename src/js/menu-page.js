@@ -181,7 +181,7 @@
     orderTypeRadios.forEach((r) => r.addEventListener('change', renderCart));
     document.addEventListener('cart-changed', renderCart);
 
-    window.LTA_CATALOG.load().then((data) => {
+    function renderMenu(data) {
       runtimeConfig = Object.assign(runtimeConfig, data.config || {});
       toggleVisible(deliveryOption, !!runtimeConfig.delivery_enabled, 'grid');
 
@@ -210,7 +210,13 @@
       });
 
       renderCart();
-    });
+    }
+
+    // Pinta rápido con el snapshot (no bloquea el LCP) y, apenas llegue,
+    // vuelve a pintar con el refresco en vivo del Sheet — sin recargar la
+    // página ni esperar al próximo build/deploy.
+    window.LTA_CATALOG.onUpdate(renderMenu);
+    window.LTA_CATALOG.load().then(renderMenu);
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();

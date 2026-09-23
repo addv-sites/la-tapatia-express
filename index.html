@@ -296,6 +296,7 @@
 </nav>
 
 <script src="src/js/cart.js"></script>
+<script src="src/js/api.js"></script>
 <script src="src/js/catalog.js"></script>
 <script src="src/js/pwa-install.js"></script>
 <script>
@@ -358,8 +359,9 @@
       closeDrawer();
     });
 
-    // Favoritos: cargar del snapshot
-    window.LTA_CATALOG.load().then(function (data) {
+    // Favoritos: pinta con el snapshot y se refresca solo cuando llega el
+    // dato en vivo del Sheet (sin esperar al próximo build/deploy).
+    function renderFavoritos(data) {
       var featured = (data.products || []).filter(function (p) { return p.featured; }).slice(0, 3);
       var list = document.getElementById('favoritos-list');
       list.innerHTML = '';
@@ -390,7 +392,10 @@
         article.querySelector('button').addEventListener('click', function () { openDrawer(product); });
         list.appendChild(article);
       });
-    });
+    }
+
+    window.LTA_CATALOG.onUpdate(renderFavoritos);
+    window.LTA_CATALOG.load().then(renderFavoritos);
   });
 })();
 </script>

@@ -5,6 +5,7 @@
  */
 (function () {
   let cachePromise = null;
+  const updateListeners = [];
 
   function resolveSnapshotPath() {
     const configured = window.SITE_CONFIG.catalogSnapshotPath || '/data/catalog.json';
@@ -17,13 +18,44 @@
     }
   }
 
+  function loadSnapshot_() {
+    return fetch(resolveSnapshotPath(), { cache: 'no-store' })
+      .then((r) => r.json())
+      .catch(() => ({ products: [], config: null }));
+  }
+
+  /**
+   * Revalidación silenciosa: el snapshot estático pinta rápido (no bloquea el
+   * LCP), pero puede tener hasta ~20min de retraso (solo se regenera en cada
+   * build). Esto refresca contra Apps Script/Sheets en vivo justo después y
+   * avisa a quien se haya suscrito con onUpdate, sin volver a bloquear nada.
+   */
+  function loadLive_() {
+    const url = window.SITE_CONFIG.appsScript && window.SITE_CONFIG.appsScript.webAppUrl;
+    if (!url || !window.LTA_API) return Promise.resolve(null);
+    return Promise.all([
+      window.LTA_API.readAction('catalog.read', {}).catch(() => null),
+      window.LTA_API.readAction('config.read', {}).catch(() => null)
+    ]).then(([catalogData, configData]) => {
+      if (!catalogData) return null;
+      return { products: catalogData.products, config: configData ? configData.config : null };
+    });
+  }
+
   function load() {
     if (!cachePromise) {
-      cachePromise = fetch(resolveSnapshotPath(), { cache: 'no-store' })
-        .then((r) => r.json())
-        .catch(() => ({ products: [], config: null }));
+      cachePromise = loadSnapshot_();
+      loadLive_().then((liveData) => {
+        if (!liveData) return;
+        updateListeners.forEach((cb) => cb(liveData));
+      });
     }
     return cachePromise;
+  }
+
+  /** Se llama cuando llega el refresco en vivo (después del primer pintado con el snapshot). */
+  function onUpdate(callback) {
+    updateListeners.push(callback);
   }
 
   function formatPrice(n) {
@@ -39,5 +71,5 @@
     return Array.from(map.values());
   }
 
-  window.LTA_CATALOG = { load, formatPrice, byCategory };
+  window.LTA_CATALOG = { load, onUpdate, formatPrice, byCategory };
 })();
