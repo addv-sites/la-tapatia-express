@@ -19,7 +19,14 @@ function ss_() {
 }
 
 function sheet_(name) {
-  const sh = ss_().getSheetByName(name);
+  const ss = ss_();
+  let sh = ss.getSheetByName(name);
+  if (!sh) {
+    // Tolera espacios accidentales o mayúsculas/minúsculas distintas en el
+    // nombre real de la pestaña (typo común al crear el Sheet a mano).
+    const target = name.trim().toLowerCase();
+    sh = ss.getSheets().find((s) => s.getName().trim().toLowerCase() === target) || null;
+  }
   if (!sh) throw new Error('Hoja no encontrada: ' + name);
   return sh;
 }
@@ -29,7 +36,7 @@ function readSheetAsObjects_(name) {
   const sh = sheet_(name);
   const values = sh.getDataRange().getValues();
   if (values.length < 2) return [];
-  const headers = values[0];
+  const headers = values[0].map((h) => String(h).trim());
   return values.slice(1).map((row) => {
     const obj = {};
     headers.forEach((h, i) => { obj[h] = row[i]; });
@@ -319,6 +326,14 @@ function action_orderAssignDriver_(payload, user) {
   });
 }
 
+function action_driverList_() {
+  const rows = readSheetAsObjects_('DRIVERS');
+  const active = rows
+    .filter((r) => r.active)
+    .map((r) => ({ email: String(r.email).toLowerCase(), name: r.name || r.email }));
+  return { drivers: active };
+}
+
 function action_driverMyOrders_(user) {
   const rows = readSheetAsObjects_('PEDIDOS');
   const mine = rows.filter((r) =>
@@ -585,6 +600,7 @@ function route_(action, payload, idToken, sessionId) {
     case 'order.updateStatus': return action_orderUpdateStatus_(payload, requireAnyRole_(idToken, ['STAFF', 'DRIVERS']));
     case 'order.delete': return action_orderDelete_(payload, requireRole_(idToken, 'STAFF'));
     case 'order.assignDriver': return action_orderAssignDriver_(payload, requireRole_(idToken, 'STAFF'));
+    case 'driver.list': return action_driverList_(requireRole_(idToken, 'STAFF'));
     case 'catalog.updatePrice': return action_catalogUpdatePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));

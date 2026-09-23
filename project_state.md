@@ -82,11 +82,23 @@
 
 ## Pendiente de que el usuario provea/despliegue (bloquea producción, no bloquea seguir construyendo)
 
-- Desplegar el Google Sheet + `apps-script/Code.gs` como Web App y llenar `SPREADSHEET_ID` + `appsScript.webAppUrl`.
-- Crear el OAuth 2.0 Client ID de Google Cloud Console y llenar `googleClientId`.
+- [x] Desplegar el Google Sheet + `apps-script/Code.gs` como Web App y llenar `SPREADSHEET_ID` + `appsScript.webAppUrl` — **hecho** (2026-09-22), `src/config/site.js` tiene la URL real del Web App.
+- [x] Crear el OAuth 2.0 Client ID de Google Cloud Console y llenar `googleClientId` — **hecho** (2026-09-22), probado con Google Sign-In real en desktop y mobile (se corrigió Error 400 agregando el origin de IP local a Authorized JavaScript Origins).
 - Logo real de la marca (los íconos PWA actuales son un placeholder monograma "LT" generado localmente).
 - Repo `addv-sites/la-tapatia-express` ya vinculado como `origin` — sin commits todavía (se hace cuando el usuario lo pida explícitamente).
 
+## Bugs encontrados y corregidos en pruebas post-despliegue (2026-09-22)
+
+- **Barra de navegación inferior faltante en "Visítanos"** (`ubicacion/index.html`): la página nunca tuvo el `<nav>` fijo que sí existe en Home/Menú. Agregado con las mismas rutas relativas y padding del resto del sitio.
+- **Sesión de Google no persistía en admin/repartidor/analítica** (`src/js/auth-gate.js`): el idToken se guardaba en `sessionStorage` al iniciar sesión pero nunca se releía al montar la página — cada navegación repintaba el botón "Continuar con Google" en vez de restaurar la sesión vigente. Corregido: `renderGate` ahora revisa `sessionStorage` y valida `exp` del token antes de mostrar el botón de login.
+
+## Asignación de repartidor desde el Kanban (2026-09-22)
+
+- [x] Implementado: `admin/pedidos/` ahora muestra un selector de repartidor en pedidos `A domicilio` dentro de la columna "Listo / En Reparto". Cambiar la selección llama `order.assignDriver` de inmediato (sin botón aparte, revierte visualmente si falla).
+- Backend: nueva acción `driver.list` (rol STAFF) en `apps-script/Code.gs` — lista repartidores activos de la hoja `DRIVERS` para poblar el selector. `order.assignDriver` ya existía y no cambió. Documentado en `docs/apps-script-contract.md`.
+- **Pendiente del usuario:** repegar `apps-script/Code.gs` actualizado en el editor de Apps Script real y volver a desplegar — el Web App en vivo todavía no reconoce `driver.list` hasta ese paso manual. Sin eso, el selector cargará vacío/con error en producción (el resto de la página sigue funcionando igual).
+- No se pudo probar el flujo end-to-end contra el backend real por lo anterior; sí se verificó visualmente el layout de la tarjeta (selector + botón, sin overlap) con un harness temporal usando el CSS/íconos reales del proyecto, y la sintaxis del JS.
+
 ## Próximo paso
 
-Los 7 segmentos de construcción están completos. Lo que falta es todo del lado del usuario, no de código — seguir `docs/google-sheets-setup.md` para desplegar Apps Script/Sheets/OAuth y correr el checklist de verificación funcional con datos reales. Después de eso: validar precios/horarios reales con el negocio, subir fotografía real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, asignación de repartidor desde el Kanban, vínculo retroactivo de pedido-invitado a cuenta, etc.).
+Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).

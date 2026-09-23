@@ -2,6 +2,7 @@
   const POLL_MS = 15000;
   let idToken = null;
   let pollTimer = null;
+  let drivers = [];
 
   const COLUMNS = [
     { id: 'pendiente', title: 'Por Confirmar', statuses: ['pendiente'] },
@@ -39,10 +40,56 @@
     } else if (order.status === 'confirmado' || order.status === 'en_cocina') {
       actionSlot.appendChild(actionBtn('Marcar Listo', 'bg-secondary text-on-secondary w-full', () => updateStatus(order.order_id, 'listo')));
     } else if (order.status === 'listo' || order.status === 'en_reparto') {
-      actionSlot.appendChild(actionBtn('Finalizar y Entregar', 'bg-tertiary text-on-tertiary w-full', () => updateStatus(order.order_id, 'entregado')));
+      const finalizeBtn = actionBtn('Finalizar y Entregar', 'bg-tertiary text-on-tertiary w-full', () => updateStatus(order.order_id, 'entregado'));
+      if (order.order_type === 'delivery') {
+        const stack = document.createElement('div');
+        stack.className = 'flex flex-col gap-2 w-full';
+        stack.appendChild(driverSelect(order));
+        stack.appendChild(finalizeBtn);
+        actionSlot.appendChild(stack);
+      } else {
+        actionSlot.appendChild(finalizeBtn);
+      }
     }
 
     return card;
+  }
+
+  function driverSelect(order) {
+    const wrap = document.createElement('div');
+    wrap.className = 'flex items-center gap-2 w-full';
+    wrap.innerHTML =
+      '<svg class="w-5 h-5 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-person"/></svg>' +
+      '<select class="flex-1 min-h-[40px] rounded-lg border border-outline-variant bg-surface px-2 font-label-sm text-label-sm text-on-surface"></select>';
+
+    const select = wrap.querySelector('select');
+    const currentDriver = String(order.driver_id || '').toLowerCase();
+
+    const emptyOpt = document.createElement('option');
+    emptyOpt.value = '';
+    emptyOpt.textContent = 'Sin asignar';
+    select.appendChild(emptyOpt);
+
+    drivers.forEach((d) => {
+      const opt = document.createElement('option');
+      opt.value = d.email;
+      opt.textContent = d.name;
+      if (d.email === currentDriver) opt.selected = true;
+      select.appendChild(opt);
+    });
+
+    select.addEventListener('change', () => assignDriver(order.order_id, select.value));
+    return wrap;
+  }
+
+  async function assignDriver(orderId, driverId) {
+    try {
+      await window.LTA_API.callAction('order.assignDriver', { order_id: orderId, driver_id: driverId }, idToken);
+      window.LTA_TOAST.show(driverId ? orderId + ' asignado a repartidor' : orderId + ' sin asignar');
+    } catch (err) {
+      window.LTA_TOAST.show('Error: ' + err.message, 'error');
+      loadOrders();
+    }
   }
 
   function actionBtn(label, classes, onClick) {
@@ -95,6 +142,8 @@
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
         try {
+          const driverData = await window.LTA_API.callAction('driver.list', {}, idToken);
+          drivers = driverData.drivers || [];
           await loadOrders();
           pollTimer = setInterval(loadOrders, POLL_MS);
         } catch (err) {

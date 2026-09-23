@@ -41,6 +41,7 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `driver.myDeliveries` | POST | DRIVERS | Entregas completadas por este repartidor (historial + base de ganancias) |
 | `order.delete` | POST | STAFF | Borra un pedido `pendiente`/`abandonado` no concretado |
 | `order.assignDriver` | POST | STAFF | Asigna `driver_id` a un pedido listo para despacho |
+| `driver.list` | POST | STAFF | Lista repartidores activos (`email`, `name`) de la hoja `DRIVERS`, para el selector de asignación en el Kanban |
 | `order.trackingRead` | GET | ninguna (folio + teléfono como clave de acceso) | Estado + última posición GPS para el portal cliente |
 | `order.listMine` | POST | Cliente (filtra por su propio email verificado) | Historial de pedidos del portal cliente |
 | `client.getProfile` | POST | Cliente (su propio email) | Trae perfil guardado (dirección, teléfono) para precargar checkout/perfil |
