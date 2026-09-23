@@ -134,6 +134,8 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
+
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestión de Pedidos',
       subtitle: 'Acceso solo para staff autorizado de La Tapatía Ahogadas.',

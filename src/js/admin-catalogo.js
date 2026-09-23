@@ -194,6 +194,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dish-search').addEventListener('keyup', render);
     document.getElementById('btn-seed-catalog').addEventListener('click', seedCatalog);
+    window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestor de Catálogo',

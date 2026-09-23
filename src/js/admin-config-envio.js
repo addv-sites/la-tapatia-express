@@ -33,6 +33,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('save-config').addEventListener('click', save);
+    window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Configuración de Envío',

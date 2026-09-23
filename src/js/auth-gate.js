@@ -62,6 +62,16 @@
     });
   }
 
+  function signOut() {
+    sessionStorage.removeItem('lta_id_token');
+    if (window.LTA_AUTH) window.LTA_AUTH.signOut();
+    location.reload();
+  }
+
+  function wireSignOutButton(el) {
+    if (el) el.addEventListener('click', signOut);
+  }
+
   function showUnauthorized(container, message) {
     container.innerHTML =
       '<div class="max-w-sm mx-auto text-center flex flex-col gap-3 p-6">' +
@@ -69,12 +79,8 @@
       '  <p class="font-body-sm text-body-sm text-on-surface-variant">' + message + '</p>' +
       '  <button id="btn-signout" class="min-h-[44px] px-4 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md">Cerrar sesión</button>' +
       '</div>';
-    document.getElementById('btn-signout').addEventListener('click', () => {
-      sessionStorage.removeItem('lta_id_token');
-      window.LTA_AUTH.signOut();
-      location.reload();
-    });
+    wireSignOutButton(document.getElementById('btn-signout'));
   }
 
-  window.LTA_AUTH_GATE = { renderGate, showUnauthorized };
+  window.LTA_AUTH_GATE = { renderGate, showUnauthorized, signOut, wireSignOutButton };
 })();
