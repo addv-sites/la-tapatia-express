@@ -35,7 +35,7 @@
   </div>
 </header>
 
-<main class="flex-1 w-full pt-24 pb-12 px-margin max-w-2xl mx-auto w-full">
+<main class="flex-1 w-full pt-24 pb-24 px-margin max-w-2xl mx-auto w-full">
   <h1 class="font-headline-lg text-headline-lg text-on-surface mb-4">Visítanos en Morelia</h1>
 
   <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-4">
@@ -69,6 +69,27 @@
     </div>
   </div>
 </main>
+
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-around">
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-fire"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Antojo</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../menu/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-menu"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Menú</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../menu/#pedido">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-cart"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Pedido</span>
+    </a>
+    <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 text-primary font-bold" href="./">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-storefront"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Visítanos</span>
+    </a>
+  </div>
+</nav>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

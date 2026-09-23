@@ -7,6 +7,15 @@
  * silencio.
  */
 (function () {
+  function decodeJwtPayload_(token) {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    } catch (e) {
+      return null;
+    }
+  }
+
   function renderGate(container, opts) {
     const cfg = window.SITE_CONFIG;
     container.innerHTML = '';
@@ -18,6 +27,20 @@
         '  <p class="font-body-sm text-body-sm text-on-surface-variant">Falta desplegar Apps Script y/o el Google Client ID en <code>src/config/site.js</code>. Ver README.md.</p>' +
         '</div>';
       return;
+    }
+
+    // Sesión ya iniciada en esta pestaña (navegación entre páginas del
+    // mismo admin) — evita repintar el botón de Google y pedir login otra
+    // vez mientras el idToken siga vigente.
+    const storedToken = sessionStorage.getItem('lta_id_token');
+    if (storedToken) {
+      const profile = decodeJwtPayload_(storedToken);
+      const nowSec = Math.floor(Date.now() / 1000);
+      if (profile && profile.exp && profile.exp > nowSec) {
+        opts.onSignedIn(storedToken, profile);
+        return;
+      }
+      sessionStorage.removeItem('lta_id_token');
     }
 
     const wrap = document.createElement('div');
