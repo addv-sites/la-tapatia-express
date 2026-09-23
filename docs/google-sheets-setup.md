@@ -91,19 +91,14 @@ Se llena sola cuando un repartidor reporta una incidencia.
 ## Paso 3 — Desplegar Apps Script
 
 1. En el mismo Google Sheet: menú **Extensiones → Apps Script**.
-2. Borra el contenido de `Code.gs` que abre por default y pega **todo** el contenido de [`apps-script/Code.gs`](../apps-script/Code.gs) de este repo.
-3. Arriba del archivo, llena la constante:
-   ```js
-   const SPREADSHEET_ID = ''; // ← pega aquí el ID del Sheet
-   ```
-   El ID es la parte de la URL entre `/d/` y `/edit`: `https://docs.google.com/spreadsheets/d/`**`ESTE_PEDAZO`**`/edit`.
-4. Guarda (ícono de disco o Ctrl+S).
-5. **Desplegar → Nueva implementación** (ícono de engrane → "Aplicación web"):
+2. Borra el contenido de `Code.gs` que abre por default y pega **todo** el contenido de [`apps-script/Code.gs`](../apps-script/Code.gs) de este repo tal cual — no hace falta llenar ningún ID a mano: como el script vive dentro de este Sheet (lo abriste desde su menú Extensiones), `ss_()` lo detecta solo con `getActiveSpreadsheet()`. Repetir este paso en cada redespliegue no requiere tocar nada arriba del archivo.
+3. Guarda (ícono de disco o Ctrl+S).
+4. **Desplegar → Nueva implementación** (ícono de engrane → "Aplicación web"):
    - Descripción: `v1`
    - Ejecutar como: **Yo** (tu cuenta)
    - Quién tiene acceso: **Cualquier usuario**
-6. Autoriza los permisos que pida (acceso a Sheets, a URL externas para Nominatim/verificación de token — son los que el propio código necesita, revísalos antes de aceptar si quieres, están descritos en `docs/apps-script-contract.md`).
-7. Copia la **URL de la aplicación web** que te da al terminar (termina en `/exec`).
+5. Autoriza los permisos que pida (acceso a Sheets, a URL externas para Nominatim/verificación de token — son los que el propio código necesita, revísalos antes de aceptar si quieres, están descritos en `docs/apps-script-contract.md`).
+6. Copia la **URL de la aplicación web** que te da al terminar (termina en `/exec`).
 
 ## Paso 4 — Crear el OAuth Client ID de Google (para el botón "Iniciar sesión con Google")
 

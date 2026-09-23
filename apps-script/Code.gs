@@ -9,12 +9,19 @@
  * Desplegar como Web App: Ejecutar como "Yo", Acceso "Cualquier usuario".
  */
 
-const SPREADSHEET_ID = ''; // TODO: id del Google Sheet al desplegar
+// Respaldo solo para el caso raro de correr este script como standalone
+// (fuera del Sheet). Si el script vive dentro del Sheet (Extensiones >
+// Apps Script), ss_() lo resuelve solo con getActiveSpreadsheet() y esta
+// constante nunca se usa — no hace falta tocarla al repegar/redesplegar.
+const SPREADSHEET_ID = '1iqV4x9Iehk6my4iMPa9TB1AYaLCMlVy_giZGOUeW1G0';
 const TIMEZONE = 'America/Mexico_City';
 const RATE_LIMIT_PER_MINUTE = 5;
 const MIN_SUBMIT_MS = 1500; // rechaza submits a <1.5s de cargada la página
 
 function ss_() {
+  const active = SpreadsheetApp.getActiveSpreadsheet();
+  if (active) return active;
+  if (!SPREADSHEET_ID) throw new Error('SPREADSHEET_ID no configurado (script standalone sin Sheet activo)');
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
 
