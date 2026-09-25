@@ -597,6 +597,25 @@ function action_catalogCreate_(payload, user) {
   });
 }
 
+function action_catalogDelete_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) {
+        const before = {};
+        headers.forEach((h, colIdx) => { before[h] = values[i][colIdx]; });
+        sh.deleteRow(i + 1);
+        logAudit_(user.email, 'catalog.delete', 'CATALOGO', payload.product_id, before, null);
+        return { ok: true };
+      }
+    }
+    throw new Error('Producto no encontrado');
+  });
+}
+
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024; // 3MB decoded — el cliente redimensiona/comprime antes de mandar
 const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -794,6 +813,7 @@ function route_(action, payload, idToken, sessionId) {
     case 'catalog.seed': return action_catalogSeed_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.create': return action_catalogCreate_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.uploadPhoto': return action_catalogUploadPhoto_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.delete': return action_catalogDelete_(payload, requireRole_(idToken, 'STAFF'));
 
     case 'driver.myOrders': return action_driverMyOrders_(requireRole_(idToken, 'DRIVERS'));
     case 'driver.myDeliveries': return action_driverMyDeliveries_(requireRole_(idToken, 'DRIVERS'));

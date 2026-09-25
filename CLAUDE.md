@@ -2,6 +2,10 @@
 
 Protocolo de trabajo: skill `addv-web-app` (analizar → revisar impacto → criticar y mejorar → propuesta visual → confirmar → implementar → probar → asegurar). Ver también `project_state.md` (estado/decisiones) y `addv/cmem.md` (historial comprimido de la conversación).
 
+**Regla dura, sin excepción, para cualquier tarea que toque código o contenido (no solo UI):** antes de implementar, mostrar un antes/después (mockup visual si es un cambio de interfaz; diff/resumen claro del comportamiento actual vs. propuesto si es backend, lógica o config) y esperar confirmación explícita del usuario. Nunca implementar directo saltándose este paso, aunque la tarea parezca chica u obvia.
+
+**Regla dura para `apps-script/Code.gs`:** nunca pegar fragmentos/snippets sueltos para que el usuario los inserte a mano en el editor de Apps Script. Siempre modificar el archivo completo en el repo y luego entregar el archivo íntegro para copiar/pegar tal cual sobre todo el contenido del editor. Evita que queden versiones parciales o desincronizadas pegadas a medias.
+
 ## Stack y restricciones duras
 
 - **Despliegue:** GitHub Pages únicamente. Repo público, sin dominio propio (`usuario.github.io/repo`).

@@ -46,9 +46,9 @@
     <div class="flex items-center gap-space-sm min-w-0">
       <div class="flex flex-col min-w-0">
         <span class="font-headline-sm text-headline-sm text-primary tracking-tight truncate">Ahogadas La Tapatía Express</span>
-        <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-whatsapp-green animate-pulse" aria-hidden="true"></span>
-          <span class="font-label-sm text-label-sm text-tertiary font-bold">Abierto para pedidos</span>
+        <span id="business-status" class="flex items-center gap-1.5">
+          <span id="business-status-dot" class="w-2 h-2 rounded-full bg-on-surface-variant" aria-hidden="true"></span>
+          <span id="business-status-label" class="font-label-sm text-label-sm text-on-surface-variant font-bold">Horario…</span>
         </span>
       </div>
     </div>
@@ -297,6 +297,7 @@
 
 <script src="src/js/cart.js"></script>
 <script src="src/js/api.js"></script>
+<script src="src/js/business-hours.js"></script>
 <script src="src/js/catalog.js"></script>
 <script src="src/js/pwa-install.js"></script>
 <script>
@@ -310,6 +311,23 @@
     var greeting = 'Hola, quiero realizar un pedido en ' + window.SITE_CONFIG.businessName;
     document.getElementById('whatsapp-hero-cta').href = whatsappUrl(greeting);
     document.getElementById('whatsapp-location-cta').href = whatsappUrl();
+
+    // Estado abierto/cerrado real, calculado contra el horario en CONFIG.
+    window.LTA_API.readAction('config.read', {}).then(function (data) {
+      var status = window.LTA_HOURS.getStatus(data.config || {});
+      var dot = document.getElementById('business-status-dot');
+      var label = document.getElementById('business-status-label');
+      label.textContent = status.label;
+      if (status.isOpen) {
+        dot.className = 'w-2 h-2 rounded-full bg-whatsapp-green animate-pulse';
+        label.className = 'font-label-sm text-label-sm text-tertiary font-bold';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-on-surface-variant';
+        label.className = 'font-label-sm text-label-sm text-on-surface-variant font-bold';
+      }
+    }).catch(function () {
+      document.getElementById('business-status-label').textContent = 'Horario por confirmar';
+    });
 
     // Service worker
     if ('serviceWorker' in navigator) {

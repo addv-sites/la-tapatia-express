@@ -54,8 +54,9 @@
         '    <div class="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary relative after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>' +
         '  </label>' +
         '</td>' +
-        '<td class="py-3 px-4 text-right">' +
-        '  <button class="save-btn p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg" title="Guardar"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg></button>' +
+        '<td class="py-3 px-4 text-right whitespace-nowrap">' +
+        '  <button class="save-btn p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg" title="Guardar"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-save"/></svg></button>' +
+        '  <button class="delete-btn p-2 text-on-surface-variant hover:text-error hover:bg-surface-container rounded-lg" title="Eliminar platillo"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-trash"/></svg></button>' +
         '</td>';
 
       tr.querySelector('.price-input').addEventListener('change', async (e) => {
@@ -94,6 +95,19 @@
 
       tr.querySelector('.save-btn').addEventListener('click', () => {
         tr.querySelector('.price-input').dispatchEvent(new Event('change'));
+      });
+
+      tr.querySelector('.delete-btn').addEventListener('click', async () => {
+        if (!confirm('¿Eliminar "' + p.name + '"? Esta acción no se puede deshacer.')) return;
+        try {
+          await window.LTA_API.callAction('catalog.delete', { product_id: p.product_id }, idToken);
+          allProducts = allProducts.filter((item) => item.product_id !== p.product_id);
+          window.LTA_TOAST.show('"' + p.name + '" eliminado del catálogo.');
+          renderCategoryPills();
+          render();
+        } catch (err) {
+          window.LTA_TOAST.show('Error: ' + err.message, 'error');
+        }
       });
 
       const photoInput = tr.querySelector('.photo-input');

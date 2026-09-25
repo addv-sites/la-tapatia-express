@@ -23,11 +23,8 @@ window.SITE_CONFIG = {
     facebook: 'https://www.facebook.com/Latapatiaahogadas',
     tiktok: 'https://www.tiktok.com/@ahogadas.la.tapat'
   },
-  schedule: {
-    // TODO: horario real confirmado por el negocio (requiresValidation)
-    display: 'Horario por confirmar',
-    requiresValidation: true
-  },
+  // Horario real: ya no vive aquí estático — se lee en vivo de la hoja
+  // CONFIG (campos hours_<dia>_open/close) vía config.read + src/js/business-hours.js.
   analytics: {
     // Placeholders — nunca inventar IDs reales.
     gaMeasurementId: null,

@@ -12,6 +12,8 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="../css/site.css">
 <script defer src="../src/config/site.js"></script>
+<script defer src="../src/js/api.js"></script>
+<script defer src="../src/js/business-hours.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -51,9 +53,10 @@
 
     <div class="flex items-start gap-3">
       <svg class="w-6 h-6 text-secondary shrink-0 mt-0.5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-fire"/></svg>
-      <div>
-        <h2 class="font-headline-sm text-headline-sm text-on-surface">Horario</h2>
-        <p id="schedule-text" class="font-body-md text-body-md text-on-surface-variant">Horario por confirmar</p>
+      <div class="min-w-0 flex-1">
+        <h2 class="font-headline-sm text-headline-sm text-on-surface mb-1">Horario</h2>
+        <p id="schedule-fallback" class="font-body-md text-body-md text-on-surface-variant">Horario por confirmar</p>
+        <table id="schedule-table" class="hidden w-full font-body-sm text-body-sm"></table>
       </div>
     </div>
 
@@ -96,12 +99,25 @@ document.addEventListener('DOMContentLoaded', function () {
   var cfg = window.SITE_CONFIG;
   document.getElementById('maps-link').href = cfg.googleMapsUrl;
   document.getElementById('whatsapp-link').href = 'https://wa.me/' + cfg.whatsapp;
-  if (cfg.schedule && !cfg.schedule.requiresValidation) {
-    document.getElementById('schedule-text').textContent = cfg.schedule.display;
-  }
   // El embed de mapa (Leaflet + OpenStreetMap) se activa solo cuando haya
   // coordenadas reales confirmadas — ver src/config/site.js `coordinates`.
   // No se inventa un pin sin dato real.
+
+  window.LTA_API.readAction('config.read', {}).then(function (data) {
+    var week = window.LTA_HOURS.getWeekSchedule(data.config || {});
+    var table = document.getElementById('schedule-table');
+    table.innerHTML = week.map(function (d) {
+      var rowClass = d.isToday ? 'text-tertiary font-bold' : 'text-on-surface-variant';
+      return '<tr class="' + rowClass + '">' +
+        '<td class="py-1 pr-3">' + d.dayLabel + '</td>' +
+        '<td class="py-1 text-right">' + d.display + '</td>' +
+        '</tr>';
+    }).join('');
+    table.classList.remove('hidden');
+    document.getElementById('schedule-fallback').classList.add('hidden');
+  }).catch(function () {
+    // Se queda el texto "Horario por confirmar" si la config no cargó.
+  });
 });
 </script>
 </body>

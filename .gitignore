@@ -27,3 +27,6 @@ playwright-report/
 
 # Referencia local, no se sincroniza (pedido explícito: solo vive en esta máquina)
 /local/
+
+# Basura temporal detectada por Claude, revisar y borrar manual
+.trash/
