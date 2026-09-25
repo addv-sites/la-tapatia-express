@@ -4,6 +4,106 @@ Sitio web, panel administrativo, portal de cliente, panel de analítica y app de
 
 > Estado del proyecto y decisiones tomadas: ver [`project_state.md`](./project_state.md). Contexto operativo persistente: [`CLAUDE.md`](./CLAUDE.md).
 
+## URLs de producción
+
+Base: **`https://addv-sites.github.io/la-tapatia-express/`** (GitHub Pages, sin dominio propio).
+Todas las rutas de este documento fueron verificadas con HTTP 200 contra `main` el **2026-09-25**.
+
+### Sitio público — sin autenticación
+
+| URL | Qué hace | Endpoints Apps Script |
+|---|---|---|
+| https://addv-sites.github.io/la-tapatia-express/ | Home. Explora por categoría, favoritos de la casa, cómo funciona el pedido, datos de la sucursal. Carrito persistente. | `catalog.read`, `config.read` |
+| https://addv-sites.github.io/la-tapatia-express/menu/ | Menú completo por categoría + carrito + checkout. El checkout registra el pedido en Sheets y **después** abre `wa.me` con folio y detalle. | `catalog.read`, `config.read`, `client.getProfile`, `client.upsertProfile`, `order.create` |
+| https://addv-sites.github.io/la-tapatia-express/ubicacion/ | Dirección, horario y mapa (OpenStreetMap + Nominatim, sin costo). | — (estático) |
+| https://addv-sites.github.io/la-tapatia-express/contacto/ | Datos de contacto, redes sociales, formulario que deriva a WhatsApp. | — (estático) |
+
+Indexables: las 4 están en `sitemap.xml` y **no** llevan meta `robots`.
+
+### Portal de cliente — Google Sign-In abierto (cualquier cuenta, sin whitelist)
+
+| URL | Qué hace | Endpoints Apps Script |
+|---|---|---|
+| https://addv-sites.github.io/la-tapatia-express/cuenta/rastreo/ | Rastreo de un pedido por **folio + teléfono**. No requiere sesión: es la ruta de consulta rápida. | `order.trackingRead` |
+| https://addv-sites.github.io/la-tapatia-express/cuenta/historial/ | Historial de pedidos del cliente autenticado, con estado y folio. | `order.listMine` |
+| https://addv-sites.github.io/la-tapatia-express/cuenta/perfil/ | Datos del cliente, dirección guardada y opt-in de marketing. | `client.getProfile`, `client.upsertProfile`, `client.optInMarketing` |
+
+`noindex, nofollow` en las 3. El acceso es abierto pero **el contenido sí está atado a la cuenta**:
+`order.listMine` resuelve el cliente desde el ID token de Google, nunca desde un email enviado por el cliente.
+
+> Rutas reales construidas. `pc/` solo contiene el diseño de referencia (`pc/code.html` + `screen.png`)
+> y no es una superficie desplegada — ver la discrepancia con la tabla de `CLAUDE.md` pendiente de corregir.
+
+### App repartidor — Google Sign-In + whitelist hoja `DRIVERS`
+
+| URL | Qué hace | Endpoints Apps Script |
+|---|---|---|
+| https://addv-sites.github.io/la-tapatia-express/reparto/app/ | Pedidos disponibles, ficha del pedido, mapa de la entrega, cambio de estado (`en_reparto` → `entregado`), reporte de incidencia. | `driver.myOrders`, `driver.pingLocation`, `order.updateStatus`, `incident.report` |
+| https://addv-sites.github.io/la-tapatia-express/reparto/app/entregas/ | Entregas asignadas al repartidor con su historial de estado. | `driver.myDeliveries` |
+| https://addv-sites.github.io/la-tapatia-express/reparto/app/ganancias/ | Ganancias calculadas contra `driver_fixed_commission` de CONFIG. | `driver.myDeliveries`, `config.read` |
+| https://addv-sites.github.io/la-tapatia-express/reparto/app/perfil/ | Perfil del repartidor. Solo el gate de acceso, sin llamadas a la API. | — |
+
+`noindex, nofollow` en las 4. `driver.pingLocation` es la única superficie que emite geolocalización
+del repartidor; se envía al backend, nunca a un tercero.
+
+### Administración — Google Sign-In + whitelist hoja `STAFF`
+
+| URL | Qué hace | Endpoints Apps Script |
+|---|---|---|
+| https://addv-sites.github.io/la-tapatia-express/admin/ | **Punto de entrada.** Login + dashboard con las 3 herramientas de abajo (con contador real de pedidos activos en la tarjeta de Pedidos) y links a los otros portales (App Repartidor). Analítica **no** aparece aquí a propósito — es acceso interno ADDV, ver abajo. | `order.list` (solo para el contador) |
+| https://addv-sites.github.io/la-tapatia-express/admin/catalogo/ | KPIs (platillos registrados / precios pendientes), alta de platillo, **subida de fotos a Drive**, edición y aprobación de precios, activar/desactivar platillo, sembrar catálogo desde el snapshot. | `catalog.readAll`, `catalog.create`, `catalog.updatePrice`, `catalog.approvePrice`, `catalog.toggleAvailability`, `catalog.uploadPhoto`, `catalog.seed` |
+| https://addv-sites.github.io/la-tapatia-express/admin/pedidos/ | KDS de comandas en vivo, asignación de repartidor, cambio de status del enum (`pendiente→confirmado→en_cocina→listo→entregado`), y baja de pedido. | `order.list`, `order.assignDriver`, `order.updateStatus`, `order.delete`, `driver.list` |
+| https://addv-sites.github.io/la-tapatia-express/admin/config-envio/ | Tarifas por zona Z1/Z2/Z3, `driver_fixed_commission`, interruptor `delivery_enabled`, horario del negocio. | `config.read`, `config.update` |
+
+`noindex, nofollow` en las 4. Las tres de trabajo están enlazadas entre sí en la barra superior
+(catalogo ↔ pedidos ↔ config. envío), y la sesión se conserva en `sessionStorage` para no
+re-loguear al navegar entre ellas ni al volver al dashboard en `/admin/`.
+
+> `order.delete` es la única operación destructiva de la UI. Antes de exponerla en la interfaz,
+> conviene decidir si queda auditada en la hoja `LOG` — hoy el borrado no es reversible desde el panel.
+
+### Analítica — Google Sign-In + dominio `@addv.mx`
+
+| URL | Qué hace | Endpoints Apps Script |
+|---|---|---|
+| https://addv-sites.github.io/la-tapatia-express/analitica/panel/ | Mapa de pedidos a domicilio geocodificados (Leaflet + OSM), distribución por zona de envío, top de clientes registrados y demanda por hora. Todo con datos agregados server-side. | `analytics.read` |
+
+`noindex, nofollow`. Es la única superficie restringida por **dominio** en vez de whitelist de hoja.
+No está enlazada desde `/admin/` a propósito — es acceso interno del equipo ADDV, se comparte la
+URL directo con quien la necesite, no se expone en el dashboard general del negocio.
+
+### Recursos de la PWA y SEO
+
+| URL | Qué es |
+|---|---|
+| https://addv-sites.github.io/la-tapatia-express/manifest.webmanifest | Manifest de la PWA (instalable). |
+| https://addv-sites.github.io/la-tapatia-express/sw.js | Service worker: cacheo de assets y fallback offline. |
+| https://addv-sites.github.io/la-tapatia-express/offline.html | Página de fallback cuando no hay conexión. |
+| https://addv-sites.github.io/la-tapatia-express/robots.txt | Reglas de rastreo + puntero al sitemap. |
+| https://addv-sites.github.io/la-tapatia-express/sitemap.xml | Solo las 4 rutas públicas, regenerado en cada build con `lastmod` real. |
+
+Los mockups de diseño de Stitch **sí están desplegados y son accesibles sin autenticación**, y
+**no llevan meta `robots`**, así que son rastreables: `robots.txt` tiene `Allow: /` y nada los excluye.
+No exponen datos ni credenciales, pero conviene marcarlos `noindex` o moverlos fuera del build:
+
+| URL | Superficie |
+|---|---|
+| https://addv-sites.github.io/la-tapatia-express/pc/code.html | Diseño del portal de cliente |
+| https://addv-sites.github.io/la-tapatia-express/reparto/code.html | Diseño de la app repartidor |
+| https://addv-sites.github.io/la-tapatia-express/analitica/code.html | Diseño del panel de analítica |
+| https://addv-sites.github.io/la-tapatia-express/admin/administrador_de_precios_y_cat_logo_la_tapat_a_ahogadas/code.html | Diseño del gestor de catálogo |
+| https://addv-sites.github.io/la-tapatia-express/admin/gesti_n_de_pedidos_comandas_en_vivo_la_tapat_a_ahogadas/code.html | Diseño del KDS de comandas |
+
+`drive-permission-fix.html` **no está en producción** (404) a propósito: es un archivo local de
+depuración de permisos de Drive que nunca se versionó.
+
+### Sobre el acceso
+
+Todas las superficies restringidas (repartidor, administración, analítica) usan el mismo patrón:
+el cliente solo obtiene el **ID token** de Google, y la autorización real (whitelist `STAFF` /
+`DRIVERS`, o dominio `@addv.mx`) la valida Apps Script **en cada request**. Conocer la URL no da
+acceso a nada. El token vive en `sessionStorage` únicamente y se descarta al cerrar sesión.
+
 ## Arquitectura en una línea
 
 El sitio (HTML/CSS/JS estático) corre en GitHub Pages. Todo dato (catálogo, precios, pedidos, clientes, staff) vive en un Google Sheet. Toda escritura pasa por un **Google Apps Script Web App** — es la única "capa de backend", desplegada por separado en Google, no en este repo (aunque su código fuente sí se versiona aquí en [`apps-script/Code.gs`](./apps-script/Code.gs) para no perderlo).

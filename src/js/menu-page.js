@@ -55,7 +55,10 @@
         : '    <button class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button" aria-label="Agregar ' + product.name + '"><svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-plus"/></svg></button>') +
       '  </div>' +
       '</div>';
-    if (!unavailable) article.querySelector('button').addEventListener('click', () => onAdd(product));
+    if (!unavailable) {
+      const addBtn = article.querySelector('button');
+      addBtn.addEventListener('click', () => onAdd(product, addBtn));
+    }
     return article;
   }
 
@@ -203,9 +206,11 @@
         const list = document.createElement('div');
         list.className = 'flex flex-col gap-2.5';
         group.items.forEach((product) => {
-          list.appendChild(renderProductCard(product, (p) => {
+          list.appendChild(renderProductCard(product, (p, btn) => {
             window.LTA_CART.addItem(p, {});
-            window.LTA_TOAST && window.LTA_TOAST.show('"' + p.name + '" agregado al pedido.');
+            window.LTA_CART_FLY.fly(btn, document.getElementById('nav-pedido'), () => {
+              window.LTA_CART_FLY.bumpBadge(document.getElementById('nav-cart-badge'), window.LTA_CART.count());
+            });
           }));
         });
         section.appendChild(list);

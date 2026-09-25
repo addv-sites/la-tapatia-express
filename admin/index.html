@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Administración — La Tapatía Express</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../css/site.css">
+<script defer src="../src/config/site.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
+
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between px-6">
+  <div class="flex items-center gap-3">
+    <span class="font-headline-sm text-headline-sm text-primary">La Tapatía Express</span>
+    <span class="font-label-sm text-label-sm text-on-surface-variant">Panel de Administración</span>
+  </div>
+  <button id="btn-signout-header" class="hidden font-label-md text-label-md text-on-surface-variant hover:text-error">Cerrar sesión</button>
+</header>
+
+<main class="pt-16 min-h-screen">
+  <div id="auth-gate" class="min-h-[80vh] flex items-center justify-center"></div>
+
+  <div id="dashboard-content" class="hidden max-w-2xl mx-auto px-6 py-10 flex flex-col gap-4">
+    <p id="dashboard-greeting" class="font-body-sm text-body-sm text-on-surface-variant"></p>
+
+    <a href="catalogo/" class="flex items-center gap-3.5 bg-crema-surface rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="w-11 h-11 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+        <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-tostada"/></svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md text-on-surface font-bold">Catálogo &amp; Precios</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Editar platillos, precios y fotos</p>
+      </div>
+      <svg class="w-4 h-4 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-arrow-right"/></svg>
+    </a>
+
+    <a href="pedidos/" class="flex items-center gap-3.5 bg-crema-surface rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="w-11 h-11 rounded-xl bg-secondary-fixed text-secondary flex items-center justify-center shrink-0">
+        <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-soup"/></svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md text-on-surface font-bold">Pedidos<span id="pedidos-count-wrap" class="hidden text-primary"> · <span id="pedidos-count">0</span> activos</span></p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Comandas en vivo, cambia estados</p>
+      </div>
+      <svg class="w-4 h-4 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-arrow-right"/></svg>
+    </a>
+
+    <a href="config-envio/" class="flex items-center gap-3.5 bg-crema-surface rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="w-11 h-11 rounded-xl bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0">
+        <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-tune"/></svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md text-on-surface font-bold">Configuración de Envío</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Tarifas por zona, comisión, horario</p>
+      </div>
+      <svg class="w-4 h-4 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-arrow-right"/></svg>
+    </a>
+
+    <div class="mt-2 pt-3.5 border-t border-dashed border-outline-variant">
+      <p class="font-label-sm text-[10px] uppercase tracking-wider font-bold text-on-surface-variant mb-2">Otros portales (login aparte)</p>
+      <a href="../reparto/app/" class="flex items-center gap-2.5 py-2 font-body-sm text-body-sm text-on-surface-variant hover:text-primary">
+        <svg class="w-4 h-4" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-navigation"/></svg>
+        App Repartidor (solo choferes) →
+      </a>
+    </div>
+  </div>
+</main>
+
+<script src="../src/js/api.js"></script>
+<script src="../src/js/auth.js"></script>
+<script src="../src/js/auth-gate.js"></script>
+<script src="../src/js/admin-dashboard.js"></script>
+</body>
+</html>

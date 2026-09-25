@@ -133,8 +133,9 @@
       <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-menu"/></svg>
       <span class="font-label-sm text-[11px] mt-0.5">Menú</span>
     </a>
-    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="#pedido">
+    <a id="nav-pedido" class="relative flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="#pedido">
       <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-cart"/></svg>
+      <span id="nav-cart-badge" class="nav-cart-badge">0</span>
       <span class="font-label-sm text-[11px] mt-0.5">Pedido</span>
     </a>
     <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../ubicacion/">
@@ -145,6 +146,7 @@
 </nav>
 
 <script src="../src/js/cart.js"></script>
+<script src="../src/js/cart-fly.js"></script>
 <script src="../src/js/catalog.js"></script>
 <script src="../src/js/auth.js"></script>
 <script src="../src/js/inline-signin.js"></script>

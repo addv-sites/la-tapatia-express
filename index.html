@@ -280,8 +280,9 @@
       <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-menu"/></svg>
       <span class="font-label-sm text-[11px] mt-0.5">Menú</span>
     </a>
-    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="menu/#pedido">
+    <a id="nav-pedido" class="relative flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="menu/#pedido">
       <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-cart"/></svg>
+      <span id="nav-cart-badge" class="nav-cart-badge">0</span>
       <span class="font-label-sm text-[11px] mt-0.5">Pedido</span>
     </a>
     <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="ubicacion/">
@@ -295,7 +296,7 @@
 <script src="src/js/api.js"></script>
 <script src="src/js/business-hours.js"></script>
 <script src="src/js/catalog.js"></script>
-<script src="src/js/toast.js"></script>
+<script src="src/js/cart-fly.js"></script>
 <script src="src/js/pwa-install.js"></script>
 <script>
 (function () {
@@ -335,16 +336,13 @@
       document.getElementById('ios-install-modal').style.display = 'none';
     });
 
-    // Carrito: badge
+    // Carrito: badge del ícono del header (se actualiza al instante, sin animación)
     function updateCartBadge() {
       var n = window.LTA_CART.count();
       var badge = document.getElementById('cart-badge');
       badge.textContent = n;
       badge.classList.toggle('hidden', n === 0);
       badge.classList.toggle('flex', n !== 0);
-      badge.classList.remove('cart-bump');
-      void badge.offsetWidth; // fuerza reflow para poder repetir la animación
-      badge.classList.add('cart-bump');
     }
     updateCartBadge();
     document.addEventListener('cart-changed', updateCartBadge);
@@ -368,11 +366,13 @@
     }
     backdrop.addEventListener('click', closeDrawer);
     document.getElementById('close-drawer').addEventListener('click', closeDrawer);
-    document.getElementById('confirm-customizer').addEventListener('click', function () {
+    document.getElementById('confirm-customizer').addEventListener('click', function (e) {
       if (!currentProduct) return;
       var salsa = document.querySelector('input[name="salsa"]:checked');
       window.LTA_CART.addItem(currentProduct, { salsa: salsa ? salsa.value : null });
-      window.LTA_TOAST.show('"' + currentProduct.name + '" agregado al pedido.');
+      window.LTA_CART_FLY.fly(e.currentTarget, document.getElementById('nav-pedido'), function () {
+        window.LTA_CART_FLY.bumpBadge(document.getElementById('nav-cart-badge'), window.LTA_CART.count());
+      });
       closeDrawer();
     });
 
