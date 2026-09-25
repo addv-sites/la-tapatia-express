@@ -67,13 +67,30 @@ function getOrCreateFolderPath_(pathParts) {
   return folder;
 }
 
-/** Prueba manual: selecciónala en el dropdown del editor y dale Ejecutar para disparar el diálogo de autorización de Drive. Crea y borra un archivo de prueba para forzar el scope de escritura (drive), no solo lectura. Se puede borrar después de usarla. */
+/**
+ * Prueba manual de setup de Drive para un cliente nuevo. Requiere:
+ *   1. appsscript.json con oauthScopes incluyendo "https://www.googleapis.com/auth/drive"
+ *   2. Servicio avanzado "Drive API" añadido (panel Servicios del editor, ícono +)
+ * Correr runTestDriveAuth (no testDriveAuth_ directo: los nombres con "_" no
+ * aparecen en el dropdown "Ejecutar" del editor) para disparar el diálogo de
+ * autorización. Confirma folder + createFile + Drive.Permissions.create
+ * (NO usar DriveApp.setSharing: falla con "Access denied" incluso con scope
+ * completo y política de dominio permitiendo compartir — usar siempre el
+ * servicio avanzado Drive.Permissions.create en su lugar).
+ */
 function testDriveAuth_() {
   const folder = getOrCreateFolderPath_(['laTapatia', 'imagenes', 'catalogo']);
   const testFile = folder.createFile('test-auth.txt', 'ok', MimeType.PLAIN_TEXT);
   Logger.log('OK: ' + folder.getName() + ' — archivo creado: ' + testFile.getId());
+  Drive.Permissions.create({ role: 'reader', type: 'anyone' }, testFile.getId());
+  Logger.log('OK Drive.Permissions.create (requiere servicio avanzado Drive API)');
   testFile.setTrashed(true);
   Logger.log('Archivo de prueba borrado.');
+}
+
+/** Wrapper sin "_" para que aparezca en el dropdown "Ejecutar" del editor. */
+function runTestDriveAuth() {
+  testDriveAuth_();
 }
 
 /** Normaliza un nombre a slug ascii-kebab para usarlo como product_id legible. */
@@ -589,8 +606,8 @@ function action_catalogUploadPhoto_(payload, user) {
 
     const blob = Utilities.newBlob(bytes, mimeType, payload.product_id + '-' + Date.now());
     const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    const imageUrl = 'https://drive.google.com/uc?export=view&id=' + file.getId();
+    Drive.Permissions.create({ role: 'reader', type: 'anyone' }, file.getId());
+    const imageUrl = 'https://drive.google.com/thumbnail?id=' + file.getId() + '&sz=w1000';
 
     sh.getRange(rowIndex, imgCol).setValue(imageUrl);
     logAudit_(user.email, 'catalog.uploadPhoto', 'CATALOGO', payload.product_id, null, { image: imageUrl });
