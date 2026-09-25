@@ -67,7 +67,7 @@
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Configuración de Envío',
-      subtitle: 'Acceso solo para staff autorizado de Ahogadas La Tapatía Express.',
+      subtitle: 'Acceso solo para staff autorizado de La Tapatía Express.',
       onSignedIn: async (token) => {
         idToken = token;
         document.getElementById('auth-gate').classList.add('hidden');

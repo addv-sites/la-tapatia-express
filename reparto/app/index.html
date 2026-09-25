@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>App Repartidor | Ahogadas La Tapatía Express</title>
+<title>App Repartidor | La Tapatía Express</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="manifest" href="../../manifest.webmanifest">
 <meta name="theme-color" content="#93000b">
@@ -35,6 +35,10 @@
   <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
 
   <div id="app-content" class="hidden flex-col gap-4">
+    <div id="loading-skeleton" class="hidden flex-col gap-3">
+      <div class="skeleton rounded-xl h-40"></div>
+      <div class="skeleton rounded-xl h-24"></div>
+    </div>
     <div id="empty-state" class="hidden bg-surface-container-lowest rounded-2xl p-6 text-center shadow-sm">
       <p class="font-headline-sm text-headline-sm text-on-surface">Sin pedidos asignados</p>
       <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Cuando el restaurante te asigne una entrega, aparece aquí.</p>

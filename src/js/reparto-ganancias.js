@@ -6,6 +6,9 @@
       onSignedIn: async (token) => {
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('content').classList.remove('hidden');
+        document.getElementById('total-earned').innerHTML = '<span class="skeleton rounded-lg inline-block h-9 w-28"></span>';
+        document.getElementById('count-deliveries').innerHTML = '<span class="skeleton rounded-lg inline-block h-6 w-8"></span>';
+        document.getElementById('commission-each').innerHTML = '<span class="skeleton rounded-lg inline-block h-6 w-14"></span>';
         try {
           const [deliveries, config] = await Promise.all([
             window.LTA_API.callAction('driver.myDeliveries', {}, token),

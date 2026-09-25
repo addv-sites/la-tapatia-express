@@ -203,7 +203,10 @@
         const list = document.createElement('div');
         list.className = 'flex flex-col gap-2.5';
         group.items.forEach((product) => {
-          list.appendChild(renderProductCard(product, (p) => window.LTA_CART.addItem(p, {})));
+          list.appendChild(renderProductCard(product, (p) => {
+            window.LTA_CART.addItem(p, {});
+            window.LTA_TOAST && window.LTA_TOAST.show('"' + p.name + '" agregado al pedido.');
+          }));
         });
         section.appendChild(list);
         sections.appendChild(section);

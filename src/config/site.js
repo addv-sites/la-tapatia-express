@@ -6,7 +6,7 @@
  */
 window.SITE_CONFIG = {
   siteUrl: 'https://addv-sites.github.io/la-tapatia-express', // dominio real de producción (GitHub Pages) — debe coincidir con los Authorized JavaScript origins del OAuth Client ID
-  businessName: 'Ahogadas La Tapatía Express',
+  businessName: 'La Tapatía Express',
   branchId: 'morelia-san-juanito',
   branchName: 'Sucursal Morelia',
   phone: '4433288181',

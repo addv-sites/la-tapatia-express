@@ -1,4 +1,4 @@
-# Ahogadas La Tapatía Express — Contexto del Proyecto
+# La Tapatía Express — Contexto del Proyecto
 
 Protocolo de trabajo: skill `addv-web-app` (analizar → revisar impacto → criticar y mejorar → propuesta visual → confirmar → implementar → probar → asegurar). Ver también `project_state.md` (estado/decisiones) y `addv/cmem.md` (historial comprimido de la conversación).
 

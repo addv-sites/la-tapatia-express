@@ -10,11 +10,14 @@
       onSignedIn: async (token) => {
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('content').classList.remove('hidden');
+        document.getElementById('deliveries-list').innerHTML =
+          '<div class="skeleton rounded-xl h-20"></div>'.repeat(3);
         try {
           const data = await window.LTA_API.callAction('driver.myDeliveries', {}, token);
           const orders = data.orders || [];
           const list = document.getElementById('deliveries-list');
           if (!orders.length) {
+            list.innerHTML = '';
             document.getElementById('empty').classList.remove('hidden');
             return;
           }
@@ -30,6 +33,7 @@
                 '</div>';
             }).join('');
         } catch (err) {
+          document.getElementById('deliveries-list').innerHTML = '';
           window.LTA_TOAST.show('Error: ' + err.message, 'error');
         }
       }

@@ -323,11 +323,14 @@
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestor de Catálogo',
-      subtitle: 'Acceso solo para staff autorizado de Ahogadas La Tapatía Express.',
+      subtitle: 'Acceso solo para staff autorizado de La Tapatía Express.',
       onSignedIn: async (token) => {
         idToken = token;
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
+        document.getElementById('catalog-table-wrap').classList.remove('hidden');
+        document.getElementById('catalog-tbody').innerHTML =
+          '<tr><td colspan="7" class="p-3"><div class="skeleton rounded-lg h-12"></div></td></tr>'.repeat(5);
         try {
           await loadCatalog();
         } catch (err) {

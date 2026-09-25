@@ -7,6 +7,7 @@
     const list = document.getElementById('orders-list');
     const empty = document.getElementById('orders-empty');
     if (!orders.length) {
+      list.innerHTML = '';
       empty.classList.remove('hidden');
       return;
     }
@@ -37,10 +38,13 @@
       onSignedIn: async (token) => {
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('history-content').classList.remove('hidden');
+        document.getElementById('orders-list').innerHTML =
+          '<div class="skeleton rounded-xl h-20"></div>'.repeat(3);
         try {
           const data = await window.LTA_API.callAction('order.listMine', {}, token);
           renderOrders(data.orders || []);
         } catch (err) {
+          document.getElementById('orders-list').innerHTML = '';
           window.LTA_TOAST.show('No se pudo cargar tu historial: ' + err.message, 'error');
         }
       }

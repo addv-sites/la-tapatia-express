@@ -2,7 +2,7 @@
   "name": "la-tapatia-ahogadas",
   "version": "0.1.0",
   "private": true,
-  "description": "Sitio Ahogadas La Tapatía Express - GitHub Pages + Google Sheets/Apps Script, sin backend tradicional.",
+  "description": "Sitio La Tapatía Express - GitHub Pages + Google Sheets/Apps Script, sin backend tradicional.",
   "scripts": {
     "dev:css": "tailwindcss -i ./src/styles/input.css -o ./css/site.css --watch",
     "build:css": "tailwindcss -i ./src/styles/input.css -o ./css/site.css --minify",

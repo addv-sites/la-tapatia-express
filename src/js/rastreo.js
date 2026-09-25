@@ -46,13 +46,28 @@
     wa.href = 'https://wa.me/' + window.SITE_CONFIG.whatsapp + '?text=' + encodeURIComponent('Hola, tengo duda con mi pedido ' + order.order_id);
   }
 
+  function showResultSkeleton() {
+    document.getElementById('lookup-form').classList.add('hidden');
+    const el = document.getElementById('tracking-result');
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+    document.getElementById('result-folio').innerHTML = '<span class="skeleton rounded-lg inline-block h-7 w-32"></span>';
+    document.getElementById('result-total').innerHTML = '<span class="skeleton rounded-lg inline-block h-5 w-16"></span>';
+    document.getElementById('result-steps').innerHTML = '<div class="skeleton rounded-xl h-8 mb-2"></div>'.repeat(5);
+    document.getElementById('result-items').innerHTML = '<div class="skeleton rounded-lg h-4 mb-2"></div><div class="skeleton rounded-lg h-4"></div>';
+  }
+
   async function lookup(folio, tel) {
     const errorEl = document.getElementById('lookup-error');
     errorEl.classList.add('hidden');
+    showResultSkeleton();
     try {
       const data = await window.LTA_API.callAction('order.trackingRead', { order_id: folio, customer_phone: tel });
       renderOrder(data.order);
     } catch (err) {
+      document.getElementById('tracking-result').classList.add('hidden');
+      document.getElementById('tracking-result').classList.remove('flex');
+      document.getElementById('lookup-form').classList.remove('hidden');
       errorEl.textContent = 'No encontramos ese pedido con ese folio y teléfono. Revisa los datos.';
       errorEl.classList.remove('hidden');
     }

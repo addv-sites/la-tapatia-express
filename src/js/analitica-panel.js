@@ -92,7 +92,17 @@
     a.click();
   }
 
+  function showSkeleton() {
+    ['kpi-orders', 'kpi-delivery', 'kpi-pin-rate', 'kpi-revenue', 'kpi-avg-ticket', 'kpi-recurring'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="skeleton rounded-lg inline-block h-6 w-12"></span>';
+    });
+    document.getElementById('zones-table').innerHTML = '<div class="skeleton rounded-lg h-10 mb-2"></div>'.repeat(3);
+    document.getElementById('top-clients').innerHTML = '<div class="skeleton rounded-lg h-10 mb-2"></div>'.repeat(3);
+    document.getElementById('hourly-chart').innerHTML = '<div class="skeleton rounded-lg w-full h-full"></div>';
+  }
+
   async function load(range) {
+    showSkeleton();
     const data = await window.LTA_API.callAction('analytics.read', { range }, idToken);
     lastData = data;
     renderKpis(data.kpis);
@@ -107,7 +117,7 @@
     document.getElementById('range-select').addEventListener('change', (e) => load(e.target.value));
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
-      title: 'Analítica Ahogadas La Tapatía Express',
+      title: 'Analítica La Tapatía Express',
       subtitle: 'Acceso restringido a personal de ADDV (@addv.mx).',
       onSignedIn: async (token) => {
         idToken = token;

@@ -138,11 +138,15 @@
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestión de Pedidos',
-      subtitle: 'Acceso solo para staff autorizado de Ahogadas La Tapatía Express.',
+      subtitle: 'Acceso solo para staff autorizado de La Tapatía Express.',
       onSignedIn: async (token) => {
         idToken = token;
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
+        COLUMNS.forEach((col) => {
+          document.getElementById('col-' + col.id).innerHTML =
+            '<div class="skeleton rounded-xl h-24 mb-2"></div>'.repeat(2);
+        });
         try {
           const driverData = await window.LTA_API.callAction('driver.list', {}, idToken);
           drivers = driverData.drivers || [];

@@ -47,7 +47,7 @@
     ).join('');
 
     document.getElementById('wa-customer').href = 'https://wa.me/' + String(order.customer_phone).replace(/\D/g, '') +
-      '?text=' + encodeURIComponent('Hola ' + order.customer_name + ', soy el repartidor de Ahogadas La Tapatía Express, voy en camino con tu pedido ' + order.order_id);
+      '?text=' + encodeURIComponent('Hola ' + order.customer_name + ', soy el repartidor de La Tapatía Express, voy en camino con tu pedido ' + order.order_id);
     document.getElementById('call-customer').href = 'tel:' + order.customer_phone;
     document.getElementById('nav-google').href = mapsUrl(order.delivery_address || '');
     document.getElementById('nav-waze').href = wazeUrl(order.delivery_address || '');
@@ -141,15 +141,21 @@
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'App Repartidor',
-      subtitle: 'Acceso solo para repartidores autorizados de Ahogadas La Tapatía Express.',
+      subtitle: 'Acceso solo para repartidores autorizados de La Tapatía Express.',
       onSignedIn: async (token) => {
         idToken = token;
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('app-content').classList.remove('hidden');
+        document.getElementById('loading-skeleton').classList.remove('hidden');
+        document.getElementById('loading-skeleton').classList.add('flex');
         try {
           await loadActiveOrder();
+          document.getElementById('loading-skeleton').classList.add('hidden');
+          document.getElementById('loading-skeleton').classList.remove('flex');
           setInterval(loadActiveOrder, 20000);
         } catch (err) {
+          document.getElementById('loading-skeleton').classList.add('hidden');
+          document.getElementById('loading-skeleton').classList.remove('flex');
           document.getElementById('app-content').classList.add('hidden');
           document.getElementById('auth-gate').classList.remove('hidden');
           window.LTA_AUTH_GATE.showUnauthorized(document.getElementById('auth-gate'), err.message);

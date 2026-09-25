@@ -23,7 +23,7 @@ test.describe('Sucursal / Ubicación — mobile', () => {
 
   test('home muestra sucursal y navegación mobile bottom nav', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('header')).toContainText(/Ahogadas La Tapatía Express/);
+    await expect(page.locator('header')).toContainText(/La Tapatía Express/);
     // Aviso de servicio visible
     await expect(page.locator('aside')).toContainText(/Morelia/);
     // Bottom nav debe ser visible en mobile (4 items)
