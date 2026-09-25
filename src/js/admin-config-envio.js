@@ -54,24 +54,42 @@
     });
     try {
       await window.LTA_API.callAction('config.update', payload, idToken);
-      window.LTA_TOAST.show('Configuración de envío guardada.');
+      window.LTA_TOAST.show('Configuración guardada.');
     } catch (err) {
       window.LTA_TOAST.show('Error: ' + err.message, 'error');
     }
   }
 
+  function showTab(which) {
+    const panelEnvio = document.getElementById('panel-envio');
+    const panelHorario = document.getElementById('panel-horario');
+    const tabEnvio = document.getElementById('tab-envio');
+    const tabHorario = document.getElementById('tab-horario');
+    panelEnvio.style.display = which === 'envio' ? 'flex' : 'none';
+    panelHorario.style.display = which === 'horario' ? 'flex' : 'none';
+    tabEnvio.classList.toggle('bg-primary-fixed', which === 'envio');
+    tabEnvio.classList.toggle('text-on-primary-fixed', which === 'envio');
+    tabEnvio.classList.toggle('text-on-surface-variant', which !== 'envio');
+    tabHorario.classList.toggle('bg-primary-fixed', which === 'horario');
+    tabHorario.classList.toggle('text-on-primary-fixed', which === 'horario');
+    tabHorario.classList.toggle('text-on-surface-variant', which !== 'horario');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     renderHoursRows();
     document.getElementById('save-config').addEventListener('click', save);
+    document.getElementById('tab-envio').addEventListener('click', () => showTab('envio'));
+    document.getElementById('tab-horario').addEventListener('click', () => showTab('horario'));
     window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
-      title: 'Configuración de Envío',
+      title: 'Configuraciones',
       subtitle: 'Acceso solo para staff autorizado de La Tapatía Express.',
       onSignedIn: async (token) => {
         idToken = token;
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('admin-content').classList.remove('hidden');
+        document.getElementById('save-bar').classList.remove('hidden');
         try {
           const data = await window.LTA_API.callAction('config.read', {}, idToken);
           fill(data.config || {});

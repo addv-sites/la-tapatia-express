@@ -52,11 +52,55 @@
         <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-tune"/></svg>
       </div>
       <div class="min-w-0 flex-1">
-        <p class="font-label-md text-label-md text-on-surface font-bold">Configuración de Envío</p>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">Tarifas por zona, comisión, horario</p>
+        <p class="font-label-md text-label-md text-on-surface font-bold">Configuraciones</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Envío, comisión y horario</p>
       </div>
       <svg class="w-4 h-4 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-arrow-right"/></svg>
     </a>
+
+    <p class="font-label-sm text-[10px] uppercase tracking-wider font-bold text-on-surface-variant mt-2 mb-1">Guías rápidas</p>
+
+    <button type="button" class="guide-trigger flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-2xl p-3.5 text-left" data-guide="repartidor">
+      <div class="w-9 h-9 rounded-xl bg-crema-surface text-primary flex items-center justify-center shrink-0">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-navigation"/></svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md text-on-surface font-bold">Asignar un pedido a un repartidor</p>
+        <p class="font-label-sm text-[10.5px] text-on-surface-variant">3 pasos · 15 seg</p>
+      </div>
+      <span class="flex items-center gap-1 font-label-sm text-[10px] font-bold text-primary shrink-0">
+        <svg class="w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Ver
+      </span>
+    </button>
+
+    <button type="button" class="guide-trigger flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-2xl p-3.5 text-left" data-guide="catalogo">
+      <div class="w-9 h-9 rounded-xl bg-crema-surface text-primary flex items-center justify-center shrink-0">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-tostada"/></svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md text-on-surface font-bold">Configurar el catálogo</p>
+        <p class="font-label-sm text-[10.5px] text-on-surface-variant">4 pasos · 20 seg</p>
+      </div>
+      <span class="flex items-center gap-1 font-label-sm text-[10px] font-bold text-primary shrink-0">
+        <svg class="w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Ver
+      </span>
+    </button>
+
+    <button type="button" class="guide-trigger flex items-center gap-3 bg-surface-container-lowest border border-outline-variant rounded-2xl p-3.5 text-left" data-guide="horario">
+      <div class="w-9 h-9 rounded-xl bg-crema-surface text-primary flex items-center justify-center shrink-0">
+        <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-fire"/></svg>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md text-on-surface font-bold">Configurar horarios</p>
+        <p class="font-label-sm text-[10.5px] text-on-surface-variant">2 pasos · 10 seg</p>
+      </div>
+      <span class="flex items-center gap-1 font-label-sm text-[10px] font-bold text-primary shrink-0">
+        <svg class="w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Ver
+      </span>
+    </button>
 
     <div class="mt-2 pt-3.5 border-t border-dashed border-outline-variant">
       <p class="font-label-sm text-[10px] uppercase tracking-wider font-bold text-on-surface-variant mb-2">Otros portales (login aparte)</p>
@@ -66,11 +110,30 @@
       </a>
     </div>
   </div>
+
+  <!-- Overlay de guía animada -->
+  <div id="guide-overlay" class="hidden fixed inset-0 z-[70] bg-inverse-surface/60 items-end justify-center">
+    <div class="w-full max-w-2xl bg-surface-container-lowest rounded-t-3xl p-5 shadow-2xl max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3">
+        <span id="guide-title" class="font-headline-sm text-headline-sm text-on-surface"></span>
+        <button id="guide-close" type="button" class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center" aria-label="Cerrar guía">
+          <svg class="w-4 h-4" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-close"/></svg>
+        </button>
+      </div>
+      <div id="guide-stage" class="relative bg-crema-bg rounded-2xl p-4 min-h-[220px] overflow-hidden"></div>
+      <div id="guide-dots" class="flex justify-center gap-1.5 my-3.5"></div>
+      <div class="flex gap-2">
+        <button id="guide-prev" type="button" class="flex-1 min-h-[44px] rounded-xl font-label-md text-label-md font-bold bg-surface-container text-on-surface-variant">Anterior</button>
+        <button id="guide-next" type="button" class="flex-1 min-h-[44px] rounded-xl font-label-md text-label-md font-bold bg-primary text-on-primary">Siguiente</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <script src="../src/js/api.js"></script>
 <script src="../src/js/auth.js"></script>
 <script src="../src/js/auth-gate.js"></script>
 <script src="../src/js/admin-dashboard.js"></script>
+<script src="../src/js/admin-guides.js"></script>
 </body>
 </html>

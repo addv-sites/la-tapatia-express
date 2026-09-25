@@ -5,6 +5,7 @@ module.exports = {
     './menu/**/*.html',
     './ubicacion/**/*.html',
     './contacto/**/*.html',
+    './admin/*.html',
     './admin/catalogo/**/*.html',
     './admin/pedidos/**/*.html',
     './admin/config-envio/**/*.html',
