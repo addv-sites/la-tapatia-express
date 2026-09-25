@@ -346,6 +346,7 @@
     }
     updateCartBadge();
     document.addEventListener('cart-changed', updateCartBadge);
+    window.LTA_CART_FLY.setBadge(document.getElementById('nav-cart-badge'), window.LTA_CART.count());
 
     // Drawer de personalización
     var drawer = document.getElementById('customizer-drawer');

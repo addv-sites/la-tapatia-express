@@ -56,5 +56,12 @@
     badgeEl.classList.add('cart-bump');
   }
 
-  window.LTA_CART_FLY = { fly: fly, bumpBadge: bumpBadge };
+  /** Igual que bumpBadge pero sin el rebote — para sincronizar en silencio al cargar la página. */
+  function setBadge(badgeEl, count) {
+    if (!badgeEl) return;
+    badgeEl.textContent = count;
+    badgeEl.classList.toggle('show', count > 0);
+  }
+
+  window.LTA_CART_FLY = { fly: fly, bumpBadge: bumpBadge, setBadge: setBadge };
 })();

@@ -170,6 +170,7 @@
         document.getElementById('order-success').classList.remove('flex');
         items.forEach((item, i) => cartList.appendChild(renderCartLine(item, i, (idx) => {
           window.LTA_CART.removeAt(idx);
+          window.LTA_CART_FLY.bumpBadge(document.getElementById('nav-cart-badge'), window.LTA_CART.count());
           renderCart();
         })));
       }
@@ -180,6 +181,12 @@
       cartTotal.textContent = window.LTA_CATALOG.formatPrice(subtotal);
       toggleVisible(addressField, isDelivery, 'flex-col');
     }
+
+    // Sincroniza el badge del tab "Pedido" con lo que ya traiga el carrito
+    // (ej. si vienes de Home con productos agregados). Aparte del flujo de
+    // agregar/quitar — no cuelga de "cart-changed" para no adelantarse a la
+    // animación de vuelo, que es la que actualiza el número al agregar.
+    window.LTA_CART_FLY.setBadge(document.getElementById('nav-cart-badge'), window.LTA_CART.count());
 
     orderTypeRadios.forEach((r) => r.addEventListener('change', renderCart));
     document.addEventListener('cart-changed', renderCart);
