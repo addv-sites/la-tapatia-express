@@ -7,6 +7,26 @@
  * Contrato completo de acciones y esquema de hojas: docs/apps-script-contract.md
  *
  * Desplegar como Web App: Ejecutar como "Yo", Acceso "Cualquier usuario".
+ *
+ * Setup de Drive (requerido antes del primer despliegue, ver también
+ * apps-script/appsscript.json):
+ *   1. appsscript.json con oauthScopes incluyendo
+ *      "https://www.googleapis.com/auth/drive" (no dejar en autodetección).
+ *   2. Panel Servicios del editor (ícono +) → agregar servicio avanzado
+ *      "Drive API" (v3). Sin esto Drive.Permissions.create no existe.
+ *   3. Correr runTestDriveAuth (ver abajo) una vez desde el editor para
+ *      disparar el diálogo de autorización — el deploy solo no lo pide.
+ *   4. Para compartir archivos: usar SIEMPRE Drive.Permissions.create
+ *      ({role:'reader', type:'anyone'}, fileId) — NUNCA
+ *      DriveApp.setSharing(ANYONE_WITH_LINK, ...), que truena con
+ *      "Access denied: DriveApp" incluso con scope completo, autorización
+ *      ya otorgada y política de dominio Workspace permitiendo compartir
+ *      fuera de la organización. Es un problema del servicio simplificado
+ *      DriveApp, no de permisos — el servicio avanzado sí funciona.
+ *   5. Para la URL pública de la imagen: usar
+ *      'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000' —
+ *      NUNCA 'uc?export=view&id=...', que ya no sirve como imagen
+ *      embebida en <img src> (Google la redirige a una página HTML).
  */
 
 // Respaldo solo para el caso raro de correr este script como standalone
@@ -68,20 +88,18 @@ function getOrCreateFolderPath_(pathParts) {
 }
 
 /**
- * Prueba manual de setup de Drive para un cliente nuevo. Requiere:
- *   1. appsscript.json con oauthScopes incluyendo "https://www.googleapis.com/auth/drive"
- *   2. Servicio avanzado "Drive API" añadido (panel Servicios del editor, ícono +)
- * Correr runTestDriveAuth (no testDriveAuth_ directo: los nombres con "_" no
- * aparecen en el dropdown "Ejecutar" del editor) para disparar el diálogo de
- * autorización. Confirma folder + createFile + Drive.Permissions.create
- * (NO usar DriveApp.setSharing: falla con "Access denied" incluso con scope
- * completo y política de dominio permitiendo compartir — usar siempre el
- * servicio avanzado Drive.Permissions.create en su lugar).
+ * Prueba manual de setup de Drive para un cliente nuevo. Correr
+ * runTestDriveAuth (no testDriveAuth_ directo: los nombres con "_" no
+ * aparecen en el dropdown "Ejecutar" del editor) para disparar el diálogo
+ * de autorización. Confirma folder + createFile + Drive.Permissions.create
+ * (requiere el servicio avanzado Drive API — ver comentario al inicio del
+ * archivo). Se puede dejar en el proyecto de forma permanente como
+ * herramienta de diagnóstico para futuros clientes.
  */
 function testDriveAuth_() {
   const folder = getOrCreateFolderPath_(['laTapatia', 'imagenes', 'catalogo']);
   const testFile = folder.createFile('test-auth.txt', 'ok', MimeType.PLAIN_TEXT);
-  Logger.log('OK: ' + folder.getName() + ' — archivo creado: ' + testFile.getId());
+  Logger.log('OK crear archivo: ' + testFile.getId());
   Drive.Permissions.create({ role: 'reader', type: 'anyone' }, testFile.getId());
   Logger.log('OK Drive.Permissions.create (requiere servicio avanzado Drive API)');
   testFile.setTrashed(true);
@@ -95,7 +113,7 @@ function runTestDriveAuth() {
 
 /** Normaliza un nombre a slug ascii-kebab para usarlo como product_id legible. */
 function slugify_(text) {
-  const combiningMarks = new RegExp('[\u0300-\u036f]', 'g');
+  const combiningMarks = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
   return String(text)
     .normalize('NFD').replace(combiningMarks, '')
     .toLowerCase()
