@@ -14,6 +14,22 @@
     return audioCtx;
   }
 
+  // Los navegadores solo dejan crear/reanudar audio dentro de un gesto real
+  // del usuario (click/tap) — la alarma se dispara sola desde el polling,
+  // sin gesto, así que sin esto se queda muda en silencio (sin error).
+  // "Desbloqueamos" el contexto en el primer click/tap de la página; una
+  // vez reanudado, sigue funcionando después aunque lo dispare el polling.
+  function primeOnFirstGesture_() {
+    const unlock = () => {
+      ensureAudio();
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchend', unlock);
+    };
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchend', unlock);
+  }
+  primeOnFirstGesture_();
+
   function tone(ctx, time, freq, dur, type) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();

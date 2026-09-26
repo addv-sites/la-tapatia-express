@@ -14,6 +14,18 @@
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
   }
+  // La alarma la dispara el polling (sin gesto del usuario) — el navegador
+  // bloquea audio creado/reanudado fuera de un click/tap real. Se
+  // "desbloquea" solo, en el primer click o tap de la página.
+  (function primeAudioOnFirstGesture() {
+    const unlock = () => {
+      ensureAudio();
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchend', unlock);
+    };
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchend', unlock);
+  })();
   function ding(ctx, time, freq) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
