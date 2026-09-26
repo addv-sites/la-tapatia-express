@@ -39,14 +39,13 @@
       </div>
     </div>
   </div>
-  <div class="flex items-center gap-2 overflow-x-auto px-margin pb-2.5 pt-1 no-scrollbar">
-    <a href="#tortas" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tortas</a>
-    <a href="#tacos" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tacos</a>
-    <a href="#tostadas" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Tostadas</a>
-    <a href="#combo-infantil" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Combo infantil</a>
-    <a href="#extras" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Extras</a>
-    <a href="#postres" class="shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm font-label-md text-label-md">Postres</a>
-    <a href="#pedido" class="shrink-0 px-3 py-1.5 rounded-full bg-primary text-on-primary shadow-sm font-label-md text-label-md">Mi pedido</a>
+  <div class="flex items-center gap-2 overflow-x-auto px-margin pb-2.5 pt-1 no-scrollbar" id="category-pill-row">
+    <a href="#tortas" class="category-pill shrink-0 px-3 py-1.5 rounded-full border-[1.5px] border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors">Tortas</a>
+    <a href="#tacos" class="category-pill shrink-0 px-3 py-1.5 rounded-full border-[1.5px] border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors">Tacos</a>
+    <a href="#tostadas" class="category-pill shrink-0 px-3 py-1.5 rounded-full border-[1.5px] border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors">Tostadas</a>
+    <a href="#combo-infantil" class="category-pill shrink-0 px-3 py-1.5 rounded-full border-[1.5px] border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors">Combo infantil</a>
+    <a href="#extras" class="category-pill shrink-0 px-3 py-1.5 rounded-full border-[1.5px] border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors">Extras</a>
+    <a href="#postres" class="category-pill shrink-0 px-3 py-1.5 rounded-full border-[1.5px] border-outline-variant text-on-surface-variant font-label-md text-label-md transition-colors">Postres</a>
   </div>
 </header>
 
@@ -61,10 +60,15 @@
     </div>
   </div>
 
-  <section id="pedido" class="px-margin py-4 scroll-mt-32">
-    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex flex-col gap-4">
-      <h2 class="font-headline-md text-headline-md text-on-surface">Tu pedido</h2>
-
+  <div id="cart-overlay" aria-hidden="true" class="fixed inset-0 z-[55] bg-crema-bg transform translate-y-full transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] flex flex-col">
+    <div class="h-16 shrink-0 flex items-center gap-3 px-margin border-b border-surface-container-high bg-surface-container-lowest">
+      <button id="cart-back" type="button" aria-label="Volver al menú" class="w-9 h-9 rounded-full bg-crema-surface flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" aria-hidden="true" style="transform:rotate(180deg)"><use href="../assets/icons/sprite.svg#icon-arrow-right"/></svg>
+      </button>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">Tu pedido</h2>
+    </div>
+    <div class="flex-1 overflow-y-auto px-margin py-4">
+    <div class="flex flex-col gap-4">
       <div id="cart-empty" class="font-body-sm text-body-sm text-on-surface-variant py-4 text-center">
         Tu carrito está vacío. Agrega algo del menú de arriba.
       </div>
@@ -147,8 +151,15 @@
         <div id="signin-invite-postorder" hidden></div>
       </div>
     </div>
-  </section>
+    </div>
+  </div>
 </main>
+
+<!-- Botón flotante del carrito — visible mientras se navega el menú -->
+<button id="fab-cart" type="button" aria-label="Ver mi pedido" class="hidden fixed right-4 z-40 rounded-full bg-primary text-on-primary shadow-lg h-14 pl-4 pr-5 items-center gap-2 font-headline-sm text-headline-sm active:scale-95 transition-transform" style="bottom: calc(4rem + 15px)">
+  <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-cart"/></svg>
+  <span id="fab-cart-count">0</span>
+</button>
 
 <!-- Visor de imagen a detalle (tap en la foto de un platillo) -->
 <div aria-hidden="true" class="fixed inset-0 z-[65] pointer-events-none opacity-0 transition-opacity duration-[450ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] bg-inverse-surface/75 flex items-center justify-center p-4" id="image-lightbox">

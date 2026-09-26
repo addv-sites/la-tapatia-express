@@ -38,6 +38,38 @@
     history.back();
   }
 
+  // Carrito como pantalla propia (overlay de pantalla completa) en vez de
+  // ser el final del scroll del menú — mismo patrón de historial que el
+  // visor de imagen, para que el botón atrás cierre en vez de salir de la
+  // página. skipPush evita un 2do back innecesario cuando se llega ya con
+  // #pedido en la URL (ej. desde el tab "Pedido" de Home).
+  let cartOverlayOpen = false;
+  function syncFabCart() {
+    const fab = document.getElementById('fab-cart');
+    const count = window.LTA_CART.count();
+    document.getElementById('fab-cart-count').textContent = count;
+    const show = count > 0 && !cartOverlayOpen;
+    fab.classList.toggle('hidden', !show);
+    fab.classList.toggle('flex', show);
+  }
+  function openCartOverlay(opts) {
+    if (cartOverlayOpen) return;
+    cartOverlayOpen = true;
+    document.getElementById('cart-overlay').classList.remove('translate-y-full');
+    document.getElementById('cart-overlay').setAttribute('aria-hidden', 'false');
+    syncFabCart();
+    if (!(opts && opts.skipPush)) history.pushState({ ltaCart: true }, '', location.href);
+  }
+  function hideCartOverlay() {
+    document.getElementById('cart-overlay').classList.add('translate-y-full');
+    document.getElementById('cart-overlay').setAttribute('aria-hidden', 'true');
+    cartOverlayOpen = false;
+    syncFabCart();
+  }
+  function closeCartOverlay() {
+    if (!cartOverlayOpen) return;
+    history.back();
+  }
 
   function renderProductCard(product, onAdd) {
     const article = document.createElement('article');
@@ -180,7 +212,16 @@
     });
     window.addEventListener('popstate', () => {
       if (lightboxOpen) hideImageLightbox();
+      if (cartOverlayOpen) hideCartOverlay();
     });
+
+    document.getElementById('cart-back').addEventListener('click', closeCartOverlay);
+    document.getElementById('fab-cart').addEventListener('click', () => openCartOverlay());
+    document.getElementById('nav-pedido').addEventListener('click', (e) => {
+      e.preventDefault();
+      openCartOverlay();
+    });
+    if (location.hash === '#pedido') openCartOverlay({ skipPush: true });
 
     window.LTA_INLINE_SIGNIN.render(document.getElementById('signin-invite-checkout'), {
       key: 'checkout',
@@ -243,6 +284,7 @@
       toggleVisible(deliveryFeeRow, isDelivery, 'flex');
       cartTotal.textContent = window.LTA_CATALOG.formatPrice(subtotal);
       toggleVisible(addressField, isDelivery, 'flex-col');
+      syncFabCart();
     }
 
     // Sincroniza el badge del tab "Pedido" con lo que ya traiga el carrito
@@ -300,7 +342,46 @@
         sections.appendChild(section);
       });
 
+      setupCategorySpy();
       renderCart();
+    }
+
+    // Scroll-spy: la pastilla de categoría se resalta sola según qué
+    // sección está en pantalla — antes ninguna reflejaba el scroll.
+    let categorySpyObserver = null;
+    function setupCategorySpy() {
+      if (categorySpyObserver) categorySpyObserver.disconnect();
+      const pills = Array.from(document.querySelectorAll('.category-pill'));
+      if (!pills.length) return;
+
+      function setActivePill(id) {
+        pills.forEach((p) => {
+          const active = p.getAttribute('href') === '#' + id;
+          p.classList.toggle('bg-primary', active);
+          p.classList.toggle('text-on-primary', active);
+          p.classList.toggle('border-primary', active);
+          p.classList.toggle('shadow-sm', active);
+          p.classList.toggle('text-on-surface-variant', !active);
+          p.classList.toggle('border-outline-variant', !active);
+          if (active) p.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        });
+      }
+
+      const visible = new Set();
+      categorySpyObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        });
+        // El primero en orden del documento que sigue visible manda — evita
+        // que una sección corta al final "gane" solo por asomar un pixel.
+        const orderedIds = Array.from(sections.children).map((s) => s.id);
+        const current = orderedIds.find((id) => visible.has(id));
+        if (current) setActivePill(current);
+      }, { rootMargin: '-130px 0px -60% 0px', threshold: 0 });
+
+      Array.from(sections.children).forEach((sec) => categorySpyObserver.observe(sec));
+      setActivePill(pills[0].getAttribute('href').slice(1));
     }
 
     // Pinta rápido con el snapshot (no bloquea el LCP) y, apenas llegue,
