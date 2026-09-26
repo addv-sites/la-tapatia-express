@@ -227,6 +227,36 @@ function geocodeAddress_(address) {
   return result;
 }
 
+/** Reverse geocoding: lat/lng -> dirección legible. Usado por el pin arrastrable del checkout. */
+function reverseGeocode_(lat, lng) {
+  const cache = CacheService.getScriptCache();
+  const cacheKey = 'georev_' + lat + '_' + lng;
+  const cached = cache.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  Utilities.sleep(1000); // respeta política de uso de Nominatim
+  const url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng);
+  const resp = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true,
+    headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
+  });
+  if (resp.getResponseCode() !== 200) return null;
+  const result = JSON.parse(resp.getContentText());
+  if (!result || !result.display_name) return null;
+  const out = { address: result.display_name };
+  cache.put(cacheKey, JSON.stringify(out), 21600); // 6h
+  return out;
+}
+
+function action_geoReverseGeocode_(payload) {
+  const lat = Number(payload.lat);
+  const lng = Number(payload.lng);
+  if (!lat || !lng) throw new Error('Faltan coordenadas');
+  const result = reverseGeocode_(lat, lng);
+  if (!result) throw new Error('No se pudo obtener la dirección para ese punto');
+  return result;
+}
+
 function distanceKm_(lat1, lng1, lat2, lng2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -788,7 +818,7 @@ function action_analyticsRead_(payload) {
 // Router
 // ---------------------------------------------------------------------------
 
-const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead'];
+const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode'];
 
 function route_(action, payload, idToken, sessionId) {
   switch (action) {
@@ -796,6 +826,7 @@ function route_(action, payload, idToken, sessionId) {
     case 'config.read': return action_configRead_();
     case 'order.create': return action_orderCreate_(payload, sessionId, idToken);
     case 'order.trackingRead': return action_orderTrackingRead_(payload);
+    case 'geo.reverseGeocode': return action_geoReverseGeocode_(payload);
     case 'order.listMine': return action_orderListMine_(requireRole_(idToken, 'ANY'));
     case 'client.getProfile': return action_clientGetProfile_(requireRole_(idToken, 'ANY'));
 

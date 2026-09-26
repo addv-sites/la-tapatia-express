@@ -11,16 +11,19 @@
 </head>
 <body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
 
-<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between px-6">
-  <div class="flex items-center gap-3">
-    <span class="font-headline-sm text-headline-sm text-primary">La Tapatía Express</span>
-    <span class="font-label-sm text-label-sm text-on-surface-variant">Gestor de Catálogo &amp; Precios</span>
+<header class="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-sm z-50 flex items-center justify-between gap-2 px-3 sm:px-6">
+  <div class="flex items-center gap-2 min-w-0">
+    <a href="../" class="flex items-center gap-1 shrink-0 font-label-md text-label-md text-on-surface-variant hover:text-primary">
+      <svg class="w-4 h-4 shrink-0" aria-hidden="true" style="transform:rotate(180deg)"><use href="../../assets/icons/sprite.svg#icon-arrow-right"/></svg>
+      <span class="hidden sm:inline">Panel</span>
+    </a>
+    <span class="text-outline-variant shrink-0 hidden sm:inline">/</span>
+    <div class="min-w-0 flex flex-col leading-tight">
+      <span class="font-headline-sm text-headline-sm text-primary truncate">La Tapatía Express</span>
+      <span class="font-label-sm text-[10px] text-on-surface-variant truncate">Gestor de Catálogo &amp; Precios</span>
+    </div>
   </div>
-  <div class="flex items-center gap-4 font-label-md text-label-md">
-    <a href="../pedidos/" class="text-on-surface-variant hover:text-primary">Pedidos</a>
-    <a href="../config-envio/" class="text-on-surface-variant hover:text-primary">Config. Envío</a>
-    <button id="btn-signout-header" class="text-on-surface-variant hover:text-error">Cerrar sesión</button>
-  </div>
+  <button id="btn-signout-header" class="shrink-0 font-label-md text-label-md text-on-surface-variant hover:text-error whitespace-nowrap">Salir</button>
 </header>
 
 <main class="pt-16 min-h-screen">

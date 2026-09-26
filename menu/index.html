@@ -14,9 +14,11 @@
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="icon" href="../favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="stylesheet" href="../css/site.css">
 <script defer src="../src/config/site.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col">
 
@@ -97,6 +99,14 @@
         <div id="field-address" class="hidden flex-col gap-1">
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-address-input">Dirección de entrega</label>
           <input id="field-address-input" class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" autocomplete="street-address">
+          <button id="btn-toggle-map" type="button" class="self-start mt-1 flex items-center gap-1.5 font-label-sm text-label-sm text-primary font-bold">
+            <svg class="w-4 h-4" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-pin"/></svg>
+            Ajustar ubicación en el mapa
+          </button>
+          <div id="address-map-wrap" class="hidden flex-col gap-1.5 mt-1">
+            <div id="address-map" class="w-full h-56 rounded-xl overflow-hidden bg-surface-container-high"></div>
+            <p class="font-label-sm text-[11px] text-on-surface-variant">Arrastra el pin a tu ubicación exacta — la dirección de arriba se actualiza sola.</p>
+          </div>
         </div>
         <div class="flex flex-col gap-1">
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-notes">Notas (opcional)</label>

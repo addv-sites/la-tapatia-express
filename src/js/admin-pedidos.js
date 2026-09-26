@@ -131,10 +131,25 @@
       document.getElementById('count-' + col.id).textContent = colOrders.length;
       colOrders.forEach((o) => container.appendChild(orderCard(o)));
     });
+
+    // Alarma: suena mientras haya al menos un pedido "pendiente" sin atender.
+    const pendienteCount = orders.filter((o) => o.status === 'pendiente').length;
+    if (pendienteCount > 0) {
+      window.LTA_KDS_ALARM.start();
+    } else {
+      window.LTA_KDS_ALARM.stop();
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
+
+    const soundSelect = document.getElementById('kds-sound-select');
+    soundSelect.value = window.LTA_KDS_ALARM.getSelected();
+    soundSelect.addEventListener('change', () => {
+      window.LTA_KDS_ALARM.setSelected(soundSelect.value);
+      window.LTA_KDS_ALARM.preview(soundSelect.value);
+    });
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Gestión de Pedidos',
@@ -161,5 +176,8 @@
     });
   });
 
-  window.addEventListener('beforeunload', () => { if (pollTimer) clearInterval(pollTimer); });
+  window.addEventListener('beforeunload', () => {
+    if (pollTimer) clearInterval(pollTimer);
+    window.LTA_KDS_ALARM.stop();
+  });
 })();

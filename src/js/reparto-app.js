@@ -3,7 +3,74 @@
   let currentOrder = null;
   let watchId = null;
   let lastPingAt = 0;
+  let lastSeenOrderId = undefined; // undefined = aún no cargó nada; distinto de null/"" (sin pedido)
+  let vibrating = false;
   const PING_MIN_INTERVAL_MS = 20000;
+
+  // ---- Alerta sonora: mismo timbre de siempre, 6 segundos fijos ----
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function ding(ctx, time, freq) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, time);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(0.25, time + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.55);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(time);
+    osc.stop(time + 0.6);
+  }
+  function playAssignmentAlert() {
+    const ctx = ensureAudio();
+    const start = ctx.currentTime + 0.05;
+    const interval = 1.1;
+    for (let i = 0; i < Math.floor(6 / interval); i++) {
+      const t = start + i * interval;
+      ding(ctx, t, 880);
+      ding(ctx, t + 0.14, 660);
+    }
+  }
+
+  // ---- Vibración: constante mientras el popup esté abierto (no existe en iPhone/Safari) ----
+  function startVibration() {
+    if (!navigator.vibrate) return;
+    vibrating = true;
+    navigator.vibrate([400, 200, 400, 200, 400, 200, 400, 200]);
+  }
+  function stopVibration() {
+    vibrating = false;
+    if (navigator.vibrate) navigator.vibrate(0);
+  }
+
+  // ---- Popup de nuevo pedido asignado ----
+  function showAssignPopup(order) {
+    const overlay = document.getElementById('assign-popup');
+    const card = document.getElementById('assign-popup-card');
+    document.getElementById('assign-popup-detail').textContent =
+      order.order_id + ' · ' + (order.delivery_address || 'Recoge en sucursal');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.classList.remove('opacity-0');
+        card.classList.remove('opacity-0', 'scale-90', 'translate-y-3');
+      });
+    });
+  }
+  function hideAssignPopup() {
+    const overlay = document.getElementById('assign-popup');
+    const card = document.getElementById('assign-popup-card');
+    overlay.classList.add('opacity-0');
+    card.classList.add('opacity-0', 'scale-90', 'translate-y-3');
+    setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }, 700);
+    stopVibration();
+  }
 
   function parseItems(order) {
     try { return JSON.parse(order.items || '[]'); } catch (e) { return []; }
@@ -94,9 +161,17 @@
       document.getElementById('empty-state').classList.remove('hidden');
       document.getElementById('order-card').classList.add('hidden');
       stopGpsTracking();
+      lastSeenOrderId = null;
       return;
     }
-    renderOrder(orders[0]);
+    const order = orders[0];
+    if (lastSeenOrderId !== undefined && order.order_id !== lastSeenOrderId) {
+      playAssignmentAlert();
+      startVibration();
+      showAssignPopup(order);
+    }
+    lastSeenOrderId = order.order_id;
+    renderOrder(order);
   }
 
   async function startRoute() {
@@ -114,6 +189,13 @@
     document.getElementById('btn-incident').addEventListener('click', () => openModal('modal-incident'));
     document.getElementById('modal-confirm-cancel').addEventListener('click', () => closeModal('modal-confirm'));
     document.getElementById('modal-incident-cancel').addEventListener('click', () => closeModal('modal-incident'));
+
+    document.getElementById('assign-popup-ignore').addEventListener('click', hideAssignPopup);
+    document.getElementById('assign-popup-review').addEventListener('click', () => {
+      hideAssignPopup();
+      const card = document.getElementById('order-card');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     document.getElementById('modal-confirm-ok').addEventListener('click', async () => {
       try {
@@ -142,10 +224,12 @@
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'App Repartidor',
       subtitle: 'Acceso solo para repartidores autorizados de La Tapatía Express.',
-      onSignedIn: async (token) => {
+      onSignedIn: async (token, profile) => {
         idToken = token;
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('app-content').classList.remove('hidden');
+        const name = (profile && (profile.given_name || profile.name)) || '';
+        document.getElementById('driver-greeting').textContent = name ? 'Hola, ' + name : '';
         document.getElementById('loading-skeleton').classList.remove('hidden');
         document.getElementById('loading-skeleton').classList.add('flex');
         try {
@@ -164,5 +248,5 @@
     });
   });
 
-  window.addEventListener('beforeunload', stopGpsTracking);
+  window.addEventListener('beforeunload', () => { stopGpsTracking(); stopVibration(); });
 })();

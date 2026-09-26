@@ -79,6 +79,45 @@
   }
 
   let currentIdToken = null;
+  let addressMap = null;
+  let addressMarker = null;
+
+  // Centro aproximado de Morelia — mismo fallback que ya usa analitica-panel.js
+  // cuando no hay una ubicación más precisa disponible.
+  const MORELIA_CENTER = [19.7008, -101.1844];
+
+  async function onAddressPinDragEnd() {
+    const ll = addressMarker.getLatLng();
+    const input = document.getElementById('field-address-input');
+    const previous = input.value;
+    input.value = 'Buscando dirección...';
+    try {
+      const data = await window.LTA_API.readAction('geo.reverseGeocode', { lat: ll.lat, lng: ll.lng });
+      input.value = data.address;
+    } catch (err) {
+      input.value = previous;
+      window.LTA_TOAST && window.LTA_TOAST.show('No se pudo obtener la dirección de ese punto — intenta de nuevo.', 'error');
+    }
+  }
+
+  function initAddressMap() {
+    if (addressMap || !window.L) return;
+    addressMap = L.map('address-map', { zoomControl: true }).setView(MORELIA_CENTER, 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(addressMap);
+    addressMarker = L.marker(MORELIA_CENTER, { draggable: true }).addTo(addressMap);
+    addressMarker.on('dragend', onAddressPinDragEnd);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const ll = [pos.coords.latitude, pos.coords.longitude];
+        addressMap.setView(ll, 16);
+        addressMarker.setLatLng(ll);
+      }, () => { /* sin permiso o sin señal — se queda el centro de Morelia */ }, { enableHighAccuracy: true, timeout: 5000 });
+    }
+  }
 
   async function restoreSession() {
     const token = sessionStorage.getItem('lta_id_token');
@@ -190,6 +229,19 @@
 
     orderTypeRadios.forEach((r) => r.addEventListener('change', renderCart));
     document.addEventListener('cart-changed', renderCart);
+
+    document.getElementById('btn-toggle-map').addEventListener('click', () => {
+      const wrap = document.getElementById('address-map-wrap');
+      const willShow = wrap.classList.contains('hidden');
+      wrap.classList.toggle('hidden', !willShow);
+      wrap.classList.toggle('flex', willShow);
+      if (willShow) {
+        setTimeout(() => {
+          initAddressMap();
+          if (addressMap) addressMap.invalidateSize();
+        }, 50);
+      }
+    });
 
     function renderMenu(data) {
       runtimeConfig = Object.assign(runtimeConfig, data.config || {});

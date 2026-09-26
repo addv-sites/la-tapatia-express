@@ -35,6 +35,7 @@
   <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
 
   <div id="app-content" class="hidden flex-col gap-4">
+    <p id="driver-greeting" class="font-body-sm text-body-sm text-on-surface-variant"></p>
     <div id="loading-skeleton" class="hidden flex-col gap-3">
       <div class="skeleton rounded-xl h-40"></div>
       <div class="skeleton rounded-xl h-24"></div>
@@ -86,6 +87,21 @@
     </div>
   </div>
 </main>
+
+<!-- Popup: nuevo pedido asignado (aparece con animación lenta) -->
+<div id="assign-popup" class="hidden fixed inset-0 z-[60] bg-inverse-surface/60 items-center justify-center p-4 opacity-0 transition-opacity duration-700">
+  <div id="assign-popup-card" class="bg-surface-container-lowest rounded-2xl w-full max-w-sm p-6 flex flex-col items-center text-center gap-3 opacity-0 scale-90 translate-y-3 transition-all duration-700">
+    <div class="w-14 h-14 rounded-full bg-primary-fixed text-primary flex items-center justify-center">
+      <svg class="w-7 h-7" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-navigation"/></svg>
+    </div>
+    <h3 class="font-headline-sm text-headline-sm">Te asignaron un pedido</h3>
+    <p id="assign-popup-detail" class="font-body-sm text-body-sm text-on-surface-variant"></p>
+    <div class="flex gap-2 w-full pt-1">
+      <button id="assign-popup-ignore" class="flex-1 py-3 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface-variant">Ignorar</button>
+      <button id="assign-popup-review" class="flex-1 py-3 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-bold">Revisar pedido</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal confirmar entrega -->
 <div id="modal-confirm" class="hidden fixed inset-0 z-50 bg-inverse-surface/60 items-center justify-center p-4">
