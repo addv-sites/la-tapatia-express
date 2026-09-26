@@ -67,10 +67,6 @@
           <div id="bell-notif-list" class="max-h-72 overflow-y-auto"></div>
         </div>
       </div>
-      <a href="menu/#pedido" aria-label="Ver pedido" class="relative w-11 h-11 flex items-center justify-center rounded-lg text-primary hover:bg-mustard-light transition-colors">
-        <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-cart"/></svg>
-        <span id="cart-badge" class="hidden absolute top-1.5 right-1.5 bg-primary text-on-primary font-label-sm text-[10px] w-4 h-4 rounded-full items-center justify-center font-bold">0</span>
-      </a>
     </div>
   </div>
 </header>
@@ -373,16 +369,7 @@
       document.getElementById('ios-install-modal').style.display = 'none';
     });
 
-    // Carrito: badge del ícono del header (se actualiza al instante, sin animación)
-    function updateCartBadge() {
-      var n = window.LTA_CART.count();
-      var badge = document.getElementById('cart-badge');
-      badge.textContent = n;
-      badge.classList.toggle('hidden', n === 0);
-      badge.classList.toggle('flex', n !== 0);
-    }
-    updateCartBadge();
-    document.addEventListener('cart-changed', updateCartBadge);
+    // Carrito: badge de la nav inferior (se actualiza al instante, sin animación)
     window.LTA_CART_FLY.setBadge(document.getElementById('nav-cart-badge'), window.LTA_CART.count());
 
     // Drawer de personalización

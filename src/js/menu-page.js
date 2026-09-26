@@ -47,12 +47,12 @@
   function openCartOverlay(opts) {
     if (cartOverlayOpen) return;
     cartOverlayOpen = true;
-    document.getElementById('cart-overlay').classList.remove('translate-y-full');
+    document.getElementById('cart-overlay').classList.remove('translate-y-[calc(100%+4rem)]');
     document.getElementById('cart-overlay').setAttribute('aria-hidden', 'false');
     if (!(opts && opts.skipPush)) history.pushState({ ltaCart: true }, '', location.href);
   }
   function hideCartOverlay() {
-    document.getElementById('cart-overlay').classList.add('translate-y-full');
+    document.getElementById('cart-overlay').classList.add('translate-y-[calc(100%+4rem)]');
     document.getElementById('cart-overlay').setAttribute('aria-hidden', 'true');
     cartOverlayOpen = false;
   }
