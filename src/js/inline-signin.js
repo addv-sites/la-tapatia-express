@@ -30,7 +30,7 @@
     window.LTA_AUTH.renderButton(document.getElementById('gsi-btn-' + opts.key), { size: 'medium' });
     window.LTA_AUTH.onAuthChange(({ idToken, profile }) => {
       if (!idToken) return;
-      sessionStorage.setItem('lta_id_token', idToken);
+      localStorage.setItem('lta_id_token', idToken);
       container.hidden = true;
       opts.onSignedIn(idToken, profile);
     });

@@ -130,7 +130,7 @@
   }
 
   async function restoreSession() {
-    const token = sessionStorage.getItem('lta_id_token');
+    const token = localStorage.getItem('lta_id_token');
     if (!token) return;
     try {
       const data = await window.LTA_API.callAction('client.getProfile', {}, token);
@@ -138,7 +138,7 @@
       applyProfile(data.profile);
       document.getElementById('signin-invite-checkout').hidden = true;
     } catch (err) {
-      sessionStorage.removeItem('lta_id_token');
+      localStorage.removeItem('lta_id_token');
     }
   }
 

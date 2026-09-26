@@ -54,7 +54,7 @@ test.describe('Portal Cliente — mobile', () => {
     // Inyecta token y fuerza render del contenido (simula onSignedIn)
     await page.evaluate(() => {
       const token = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIn0.fake';
-      sessionStorage.setItem('lta_id_token', token);
+      localStorage.setItem('lta_id_token', token);
       // Simula callback de auth-gate: oculta gate, muestra contenido
       document.getElementById('auth-gate').classList.add('hidden');
       const c = document.getElementById('profile-content');

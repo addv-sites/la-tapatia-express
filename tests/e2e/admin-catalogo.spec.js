@@ -22,7 +22,7 @@ test.describe('Admin Catálogo — mobile', () => {
     // Simula login exitoso inyectando token y llamando al handler de auth-gate
     await page.evaluate(async () => {
       const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InN0YWZmQGFkZHYubXgiLCJuYW1lIjoiU3RhZmYgVGVzdCJ9.fake';
-      sessionStorage.setItem('lta_id_token', fakeToken);
+      localStorage.setItem('lta_id_token', fakeToken);
       document.getElementById('auth-gate').classList.add('hidden');
       const content = document.getElementById('admin-content');
       content.classList.remove('hidden');
@@ -77,7 +77,7 @@ test.describe('Admin Catálogo — mobile', () => {
     await mockAppsScript(page); // override after, pero capturamos lastAction con el mock genérico
     await page.goto('/admin/catalogo/');
     await page.evaluate(() => {
-      sessionStorage.setItem('lta_id_token', 'fake');
+      localStorage.setItem('lta_id_token', 'fake');
       document.getElementById('auth-gate').classList.add('hidden');
       document.getElementById('admin-content').classList.remove('hidden');
       document.getElementById('catalog-tbody').innerHTML = '<tr><td><input class="price-input" value="50"><button class="approve-btn">Validar</button><input type="checkbox" class="avail-toggle" checked></td></tr>';

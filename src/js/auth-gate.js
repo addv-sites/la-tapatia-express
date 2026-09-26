@@ -51,15 +51,17 @@
       return;
     }
 
-    if (isLocalDev_() && !sessionStorage.getItem('lta_id_token')) {
+    if (isLocalDev_() && !localStorage.getItem('lta_id_token')) {
       console.info('[LTA] localhost detectado — se salta el login de Google (LTA_AUTH_GATE.signOut() para forzarlo de nuevo). Las llamadas reales a Apps Script seguirán fallando porque el token no está firmado.');
-      sessionStorage.setItem('lta_id_token', buildLocalDevToken_());
+      localStorage.setItem('lta_id_token', buildLocalDevToken_());
     }
 
-    // Sesión ya iniciada en esta pestaña (navegación entre páginas del
-    // mismo admin) — evita repintar el botón de Google y pedir login otra
-    // vez mientras el idToken siga vigente.
-    const storedToken = sessionStorage.getItem('lta_id_token');
+    // Sesión persistida en localStorage (no sessionStorage): en PWA/mobile
+    // el sistema mata el proceso de la pestaña al mandarla a segundo plano
+    // y sessionStorage desaparece con él, aunque el usuario nunca "cerró"
+    // nada — eso obligaba a reloguear en cada visita. Sigue vigente hasta
+    // que expire el token de Google o el usuario cierre sesión a mano.
+    const storedToken = localStorage.getItem('lta_id_token');
     if (storedToken) {
       const profile = decodeJwtPayload_(storedToken);
       const nowSec = Math.floor(Date.now() / 1000);
@@ -67,7 +69,7 @@
         opts.onSignedIn(storedToken, profile);
         return;
       }
-      sessionStorage.removeItem('lta_id_token');
+      localStorage.removeItem('lta_id_token');
     }
 
     const wrap = document.createElement('div');
@@ -84,13 +86,13 @@
 
     window.LTA_AUTH.onAuthChange(({ idToken, profile }) => {
       if (!idToken) return;
-      sessionStorage.setItem('lta_id_token', idToken);
+      localStorage.setItem('lta_id_token', idToken);
       opts.onSignedIn(idToken, profile);
     });
   }
 
   function signOut() {
-    sessionStorage.removeItem('lta_id_token');
+    localStorage.removeItem('lta_id_token');
     if (window.LTA_AUTH) window.LTA_AUTH.signOut();
     location.reload();
   }

@@ -48,7 +48,7 @@ export function fakeGoogleIdToken(email = 'test@addv.mx') {
 export async function injectAuth(page, email = 'test@addv.mx') {
   const token = fakeGoogleIdToken(email);
   await page.evaluate(({ t, e }) => {
-    sessionStorage.setItem('lta_id_token', t);
+    localStorage.setItem('lta_id_token', t);
     // Simula que LTA_AUTH ya tiene token
     if (window.LTA_AUTH) {
       // Forzamos listeners

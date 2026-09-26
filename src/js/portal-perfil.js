@@ -60,7 +60,7 @@
     });
     document.getElementById('profile-form').addEventListener('submit', (e) => e.preventDefault());
     document.getElementById('btn-signout').addEventListener('click', () => {
-      sessionStorage.removeItem('lta_id_token');
+      localStorage.removeItem('lta_id_token');
       window.LTA_AUTH.signOut();
       location.reload();
     });

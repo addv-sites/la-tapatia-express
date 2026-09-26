@@ -43,7 +43,7 @@
       window.google.accounts.id.initialize({
         client_id: window.SITE_CONFIG.googleClientId,
         callback: onCredentialResponse,
-        auto_select: false
+        auto_select: true
       });
     });
   }

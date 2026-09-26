@@ -64,7 +64,7 @@ test.describe('Autenticación Google — mobile (validación GSI)', () => {
       const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/=/g,'');
       const payload = btoa(JSON.stringify({ email: 'staff@addv.mx', name: 'Staff Test' })).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
       const fakeToken = `${header}.${payload}.sig`;
-      sessionStorage.setItem('lta_id_token', fakeToken);
+      localStorage.setItem('lta_id_token', fakeToken);
       // Llama directamente a la API para verificar que envía el token
       window.LTA_API.callAction('catalog.readAll', {}, fakeToken).catch(()=>{});
     });
@@ -85,7 +85,7 @@ test.describe('Autenticación Google — mobile (validación GSI)', () => {
     // Simula login y luego falla de autorización
     await page.evaluate(async () => {
       const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Im5vYXV0aEBleGFtcGxlLmNvbSJ9.fake';
-      sessionStorage.setItem('lta_id_token', fakeToken);
+      localStorage.setItem('lta_id_token', fakeToken);
       document.getElementById('auth-gate').classList.add('hidden');
       document.getElementById('admin-content').classList.remove('hidden');
       try {

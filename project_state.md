@@ -147,6 +147,12 @@
 - Preview de referencia (interactivo, real): https://claude.ai/code/artifact/97e02928-2cb2-4d49-b9eb-b26345e5f37c
 - Validado local: `cuenta/rastreo/` responde 200, `rastreo.js` pasa `node --check`, clases nuevas confirmadas en `css/site.css` compilado.
 
+## UX de alta de repartidor + sesión persistente (2026-09-26)
+
+- [x] "Repartidores" (`admin/config-envio/`) tenía UX confusa — enterrado al fondo de la pestaña "Envío" después de 3 zonas + comisión, botón "+Agregar" como link de texto chico. Se movió a su propia 3ra pestaña **"Repartidores"** (mobile-first: 3 tabs `flex-1` de ancho igual), con el botón "+ Agregar repartidor" como CTA primario ancho completo arriba de la lista — mismo `drivers-list`/`btn-add-driver`/modal, solo cambió dónde vive en el DOM.
+- [x] **Sesión del cliente no persistía** (pedía Google Sign-In de nuevo en cada visita a `cuenta/historial/`): el token vivía en `sessionStorage`, que Android/iOS borra cuando el sistema mata el proceso de la PWA en segundo plano — no hace falta que el usuario cierre nada. Se cambió a `localStorage` en las 4 superficies (cliente + STAFF + DRIVERS + ADDV, decisión del usuario) — un solo archivo compartido (`auth-gate.js`) sin ramas de comportamiento por rol. También se activó `auto_select: true` en `google.accounts.id.initialize()` (`auth.js`) para re-login silencioso sin botón cuando el token expira (~1h, lo controla Google) pero sigue habiendo sesión de Google activa en el navegador — así se logra "persiste hasta cerrar sesión" de verdad, no solo dentro de la hora. Actualizados también `tests/e2e/*.spec.js` (mocks de sesión) y `repartidor/perfil/index.html` (tenía su propio sign-out duplicado con `sessionStorage`, no pasaba por `LTA_AUTH_GATE.signOut()`).
+- Validado local: 7 páginas tocadas responden 200, sintaxis de los 6 JS + `repartidor/perfil/index.html` verificada.
+
 ## Próximo paso
 
 Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).

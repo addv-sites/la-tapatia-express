@@ -18,7 +18,7 @@ test.describe('App Repartidor — mobile', () => {
     await page.goto('/repartidor/');
     await page.evaluate(async () => {
       const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InJlcGFydGlkb3JAZXhhbXBsZS5jb20ifQ.fake';
-      sessionStorage.setItem('lta_id_token', fakeToken);
+      localStorage.setItem('lta_id_token', fakeToken);
       document.getElementById('auth-gate').classList.add('hidden');
       const app = document.getElementById('app-content');
       app.classList.remove('hidden');
@@ -56,7 +56,7 @@ test.describe('App Repartidor — mobile', () => {
     await page.goto('/repartidor/');
     await page.evaluate(async () => {
       const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InJlcGFydGlkb3JAZXhhbXBsZS5jb20ifQ.fake';
-      sessionStorage.setItem('lta_id_token', fakeToken);
+      localStorage.setItem('lta_id_token', fakeToken);
       document.getElementById('auth-gate').classList.add('hidden');
       document.getElementById('app-content').classList.remove('hidden');
       const data = await window.LTA_API.callAction('driver.myOrders', {}, fakeToken);

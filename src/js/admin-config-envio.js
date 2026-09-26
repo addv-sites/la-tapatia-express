@@ -133,16 +133,22 @@
   function showTab(which) {
     const panelEnvio = document.getElementById('panel-envio');
     const panelHorario = document.getElementById('panel-horario');
+    const panelRepartidores = document.getElementById('panel-repartidores');
     const tabEnvio = document.getElementById('tab-envio');
     const tabHorario = document.getElementById('tab-horario');
+    const tabRepartidores = document.getElementById('tab-repartidores');
     panelEnvio.style.display = which === 'envio' ? 'flex' : 'none';
     panelHorario.style.display = which === 'horario' ? 'flex' : 'none';
+    panelRepartidores.style.display = which === 'repartidores' ? 'flex' : 'none';
     tabEnvio.classList.toggle('bg-primary-fixed', which === 'envio');
     tabEnvio.classList.toggle('text-on-primary-fixed', which === 'envio');
     tabEnvio.classList.toggle('text-on-surface-variant', which !== 'envio');
     tabHorario.classList.toggle('bg-primary-fixed', which === 'horario');
     tabHorario.classList.toggle('text-on-primary-fixed', which === 'horario');
     tabHorario.classList.toggle('text-on-surface-variant', which !== 'horario');
+    tabRepartidores.classList.toggle('bg-primary-fixed', which === 'repartidores');
+    tabRepartidores.classList.toggle('text-on-primary-fixed', which === 'repartidores');
+    tabRepartidores.classList.toggle('text-on-surface-variant', which !== 'repartidores');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -150,6 +156,7 @@
     document.getElementById('save-config').addEventListener('click', save);
     document.getElementById('tab-envio').addEventListener('click', () => showTab('envio'));
     document.getElementById('tab-horario').addEventListener('click', () => showTab('horario'));
+    document.getElementById('tab-repartidores').addEventListener('click', () => showTab('repartidores'));
     window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
 
     document.getElementById('btn-add-driver').addEventListener('click', openAddDriverModal_);

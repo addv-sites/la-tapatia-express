@@ -143,7 +143,7 @@
   }
 
   function init() {
-    const token = sessionStorage.getItem('lta_id_token');
+    const token = localStorage.getItem('lta_id_token');
     const bellWrap = document.getElementById('bell-wrap');
     if (!token || !bellWrap) return; // sin sesión, no hay campana que mostrar
 
