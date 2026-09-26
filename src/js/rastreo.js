@@ -11,7 +11,68 @@
     try { return JSON.parse(order.items || '[]'); } catch (e) { return []; }
   }
 
+  const REFRESH_MS = 20000;
+  let refreshTimer = null;
+  let lastKnownStatus = null;
+  let lastFolio = null;
+  let lastTel = null;
+
+  // Ding suave, una sola vez, cuando el estado cambia solo durante el
+  // auto-refresh — no es la alarma del KDS/repartidor, es un aviso pasivo.
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  (function primeAudioOnFirstGesture() {
+    const unlock = () => {
+      ensureAudio();
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchend', unlock);
+    };
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchend', unlock);
+  })();
+  function playChime() {
+    const ctx = ensureAudio();
+    const t = ctx.currentTime + 0.02;
+    [880, 1108].forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, t + i * 0.09);
+      gain.gain.setValueAtTime(0, t + i * 0.09);
+      gain.gain.linearRampToValueAtTime(0.22, t + i * 0.09 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t + i * 0.09);
+      osc.stop(t + i * 0.09 + 0.55);
+    });
+  }
+
+  async function silentRefresh() {
+    try {
+      const data = await window.LTA_API.callAction('order.trackingRead', { order_id: lastFolio, customer_phone: lastTel });
+      if (data.order.status !== lastKnownStatus) {
+        playChime();
+        renderOrder(data.order);
+      }
+    } catch (err) {
+      // Pedido ya no encontrado / red caída — se reintenta en el próximo ciclo, sin romper la vista actual.
+    }
+  }
+
   function renderOrder(order) {
+    lastKnownStatus = order.status;
+    if (!refreshTimer && !['entregado', 'cancelado', 'abandonado'].includes(order.status)) {
+      refreshTimer = setInterval(silentRefresh, REFRESH_MS);
+    }
+    if (['entregado', 'cancelado', 'abandonado'].includes(order.status) && refreshTimer) {
+      clearInterval(refreshTimer);
+      refreshTimer = null;
+    }
+
     document.getElementById('lookup-form').classList.add('hidden');
     const el = document.getElementById('tracking-result');
     el.classList.remove('hidden');
@@ -58,6 +119,8 @@
   }
 
   async function lookup(folio, tel) {
+    lastFolio = folio;
+    lastTel = tel;
     const errorEl = document.getElementById('lookup-error');
     errorEl.classList.add('hidden');
     showResultSkeleton();
@@ -89,4 +152,6 @@
       lookup(folio, tel);
     }
   });
+
+  window.addEventListener('beforeunload', () => { if (refreshTimer) clearInterval(refreshTimer); });
 })();

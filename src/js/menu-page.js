@@ -6,27 +6,6 @@
     el.classList.toggle(displayClass, visible);
   }
 
-  function whatsappUrl(text) {
-    const cfg = window.SITE_CONFIG;
-    return 'https://wa.me/' + cfg.whatsapp + (text ? '?text=' + encodeURIComponent(text) : '');
-  }
-
-  function buildWhatsappMessage(folio, items, totals, customer) {
-    const lines = [];
-    if (folio) lines.push('*Folio: ' + folio + '*', '');
-    lines.push('Hola, quiero confirmar mi pedido en ' + window.SITE_CONFIG.businessName + ':', '');
-    items.forEach((it) => {
-      lines.push('1. ' + it.name + ' x' + it.quantity + (it.salsa ? '  (Salsa: ' + it.salsa + ')' : ''));
-    });
-    lines.push('', 'Subtotal: ' + window.LTA_CATALOG.formatPrice(totals.subtotal));
-    if (totals.deliveryFee) lines.push('Envío: ' + window.LTA_CATALOG.formatPrice(totals.deliveryFee));
-    lines.push('Total: ' + window.LTA_CATALOG.formatPrice(totals.total), '');
-    lines.push('Nombre: ' + customer.name);
-    lines.push('Teléfono: ' + customer.phone);
-    if (customer.orderType === 'delivery') lines.push('Dirección: ' + customer.address);
-    if (customer.notes) lines.push('', 'Notas:', customer.notes);
-    return lines.join('\n');
-  }
 
   function renderProductCard(product, onAdd) {
     const article = document.createElement('article');
@@ -205,6 +184,8 @@
         cartEmpty.hidden = true;
         submitBtn.disabled = false;
         form.classList.remove('hidden');
+        document.getElementById('order-sending').classList.add('hidden');
+        document.getElementById('order-sending').classList.remove('flex');
         document.getElementById('order-success').classList.add('hidden');
         document.getElementById('order-success').classList.remove('flex');
         items.forEach((item, i) => cartList.appendChild(renderCartLine(item, i, (idx) => {
@@ -285,10 +266,14 @@
     window.LTA_CATALOG.onUpdate(renderMenu);
     window.LTA_CATALOG.load().then(renderMenu);
 
+    const sendingEl = document.getElementById('order-sending');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Enviando...';
+      form.classList.add('hidden');
+      sendingEl.classList.remove('hidden');
+      sendingEl.classList.add('flex');
 
       const items = window.LTA_CART.read();
       const customer = {
@@ -298,12 +283,10 @@
         notes: document.getElementById('field-notes').value.trim(),
         orderType: currentOrderType()
       };
-      const subtotal = window.LTA_CART.subtotal();
-      let totals = { subtotal, deliveryFee: 0, total: subtotal };
-      let folio = null;
 
+      let result;
       try {
-        const result = await window.LTA_API.callAction('order.create', {
+        result = await window.LTA_API.callAction('order.create', {
           branch_id: window.SITE_CONFIG.branchId,
           customer_name: customer.name,
           customer_phone: customer.phone,
@@ -312,25 +295,28 @@
           notes: customer.notes,
           items: items
         }, currentIdToken);
-        folio = result.order_id;
-        totals = { subtotal, deliveryFee: result.delivery_fee || 0, total: result.total };
       } catch (err) {
-        console.warn('No se pudo registrar el pedido en el sistema todavía (Apps Script sin desplegar o sin conexión). Se continúa directo a WhatsApp.', err);
+        sendingEl.classList.add('hidden');
+        sendingEl.classList.remove('flex');
+        form.classList.remove('hidden');
+        submitBtn.disabled = false;
+        window.LTA_TOAST && window.LTA_TOAST.show('No se pudo enviar tu pedido — revisa tu conexión e intenta de nuevo.', 'error');
+        return;
       }
 
-      if (currentIdToken) await saveProfileFromForm();
+      const folio = result.order_id;
 
-      const message = buildWhatsappMessage(folio, items, totals, customer);
-      window.open(whatsappUrl(message), '_blank', 'noopener');
+      if (currentIdToken) await saveProfileFromForm();
       window.LTA_CART.clear();
 
-      form.classList.add('hidden');
+      sendingEl.classList.add('hidden');
+      sendingEl.classList.remove('flex');
       const successEl = document.getElementById('order-success');
       successEl.classList.remove('hidden');
       successEl.classList.add('flex');
-      document.getElementById('success-folio').textContent = folio || '(sin confirmar en sistema)';
+      document.getElementById('success-folio').textContent = folio;
       document.getElementById('success-tracking-link').href =
-        '../cuenta/rastreo/?folio=' + encodeURIComponent(folio || '') + '&tel=' + encodeURIComponent(customer.phone);
+        '../cuenta/rastreo/?folio=' + encodeURIComponent(folio) + '&tel=' + encodeURIComponent(customer.phone);
 
       if (!currentIdToken) {
         window.LTA_INLINE_SIGNIN.render(document.getElementById('signin-invite-postorder'), {
@@ -346,9 +332,6 @@
           }
         });
       }
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Continuar por WhatsApp';
     });
   });
 })();

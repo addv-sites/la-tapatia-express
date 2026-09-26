@@ -30,6 +30,16 @@
       <a href="../cuenta/perfil/" aria-label="Mi cuenta" class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container">
         <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-person"/></svg>
       </a>
+      <div id="bell-wrap" class="hidden relative">
+        <button id="bell-btn" type="button" aria-label="Notificaciones" class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container">
+          <svg id="bell-icon" class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-bell"/></svg>
+          <span id="bell-badge" class="hidden absolute top-1.5 right-1.5 bg-primary text-on-primary font-label-sm text-[10px] w-4 h-4 rounded-full items-center justify-center font-bold">0</span>
+        </button>
+        <div id="bell-panel" class="hidden flex-col opacity-0 scale-95 pointer-events-none absolute right-0 top-full mt-2 w-72 max-w-[85vw] bg-surface-container-lowest rounded-2xl shadow-lg border border-outline-variant overflow-hidden origin-top-right transition-all duration-200 z-50">
+          <div class="px-4 py-3 font-label-md text-label-md font-bold border-b border-surface-container-low">Notificaciones</div>
+          <div id="bell-notif-list" class="max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="flex items-center gap-2 overflow-x-auto px-margin pb-2.5 pt-1 no-scrollbar">
@@ -113,18 +123,28 @@
           <textarea id="field-notes" class="w-full px-3 py-2 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" rows="2"></textarea>
         </div>
 
-        <button id="submit-order" disabled type="submit" class="w-full min-h-[48px] rounded-xl bg-whatsapp-green text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-transform disabled:opacity-50">
-          Continuar por WhatsApp
+        <button id="submit-order" disabled type="submit" class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-transform disabled:opacity-50">
+          Realizar pedido
         </button>
         <p class="font-body-sm text-[12px] text-on-surface-variant text-center">
-          Vas a revisar el mensaje antes de enviarlo — nada se manda automáticamente.
+          Tu pedido llega directo a cocina — no necesitas hacer nada más.
         </p>
       </form>
+
+      <div id="order-sending" class="hidden flex-col items-center justify-center gap-2 py-4">
+        <div class="send-anim">
+          <div class="send-ticket"></div>
+          <div class="send-stamp"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="send-bag"></div>
+          <div class="send-fill"></div>
+        </div>
+        <p class="font-label-md text-label-md text-on-surface-variant font-bold">Confirmando con cocina…</p>
+      </div>
 
       <div id="order-success" class="hidden flex-col gap-3 pt-2 border-t border-surface-container-high">
         <div class="p-3 bg-tertiary-fixed/40 rounded-xl">
           <p class="font-label-md text-label-md text-on-surface font-bold">Pedido enviado — Folio <span id="success-folio"></span></p>
-          <p class="font-body-sm text-body-sm text-on-surface-variant">Revisa el mensaje de WhatsApp que se abrió y dale enviar para confirmar con cocina.</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">Tu pedido ya está en cocina — guarda tu folio para dar seguimiento.</p>
         </div>
         <a id="success-tracking-link" href="#" class="font-label-md text-label-md text-primary font-bold text-center">Ver seguimiento de mi pedido →</a>
         <div id="signin-invite-postorder" hidden></div>
@@ -157,6 +177,7 @@
 
 <script src="../src/js/cart.js"></script>
 <script src="../src/js/cart-fly.js"></script>
+<script src="../src/js/order-notifications.js"></script>
 <script src="../src/js/catalog.js"></script>
 <script src="../src/js/auth.js"></script>
 <script src="../src/js/inline-signin.js"></script>

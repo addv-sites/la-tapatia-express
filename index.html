@@ -60,6 +60,16 @@
       <a href="cuenta/perfil/" aria-label="Mi cuenta" class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
         <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-person"/></svg>
       </a>
+      <div id="bell-wrap" class="hidden relative">
+        <button id="bell-btn" type="button" aria-label="Notificaciones" class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+          <svg id="bell-icon" class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-bell"/></svg>
+          <span id="bell-badge" class="hidden absolute top-1.5 right-1.5 bg-primary text-on-primary font-label-sm text-[10px] w-4 h-4 rounded-full items-center justify-center font-bold">0</span>
+        </button>
+        <div id="bell-panel" class="hidden flex-col opacity-0 scale-95 pointer-events-none absolute right-0 top-full mt-2 w-72 max-w-[85vw] bg-surface-container-lowest rounded-2xl shadow-lg border border-outline-variant overflow-hidden origin-top-right transition-all duration-200 z-50">
+          <div class="px-4 py-3 font-label-md text-label-md font-bold border-b border-surface-container-low">Notificaciones</div>
+          <div id="bell-notif-list" class="max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
       <a href="menu/#pedido" aria-label="Ver pedido" class="relative w-11 h-11 flex items-center justify-center rounded-lg text-primary hover:bg-mustard-light transition-colors">
         <svg class="w-6 h-6" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-cart"/></svg>
         <span id="cart-badge" class="hidden absolute top-1.5 right-1.5 bg-primary text-on-primary font-label-sm text-[10px] w-4 h-4 rounded-full items-center justify-center font-bold">0</span>
@@ -297,6 +307,7 @@
 <script src="src/js/business-hours.js"></script>
 <script src="src/js/catalog.js"></script>
 <script src="src/js/cart-fly.js"></script>
+<script src="src/js/order-notifications.js"></script>
 <script src="src/js/pwa-install.js"></script>
 <script>
 (function () {

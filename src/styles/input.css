@@ -111,4 +111,102 @@
   .nav-cart-badge.show {
     transform: scale(1);
   }
+
+  .send-anim {
+    position: relative;
+    width: 120px;
+    height: 104px;
+    flex-shrink: 0;
+  }
+
+  .send-bag {
+    position: absolute;
+    bottom: 0;
+    left: 32px;
+    width: 56px;
+    height: 50px;
+    border-radius: 4px 4px 10px 10px;
+    background: #efe0c8;
+    border: 2px solid theme('colors.on-surface-variant');
+    opacity: 0;
+    animation: send-bag 2.4s ease-in-out infinite;
+  }
+
+  .send-fill {
+    position: absolute;
+    bottom: 0;
+    left: 34px;
+    width: 52px;
+    height: 0;
+    border-radius: 0 0 8px 8px;
+    background: theme('colors.tertiary-fixed');
+    opacity: 0;
+    animation: send-fill 2.4s ease-in-out infinite;
+  }
+
+  .send-ticket {
+    position: absolute;
+    bottom: 48px;
+    left: 41px;
+    width: 38px;
+    height: 0;
+    background: #fff;
+    border: 1.5px solid theme('colors.outline-variant');
+    border-radius: 2px;
+    opacity: 0;
+    overflow: hidden;
+    animation: send-ticket 2.4s ease-in-out infinite;
+  }
+
+  .send-ticket::before, .send-ticket::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    height: 2px;
+    background: theme('colors.outline-variant');
+  }
+
+  .send-ticket::before { top: 6px; }
+  .send-ticket::after { top: 11px; }
+
+  .send-stamp {
+    position: absolute;
+    bottom: 54px;
+    left: 68px;
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    border: 2.5px solid theme('colors.primary');
+    color: theme('colors.primary');
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: send-stamp 2.4s ease-in-out infinite;
+  }
+
+  @keyframes send-bag {
+    0%, 100% { opacity: 1; }
+  }
+
+  @keyframes send-fill {
+    0% { height: 0; opacity: 0; }
+    20% { opacity: 1; }
+    60%, 100% { height: 26px; opacity: 1; }
+  }
+
+  @keyframes send-ticket {
+    0% { opacity: 0; height: 0; }
+    15% { opacity: 1; }
+    55% { height: 16px; }
+    70%, 100% { height: 16px; opacity: 1; }
+  }
+
+  @keyframes send-stamp {
+    0%, 55% { opacity: 0; transform: scale(1.6) rotate(-12deg); }
+    65% { opacity: 1; transform: scale(1) rotate(-12deg); }
+    75% { transform: scale(0.92) rotate(-12deg); }
+    100% { opacity: 1; transform: scale(1) rotate(-12deg); }
+  }
 }
