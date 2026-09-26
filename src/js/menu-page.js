@@ -44,27 +44,17 @@
   // página. skipPush evita un 2do back innecesario cuando se llega ya con
   // #pedido en la URL (ej. desde el tab "Pedido" de Home).
   let cartOverlayOpen = false;
-  function syncFabCart() {
-    const fab = document.getElementById('fab-cart');
-    const count = window.LTA_CART.count();
-    document.getElementById('fab-cart-count').textContent = count;
-    const show = count > 0 && !cartOverlayOpen;
-    fab.classList.toggle('hidden', !show);
-    fab.classList.toggle('flex', show);
-  }
   function openCartOverlay(opts) {
     if (cartOverlayOpen) return;
     cartOverlayOpen = true;
     document.getElementById('cart-overlay').classList.remove('translate-y-full');
     document.getElementById('cart-overlay').setAttribute('aria-hidden', 'false');
-    syncFabCart();
     if (!(opts && opts.skipPush)) history.pushState({ ltaCart: true }, '', location.href);
   }
   function hideCartOverlay() {
     document.getElementById('cart-overlay').classList.add('translate-y-full');
     document.getElementById('cart-overlay').setAttribute('aria-hidden', 'true');
     cartOverlayOpen = false;
-    syncFabCart();
   }
   function closeCartOverlay() {
     if (!cartOverlayOpen) return;
@@ -216,7 +206,6 @@
     });
 
     document.getElementById('cart-back').addEventListener('click', closeCartOverlay);
-    document.getElementById('fab-cart').addEventListener('click', () => openCartOverlay());
     document.getElementById('nav-pedido').addEventListener('click', (e) => {
       e.preventDefault();
       openCartOverlay();
@@ -284,7 +273,6 @@
       toggleVisible(deliveryFeeRow, isDelivery, 'flex');
       cartTotal.textContent = window.LTA_CATALOG.formatPrice(subtotal);
       toggleVisible(addressField, isDelivery, 'flex-col');
-      syncFabCart();
     }
 
     // Sincroniza el badge del tab "Pedido" con lo que ya traiga el carrito
