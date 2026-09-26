@@ -257,6 +257,29 @@
     </div>
   </div>
 
+  <!-- Visor de imagen a detalle (tap en la foto de un antojo) -->
+  <div aria-hidden="true" class="fixed inset-0 z-[65] pointer-events-none opacity-0 transition-opacity duration-[450ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] bg-inverse-surface/75 flex items-center justify-center p-4" id="image-lightbox">
+    <div class="relative w-full max-w-sm bg-surface-container-lowest rounded-3xl overflow-hidden shadow-2xl transform scale-95 translate-y-2 transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] max-h-[85vh] flex flex-col" id="image-lightbox-card">
+      <div class="relative w-full aspect-[4/3] bg-surface-container-high shrink-0">
+        <img class="w-full h-full object-cover" id="image-lightbox-img" src="" alt="">
+        <button type="button" id="image-lightbox-close" aria-label="Cerrar" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-inverse-surface/70 text-inverse-on-surface flex items-center justify-center">
+          <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-close"/></svg>
+        </button>
+      </div>
+      <div class="p-5 flex flex-col gap-2 overflow-y-auto">
+        <div class="flex items-start justify-between gap-3">
+          <h3 class="font-headline-md text-headline-md text-on-surface" id="image-lightbox-name"></h3>
+          <span class="font-price-md text-price-md text-primary font-bold shrink-0" id="image-lightbox-price"></span>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant" id="image-lightbox-desc"></p>
+        <button type="button" id="image-lightbox-add" class="mt-2 min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md">
+          <svg class="w-5 h-5" aria-hidden="true"><use href="assets/icons/sprite.svg#icon-plus"/></svg>
+          <span>Agregar al pedido</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal instrucciones instalar en iOS -->
   <div id="ios-install-modal" style="display:none" class="fixed inset-0 z-50 bg-inverse-surface/60 items-center justify-center p-4">
     <div class="bg-surface-container-lowest rounded-2xl w-full max-w-sm p-5 flex flex-col gap-3 shadow-2xl">
@@ -389,6 +412,51 @@
       closeDrawer();
     });
 
+    // Visor de imagen a detalle: tap en la foto abre grande + descripción.
+    // El botón atrás del navegador/celular también lo cierra (popstate),
+    // en vez de sacar al usuario de la página.
+    var lightbox = document.getElementById('image-lightbox');
+    var lightboxCard = document.getElementById('image-lightbox-card');
+    var lightboxOpen = false;
+    var lightboxProduct = null;
+
+    function showLightbox() {
+      lightbox.classList.remove('pointer-events-none', 'opacity-0');
+      lightboxCard.classList.remove('scale-95', 'translate-y-2');
+    }
+    function hideLightbox() {
+      lightbox.classList.add('opacity-0', 'pointer-events-none');
+      lightboxCard.classList.add('scale-95', 'translate-y-2');
+      lightboxOpen = false;
+      lightboxProduct = null;
+    }
+    function openLightbox(product) {
+      lightboxProduct = product;
+      document.getElementById('image-lightbox-img').src = product.image || '';
+      document.getElementById('image-lightbox-name').textContent = product.name;
+      document.getElementById('image-lightbox-price').textContent = window.LTA_CATALOG.formatPrice(product.price);
+      document.getElementById('image-lightbox-desc').textContent = product.description || product.short_description || '';
+      showLightbox();
+      lightboxOpen = true;
+      history.pushState({ ltaLightbox: true }, '', location.href);
+    }
+    function closeLightbox() {
+      if (!lightboxOpen) return;
+      history.back();
+    }
+    window.addEventListener('popstate', function () {
+      if (lightboxOpen) hideLightbox();
+    });
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.getElementById('image-lightbox-close').addEventListener('click', closeLightbox);
+    document.getElementById('image-lightbox-add').addEventListener('click', function () {
+      var product = lightboxProduct;
+      closeLightbox();
+      if (product) openDrawer(product);
+    });
+
     // Favoritos: pinta con el snapshot y se refresca solo cuando llega el
     // dato en vivo del Sheet (sin esperar al próximo build/deploy).
     function renderFavoritos(data) {
@@ -405,7 +473,7 @@
           ? '<img class="w-full h-full object-cover" src="' + product.image + '" alt="" loading="lazy">'
           : '';
         article.innerHTML =
-          '<div class="relative w-full aspect-[16/9] bg-surface-container-high">' + hero + '</div>' +
+          '<div class="relative w-full aspect-[16/9] bg-surface-container-high' + (product.image ? ' cursor-pointer' : '') + '" role="' + (product.image ? 'button' : 'presentation') + '" tabindex="' + (product.image ? '0' : '-1') + '" aria-label="Ver ' + product.name + ' en grande">' + hero + '</div>' +
           '<div class="p-4 flex flex-col gap-2">' +
           '  <div class="flex items-start justify-between gap-2">' +
           '    <h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">' + product.name + '</h3>' +
@@ -420,6 +488,13 @@
           '  </div>' +
           '</div>';
         article.querySelector('button').addEventListener('click', function () { openDrawer(product); });
+        if (product.image) {
+          var heroEl = article.querySelector('.aspect-\\[16\\/9\\]');
+          heroEl.addEventListener('click', function () { openLightbox(product); });
+          heroEl.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(product); }
+          });
+        }
         list.appendChild(article);
       });
     }

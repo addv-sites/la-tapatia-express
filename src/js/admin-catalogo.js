@@ -60,6 +60,7 @@
         '  </button>' +
         '</td>' +
         '<td class="py-3 px-4 text-right whitespace-nowrap">' +
+        '  <button class="edit-btn p-2 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded-lg" title="Editar"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-edit"/></svg></button>' +
         '  <button class="save-btn p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg" title="Guardar"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-save"/></svg></button>' +
         '  <button class="delete-btn p-2 text-on-surface-variant hover:text-error hover:bg-surface-container rounded-lg" title="Eliminar platillo"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-trash"/></svg></button>' +
         '</td>';
@@ -126,6 +127,8 @@
       tr.querySelector('.save-btn').addEventListener('click', () => {
         tr.querySelector('.price-input').dispatchEvent(new Event('change'));
       });
+
+      tr.querySelector('.edit-btn').addEventListener('click', () => openEditDishModal_(p));
 
       tr.querySelector('.delete-btn').addEventListener('click', async () => {
         if (!confirm('¿Eliminar "' + p.name + '"? Esta acción no se puede deshacer.')) return;
@@ -244,10 +247,9 @@
     }
   }
 
-  function populateAddDishCategorySelect_() {
-    const select = document.getElementById('add-dish-category');
+  function populateCategorySelect_(select, preselectId) {
     const categories = Array.from(new Set(allProducts.map((p) => p.category_id)));
-    select.innerHTML = '<option value="">Selecciona…</option>';
+    select.innerHTML = preselectId ? '' : '<option value="">Selecciona…</option>';
     categories.forEach((id) => {
       const product = allProducts.find((p) => p.category_id === id);
       const opt = document.createElement('option');
@@ -259,10 +261,11 @@
     newOpt.value = '__nueva__';
     newOpt.textContent = '+ Nueva categoría';
     select.appendChild(newOpt);
+    if (preselectId) select.value = preselectId;
   }
 
   function openAddDishModal_() {
-    populateAddDishCategorySelect_();
+    populateCategorySelect_(document.getElementById('add-dish-category'));
     document.getElementById('add-dish-form').reset();
     document.getElementById('add-dish-new-category-wrap').classList.add('hidden');
     document.getElementById('add-dish-modal').classList.remove('hidden');
@@ -271,6 +274,26 @@
 
   function closeAddDishModal_() {
     document.getElementById('add-dish-modal').classList.add('hidden');
+  }
+
+  let editingProduct = null;
+
+  function openEditDishModal_(product) {
+    editingProduct = product;
+    populateCategorySelect_(document.getElementById('edit-dish-category'), product.category_id);
+    document.getElementById('edit-dish-name').value = product.name;
+    document.getElementById('edit-dish-price').value = product.price;
+    document.getElementById('edit-dish-description').value = product.short_description || '';
+    document.getElementById('edit-dish-new-category-wrap').classList.add('hidden');
+    document.getElementById('edit-dish-photo-preview').src = product.image || '';
+    document.getElementById('edit-dish-photo-input').value = '';
+    document.getElementById('edit-dish-modal').classList.remove('hidden');
+    document.getElementById('edit-dish-name').focus();
+  }
+
+  function closeEditDishModal_() {
+    document.getElementById('edit-dish-modal').classList.add('hidden');
+    editingProduct = null;
   }
 
   function openFeaturedLimitModal_(message) {
@@ -336,6 +359,73 @@
     }
   }
 
+  async function submitEditDish_() {
+    if (!editingProduct) return;
+    const submitBtn = document.getElementById('btn-submit-edit-dish');
+    const name = document.getElementById('edit-dish-name').value.trim();
+    const price = Number(document.getElementById('edit-dish-price').value);
+    const description = document.getElementById('edit-dish-description').value.trim();
+    const categorySelect = document.getElementById('edit-dish-category');
+    const isNewCategory = categorySelect.value === '__nueva__';
+    const categoryLabel = isNewCategory
+      ? document.getElementById('edit-dish-new-category').value.trim()
+      : (categorySelect.selectedOptions[0] ? categorySelect.selectedOptions[0].textContent : '');
+    const categoryId = isNewCategory ? slugify_(categoryLabel) : categorySelect.value;
+    const photoFile = document.getElementById('edit-dish-photo-input').files[0];
+
+    if (!name) { window.LTA_TOAST.show('Falta el nombre del platillo.', 'error'); return; }
+    if (!categoryId || !categoryLabel) { window.LTA_TOAST.show('Falta la categoría.', 'error'); return; }
+    if (!price || price <= 0) { window.LTA_TOAST.show('Precio inválido.', 'error'); return; }
+    if (photoFile) {
+      try {
+        assertPhotoSize_(photoFile);
+      } catch (err) {
+        window.LTA_TOAST.show(err.message, 'error');
+        return;
+      }
+    }
+
+    const product = editingProduct;
+    submitBtn.disabled = true;
+    try {
+      await window.LTA_API.callAction('catalog.updateDetails', {
+        product_id: product.product_id,
+        name,
+        category_id: categoryId,
+        category: categoryLabel,
+        price,
+        short_description: description
+      }, idToken);
+
+      let imageUrl = product.image;
+      if (photoFile) {
+        const base64Data = await resizeImageToBase64_(photoFile, 800, 0.8);
+        const result = await window.LTA_API.callAction('catalog.uploadPhoto', {
+          product_id: product.product_id,
+          mimeType: 'image/jpeg',
+          base64Data
+        }, idToken);
+        imageUrl = result.imageUrl;
+      }
+
+      product.name = name;
+      product.category_id = categoryId;
+      product.category = categoryLabel;
+      product.price = price;
+      product.short_description = description;
+      product.image = imageUrl;
+
+      window.LTA_TOAST.show('"' + name + '" actualizado.');
+      closeEditDishModal_();
+      renderCategoryPills();
+      render();
+    } catch (err) {
+      window.LTA_TOAST.show('Error: ' + err.message, 'error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+
   function slugify_(text) {
     return String(text)
       .normalize('NFD').replace(new RegExp('[\u0300-\u036f]', 'g'), '')
@@ -359,6 +449,20 @@
     document.getElementById('add-dish-form').addEventListener('submit', (e) => {
       e.preventDefault();
       submitAddDish_();
+    });
+
+    document.getElementById('btn-close-edit-dish').addEventListener('click', closeEditDishModal_);
+    document.getElementById('edit-dish-category').addEventListener('change', (e) => {
+      document.getElementById('edit-dish-new-category-wrap').classList.toggle('hidden', e.target.value !== '__nueva__');
+    });
+    document.getElementById('btn-edit-dish-photo').addEventListener('click', () => document.getElementById('edit-dish-photo-input').click());
+    document.getElementById('edit-dish-photo-input').addEventListener('change', () => {
+      const file = document.getElementById('edit-dish-photo-input').files[0];
+      if (file) document.getElementById('edit-dish-photo-preview').src = URL.createObjectURL(file);
+    });
+    document.getElementById('edit-dish-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitEditDish_();
     });
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {

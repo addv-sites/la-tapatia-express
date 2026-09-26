@@ -86,6 +86,7 @@
 - [x] Crear el OAuth 2.0 Client ID de Google Cloud Console y llenar `googleClientId` — **hecho** (2026-09-22), probado con Google Sign-In real en desktop y mobile (se corrigió Error 400 agregando el origin de IP local a Authorized JavaScript Origins).
 - Logo real de la marca (los íconos PWA actuales son un placeholder monograma "LT" generado localmente).
 - Repo `addv-sites/la-tapatia-express` ya vinculado como `origin` — sin commits todavía (se hace cuando el usuario lo pida explícitamente).
+- [x] **Falta en admin: menú para agregar repartidor** — **hecho** (2026-09-25). Tarjeta "Repartidores" en `admin/config-envio/` (lista + toggle activo/inactivo + botón "+ Agregar"). Acciones nuevas: `driver.listAll`, `driver.create`, `driver.toggleActive`.
 
 ## Bugs encontrados y corregidos en pruebas post-despliegue (2026-09-22)
 
@@ -123,6 +124,15 @@
 - Mockups de referencia: https://claude.ai/code/artifact/397bf306-89c6-4e91-a84b-0b224c01e00f (menú inferior + toggle perfil) y https://claude.ai/code/artifact/f601f001-9806-4190-b338-c22884ebf21f (slug, compartir app, 3 auras).
 - Validado local con `npm run build:css` + `npm run serve`: todas las rutas tocadas (`/repartidor/` y sus 3 subpáginas, `/reparto/app/` redirect, `/admin/`, las 3 de `/cuenta/`) responden 200.
 - **Pendiente:** correr `npm run test:e2e` contra el nuevo slug (el spec ya apunta a `/repartidor/`, no se ejecutó en esta sesión) y validar en dispositivo real el fallback de `navigator.share()` en escritorio.
+
+## Visor de imagen, Editar en catálogo y alta de repartidores (2026-09-25)
+
+- [x] Visor de imagen a detalle: tap/click en la foto de un antojo (Home) o platillo (`/menu/`) abre una vista grande con nombre, precio, descripción y botón "+ Agregar al pedido" (Home lo manda al drawer de salsas existente; Menú agrega directo con la misma animación de vuelo al carrito). Cierra con la X, tocando el fondo, o con el botón atrás del navegador/celular (`history.pushState` + `popstate`, no navega fuera de la página). Animación 450ms, fade + scale, curva suave.
+- [x] `admin/catalogo/`: nuevo botón "Editar" (lápiz) junto a Guardar/Borrar — abre modal precargado para cambiar nombre, categoría, precio, descripción corta **y foto** en un solo guardado. Nueva acción `catalog.updateDetails` en Apps Script (el precio inline de la tabla y "Validar" siguen igual, esto es un camino adicional).
+- [x] `admin/config-envio/`: tarjeta "Repartidores" (lista con toggle activo/inactivo + botón "+ Agregar repartidor"). Nuevas acciones `driver.listAll`, `driver.create`, `driver.toggleActive` — resuelve el pendiente de arriba.
+- Mockups de referencia: https://claude.ai/code/artifact/caf3534d-92cd-4f88-a5ae-c58765a0346f
+- Validado local (`npm run build:css` + `npm run serve`): las 4 páginas tocadas (Home, `/menu/`, `admin/catalogo/`, `admin/config-envio/`) responden 200, sintaxis de los 3 JS + `Code.gs` verificada.
+- **Pendiente del usuario:** repegar `Code.gs` completo en el editor de Apps Script y "Nueva versión" — sin eso `catalog.updateDetails`/`driver.listAll`/`driver.create`/`driver.toggleActive` no existen todavía en producción.
 
 ## Próximo paso
 

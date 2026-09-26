@@ -435,6 +435,50 @@ function action_driverList_() {
   return { drivers: active };
 }
 
+// Lista completa (activos e inactivos) para la tarjeta "Repartidores" del
+// admin — driver.list de arriba solo trae activos, es lo que usa el
+// selector de asignación del Kanban y no debe cambiar.
+function action_driverListAll_() {
+  return { drivers: readSheetAsObjects_('DRIVERS') };
+}
+
+function action_driverCreate_(payload, user) {
+  return withLock_(() => {
+    const email = String(payload.email || '').trim().toLowerCase();
+    const name = String(payload.name || '').trim();
+    if (!email || !email.includes('@')) throw new Error('Email inválido');
+    if (!name) throw new Error('Falta el nombre del repartidor');
+
+    const existing = readSheetAsObjects_('DRIVERS');
+    if (existing.some((r) => String(r.email).toLowerCase() === email)) {
+      throw new Error('Ya existe un repartidor con ese email');
+    }
+
+    appendRow_('DRIVERS', { email: email, name: name, active: true }, ['email', 'name', 'active']);
+    logAudit_(user.email, 'driver.create', 'DRIVERS', email, null, { email: email, name: name, active: true });
+    return { ok: true, driver: { email: email, name: name, active: true } };
+  });
+}
+
+function action_driverToggleActive_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('DRIVERS');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const emailCol = headers.indexOf('email');
+    const activeCol = headers.indexOf('active') + 1;
+    const targetEmail = String(payload.email || '').trim().toLowerCase();
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][emailCol]).toLowerCase() === targetEmail) {
+        sh.getRange(i + 1, activeCol).setValue(payload.active);
+        logAudit_(user.email, 'driver.toggleActive', 'DRIVERS', targetEmail, null, { active: payload.active });
+        return { ok: true };
+      }
+    }
+    throw new Error('Repartidor no encontrado');
+  });
+}
+
 function action_driverMyOrders_(user) {
   const rows = readSheetAsObjects_('PEDIDOS');
   const mine = rows.filter((r) =>
@@ -504,6 +548,32 @@ function action_catalogUpdatePrice_(payload, user) {
         const before = values[i][priceCol - 1];
         sh.getRange(i + 1, priceCol).setValue(payload.price);
         logAudit_(user.email, 'catalog.updatePrice', 'CATALOGO', payload.product_id, { price: before }, { price: payload.price });
+        return { ok: true };
+      }
+    }
+    throw new Error('Producto no encontrado');
+  });
+}
+
+function action_catalogUpdateDetails_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) {
+        const before = {};
+        const after = {};
+        ['name', 'category_id', 'category', 'price', 'short_description'].forEach((field) => {
+          if (payload[field] === undefined) return;
+          const col = headers.indexOf(field) + 1;
+          if (col <= 0) return;
+          before[field] = values[i][col - 1];
+          after[field] = payload[field];
+          sh.getRange(i + 1, col).setValue(payload[field]);
+        });
+        logAudit_(user.email, 'catalog.updateDetails', 'CATALOGO', payload.product_id, before, after);
         return { ok: true };
       }
     }
@@ -874,7 +944,11 @@ function route_(action, payload, idToken, sessionId) {
     case 'order.delete': return action_orderDelete_(payload, requireRole_(idToken, 'STAFF'));
     case 'order.assignDriver': return action_orderAssignDriver_(payload, requireRole_(idToken, 'STAFF'));
     case 'driver.list': return action_driverList_(requireRole_(idToken, 'STAFF'));
+    case 'driver.listAll': return action_driverListAll_(requireRole_(idToken, 'STAFF'));
+    case 'driver.create': return action_driverCreate_(payload, requireRole_(idToken, 'STAFF'));
+    case 'driver.toggleActive': return action_driverToggleActive_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.updatePrice': return action_catalogUpdatePrice_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.updateDetails': return action_catalogUpdateDetails_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleFeatured': return action_catalogToggleFeatured_(payload, requireRole_(idToken, 'STAFF'));

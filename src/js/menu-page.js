@@ -6,6 +6,37 @@
     el.classList.toggle(displayClass, visible);
   }
 
+  // Visor de imagen a detalle: tap en la miniatura abre grande + descripción.
+  // El botón atrás del navegador/celular también lo cierra (popstate), en
+  // vez de sacar al usuario de la página.
+  let lightboxOpen = false;
+  let lightboxProduct = null;
+  let lightboxOnAdd = null;
+
+  function openImageLightbox(product, onAdd) {
+    lightboxProduct = product;
+    lightboxOnAdd = onAdd;
+    document.getElementById('image-lightbox-img').src = product.image || '';
+    document.getElementById('image-lightbox-name').textContent = product.name;
+    document.getElementById('image-lightbox-price').textContent = window.LTA_CATALOG.formatPrice(product.price);
+    document.getElementById('image-lightbox-desc').textContent = product.description || product.short_description || '';
+    document.getElementById('image-lightbox').classList.remove('pointer-events-none', 'opacity-0');
+    document.getElementById('image-lightbox-card').classList.remove('scale-95', 'translate-y-2');
+    lightboxOpen = true;
+    history.pushState({ ltaLightbox: true }, '', location.href);
+  }
+  function hideImageLightbox() {
+    document.getElementById('image-lightbox').classList.add('opacity-0', 'pointer-events-none');
+    document.getElementById('image-lightbox-card').classList.add('scale-95', 'translate-y-2');
+    lightboxOpen = false;
+    lightboxProduct = null;
+    lightboxOnAdd = null;
+  }
+  function closeImageLightbox() {
+    if (!lightboxOpen) return;
+    history.back();
+  }
+
 
   function renderProductCard(product, onAdd) {
     const article = document.createElement('article');
@@ -15,7 +46,7 @@
       : '<span></span>';
     const unavailable = product.active === false;
     const thumb = product.image
-      ? '<img class="w-14 h-14 rounded-xl object-cover shrink-0" src="' + product.image + '" alt="" loading="lazy">'
+      ? '<img class="thumb-img w-14 h-14 rounded-xl object-cover shrink-0 cursor-pointer" src="' + product.image + '" alt="" loading="lazy">'
       : '';
     article.innerHTML =
       '<div class="p-4 flex items-center justify-between gap-3' + (unavailable ? ' opacity-50' : '') + '">' +
@@ -37,6 +68,9 @@
     if (!unavailable) {
       const addBtn = article.querySelector('button');
       addBtn.addEventListener('click', () => onAdd(product, addBtn));
+    }
+    if (product.image) {
+      article.querySelector('.thumb-img').addEventListener('click', () => openImageLightbox(product, onAdd));
     }
     return article;
   }
@@ -138,6 +172,18 @@
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(() => {});
     window.LTA_PWA_INSTALL.setup(document.getElementById('btn-install'), null);
     restoreSession();
+
+    document.getElementById('image-lightbox-close').addEventListener('click', closeImageLightbox);
+    document.getElementById('image-lightbox').addEventListener('click', (e) => {
+      if (e.target.id === 'image-lightbox') closeImageLightbox();
+    });
+    document.getElementById('image-lightbox-add').addEventListener('click', () => {
+      if (lightboxOnAdd && lightboxProduct) lightboxOnAdd(lightboxProduct, document.getElementById('image-lightbox-add'));
+      closeImageLightbox();
+    });
+    window.addEventListener('popstate', () => {
+      if (lightboxOpen) hideImageLightbox();
+    });
 
     window.LTA_INLINE_SIGNIN.render(document.getElementById('signin-invite-checkout'), {
       key: 'checkout',

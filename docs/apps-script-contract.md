@@ -49,6 +49,10 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `catalog.readAll` | POST | STAFF | Catálogo completo (incluye inactivos) para el admin |
 | `catalog.updatePrice` / `catalog.approvePrice` / `catalog.toggleAvailability` | POST | STAFF | Admin catálogo |
 | `catalog.toggleFeatured` | POST | STAFF | Marca/quita un platillo de "Antojos" (`featured`, columna de `CATALOGO`). Máx. 3 activos / mín. 1 — valida en servidor además del botón del admin |
+| `catalog.updateDetails` | POST | STAFF | Edita nombre/categoría/precio/descripción corta de un platillo existente en un solo request (botón "Editar" del admin) |
+| `driver.listAll` | POST | STAFF | Lista completa de `DRIVERS` (activos e inactivos) para la tarjeta "Repartidores" del admin — `driver.list` sigue siendo solo-activos para el selector del Kanban |
+| `driver.create` | POST | STAFF | Da de alta un repartidor nuevo (`email`, `name`) en `DRIVERS`, `active: true` por default |
+| `driver.toggleActive` | POST | STAFF | Activa/desactiva un repartidor sin borrar su fila (conserva historial de entregas) |
 | `catalog.seed` | POST | STAFF | Carga productos (`payload.products`, mismo shape que `data/catalog.json`) a la hoja `CATALOGO`, ignora los `product_id` que ya existen — no duplica |
 | `catalog.create` | POST | STAFF | Da de alta un platillo nuevo (`name`, `category_id`, `category`, `price`, opcional `short_description`/`description`/`image`). Genera `product_id` slug desde el nombre (agrega sufijo `-2`, `-3`... si ya existe), `requiresValidation: true` |
 | `catalog.uploadPhoto` | POST | STAFF | Sube una foto (`payload.base64Data`, máx 3MB decodificado, jpeg/png/webp) a Drive en `laTapatia/imagenes/catalogo/` (crea la ruta si falta), la hace pública por link, y actualiza la columna `image` de `CATALOGO` |
