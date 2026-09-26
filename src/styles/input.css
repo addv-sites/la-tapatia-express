@@ -78,6 +78,36 @@
     100% { transform: scale(1); }
   }
 
+  .rastreo-line-fill {
+    transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .rastreo-pulse::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 9999px;
+    border: 2px solid theme('colors.tertiary');
+    opacity: 0;
+    animation: rastreo-radar 1.8s ease-out infinite;
+  }
+
+  @keyframes rastreo-radar {
+    0% { transform: scale(0.8); opacity: 0.7; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+
+  .rastreo-bounce {
+    animation: rastreo-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes rastreo-bounce {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.28); }
+    70% { transform: scale(0.92); }
+    100% { transform: scale(1); }
+  }
+
   .pedidos-alert {
     animation: pedidos-heartbeat 1.8s ease-in-out infinite, pedidos-glow 1.8s ease-in-out infinite;
   }

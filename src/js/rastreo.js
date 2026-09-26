@@ -16,6 +16,26 @@
   let lastKnownStatus = null;
   let lastFolio = null;
   let lastTel = null;
+  let lastCurrentStepIndex = null;
+
+  // Alinea la línea conectora (track + relleno) con el centro real del
+  // primer y último círculo — getBoundingClientRect en vez de matemática
+  // fija de píxeles porque el label "En camino / para recoger" puede hacer
+  // wrap en pantallas angostas y desalinearía una línea calculada a mano.
+  function layoutStepsLine(container, firstCircle, lastCircle, trackEl, fillEl) {
+    const containerRect = container.getBoundingClientRect();
+    const firstRect = firstCircle.getBoundingClientRect();
+    const lastRect = lastCircle.getBoundingClientRect();
+    const left = firstRect.left - containerRect.left + firstRect.width / 2;
+    const top = firstRect.top - containerRect.top + firstRect.height / 2;
+    const totalH = (lastRect.top - containerRect.top + lastRect.height / 2) - top;
+    trackEl.style.left = left + 'px';
+    trackEl.style.top = top + 'px';
+    trackEl.style.height = totalH + 'px';
+    fillEl.style.left = left + 'px';
+    fillEl.style.top = top + 'px';
+    return totalH;
+  }
 
   // Ding suave, una sola vez, cuando el estado cambia solo durante el
   // auto-refresh — no es la alarma del KDS/repartidor, es un aviso pasivo.
@@ -88,19 +108,51 @@
     ).join('');
 
     const stepsEl = document.getElementById('result-steps');
-    stepsEl.innerHTML = '';
-    let reachedCurrent = false;
-    STEPS.forEach((step) => {
-      const done = step.statuses.includes(order.status);
-      const isCurrent = done && !reachedCurrent && (STEPS.filter(s => s.statuses.includes(order.status)).pop() === step);
+    stepsEl.innerHTML =
+      '<div class="rastreo-line-track absolute w-0.5 bg-surface-container-high" id="rastreo-line-track"></div>' +
+      '<div class="rastreo-line-fill absolute w-0.5 bg-tertiary" id="rastreo-line-fill" style="height:0px"></div>';
+
+    const doneFlags = STEPS.map((step) => step.statuses.includes(order.status));
+    const isTerminal = order.status === 'entregado';
+    let currentStepIndex = -1;
+    for (let i = doneFlags.length - 1; i >= 0; i--) {
+      if (doneFlags[i]) { currentStepIndex = i; break; }
+    }
+
+    STEPS.forEach((step, i) => {
+      const done = doneFlags[i];
+      const isCurrent = i === currentStepIndex && !isTerminal;
       const row = document.createElement('div');
-      row.className = 'flex items-center gap-3' + (done ? '' : ' opacity-40');
+      row.className = 'relative z-10 flex items-center gap-3' + (done ? '' : ' opacity-40');
       row.innerHTML =
-        '<div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 ' + (done ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container-high text-on-surface-variant') + '">' +
+        '<div class="step-circle relative w-8 h-8 rounded-full flex items-center justify-center shrink-0 ' +
+        (done ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container-high text-on-surface-variant') +
+        (isCurrent ? ' rastreo-pulse' : '') + '">' +
         (done ? '<svg class="w-4 h-4" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg>' : '') +
         '</div>' +
         '<span class="font-label-md text-label-md ' + (done ? 'text-on-surface font-bold' : 'text-on-surface-variant') + '">' + step.label + '</span>';
       stepsEl.appendChild(row);
+    });
+
+    // Doble rAF: el primer frame ubica la línea y deja el relleno en 0,
+    // el segundo dispara la transición de height hacia el valor real —
+    // en un solo rAF el navegador a veces junta ambos cambios en el mismo
+    // frame y la línea aparece ya rellena, sin animar.
+    requestAnimationFrame(() => {
+      const circles = stepsEl.querySelectorAll('.step-circle');
+      const track = document.getElementById('rastreo-line-track');
+      const fill = document.getElementById('rastreo-line-fill');
+      const totalH = layoutStepsLine(stepsEl, circles[0], circles[circles.length - 1], track, fill);
+      const doneCount = doneFlags.filter(Boolean).length;
+      const fillH = doneCount > 1 ? (doneCount - 1) / (STEPS.length - 1) * totalH : 0;
+      requestAnimationFrame(() => { fill.style.height = fillH + 'px'; });
+
+      if (currentStepIndex !== -1 && lastCurrentStepIndex !== null && currentStepIndex !== lastCurrentStepIndex) {
+        const circle = circles[currentStepIndex];
+        circle.classList.add('rastreo-bounce');
+        circle.addEventListener('animationend', () => circle.classList.remove('rastreo-bounce'), { once: true });
+      }
+      lastCurrentStepIndex = currentStepIndex;
     });
 
     const wa = document.getElementById('result-whatsapp');
@@ -121,6 +173,7 @@
   async function lookup(folio, tel) {
     lastFolio = folio;
     lastTel = tel;
+    lastCurrentStepIndex = null;
     const errorEl = document.getElementById('lookup-error');
     errorEl.classList.add('hidden');
     showResultSkeleton();

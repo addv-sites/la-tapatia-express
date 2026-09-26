@@ -141,6 +141,12 @@
 - No aplica a los placeholders por categoría (`assets/img/catalogo/tacos.svg`, etc.) que trae `data/catalog.seed.json` — esos siguen siendo un ícono válido, no un "sin imagen".
 - Validado local: las 3 páginas tocadas responden 200, el asset carga (`/assets/img/catalogo/imagen-no-disponible.jpg`), sintaxis de los 2 JS verificada.
 
+## Timeline de rastreo animado — implementado (2026-09-25)
+
+- [x] Se implementó la fusión de las Propuestas 1+2 (quedó pendiente desde la sesión anterior, nunca se había hecho): en `cuenta/rastreo/`, el paso que avanza pinta la línea conectora de verde con una transición suave (`height` animado vía doble `requestAnimationFrame`, posición calculada con `getBoundingClientRect` — robusto si el label "En camino / para recoger" hace wrap), y el paso activo emite un pulso tipo radar en loop (`::before` + `@keyframes rastreo-radar`) todo el tiempo que se mantiene fijo ahí, con un rebote (`rastreo-bounce`) el instante en que se vuelve el nuevo actual. Se apaga al llegar a "Entregado". Nuevas clases en `src/styles/input.css`: `.rastreo-line-fill`, `.rastreo-pulse`, `.rastreo-bounce`. Cubierto por la regla global de `prefers-reduced-motion` ya existente.
+- Preview de referencia (interactivo, real): https://claude.ai/code/artifact/97e02928-2cb2-4d49-b9eb-b26345e5f37c
+- Validado local: `cuenta/rastreo/` responde 200, `rastreo.js` pasa `node --check`, clases nuevas confirmadas en `css/site.css` compilado.
+
 ## Próximo paso
 
 Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).
