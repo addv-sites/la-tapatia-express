@@ -154,7 +154,7 @@
 <div aria-hidden="true" class="fixed inset-0 z-[65] pointer-events-none opacity-0 transition-opacity duration-[450ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] bg-inverse-surface/75 flex items-center justify-center p-4" id="image-lightbox">
   <div class="relative w-full max-w-sm bg-surface-container-lowest rounded-3xl overflow-hidden shadow-2xl transform scale-95 translate-y-2 transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] max-h-[85vh] flex flex-col" id="image-lightbox-card">
     <div class="relative w-full aspect-[4/3] bg-surface-container-high shrink-0">
-      <img class="w-full h-full object-cover" id="image-lightbox-img" src="" alt="">
+      <img class="w-full h-full object-cover" id="image-lightbox-img" src="" alt="" onerror="this.onerror=null;this.src='../assets/img/catalogo/imagen-no-disponible.jpg';">
       <button type="button" id="image-lightbox-close" aria-label="Cerrar" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-inverse-surface/70 text-inverse-on-surface flex items-center justify-center">
         <svg class="w-5 h-5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-close"/></svg>
       </button>

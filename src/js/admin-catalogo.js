@@ -1,5 +1,6 @@
 (function () {
   const MAX_PHOTO_UPLOAD_BYTES = 4 * 1024 * 1024; // 4MB — validación en front antes de leer/redimensionar el archivo
+  const FALLBACK_IMAGE = '../../assets/img/catalogo/imagen-no-disponible.jpg';
 
   let idToken = null;
   let allProducts = [];
@@ -28,7 +29,7 @@
       tr.innerHTML =
         '<td class="py-3 px-4">' +
         '  <div class="relative w-12 h-12 shrink-0">' +
-        '    <img class="thumb-img w-12 h-12 rounded-lg object-cover bg-surface-container-high" src="' + (p.image || '') + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+        '    <img class="thumb-img w-12 h-12 rounded-lg object-cover bg-surface-container-high" src="' + (p.image || FALLBACK_IMAGE) + '" alt="" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMAGE + '\';">' +
         '    <input type="file" accept="image/*" class="photo-input hidden">' +
         '    <button class="photo-btn absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center" title="Cambiar foto">' +
         '      <svg class="w-3 h-3" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-plus"/></svg>' +
@@ -158,7 +159,6 @@
           }, idToken);
           p.image = result.imageUrl;
           tr.querySelector('.thumb-img').src = result.imageUrl;
-          tr.querySelector('.thumb-img').style.visibility = 'visible';
           window.LTA_TOAST.show('Foto de "' + p.name + '" actualizada.');
         } catch (err) {
           window.LTA_TOAST.show('Error: ' + err.message, 'error');
@@ -285,7 +285,7 @@
     document.getElementById('edit-dish-price').value = product.price;
     document.getElementById('edit-dish-description').value = product.short_description || '';
     document.getElementById('edit-dish-new-category-wrap').classList.add('hidden');
-    document.getElementById('edit-dish-photo-preview').src = product.image || '';
+    document.getElementById('edit-dish-photo-preview').src = product.image || FALLBACK_IMAGE;
     document.getElementById('edit-dish-photo-input').value = '';
     document.getElementById('edit-dish-modal').classList.remove('hidden');
     document.getElementById('edit-dish-name').focus();

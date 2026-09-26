@@ -134,6 +134,13 @@
 - Validado local (`npm run build:css` + `npm run serve`): las 4 páginas tocadas (Home, `/menu/`, `admin/catalogo/`, `admin/config-envio/`) responden 200, sintaxis de los 3 JS + `Code.gs` verificada.
 - **Pendiente del usuario:** repegar `Code.gs` completo en el editor de Apps Script y "Nueva versión" — sin eso `catalog.updateDetails`/`driver.listAll`/`driver.create`/`driver.toggleActive` no existen todavía en producción.
 
+## Imagen de fallback "Imagen no disponible" (2026-09-25)
+
+- [x] El usuario subió `procesadas/indp.png` (2.4MB, 1484×1060) — arte de marca "Imagen no disponible" con el mascota/logo de La Tapatía. Se comprimió a `assets/img/catalogo/imagen-no-disponible.jpg` (900×643, JPEG calidad 78, ~105KB).
+- [x] Se volvió la regla base en todo el sitio para productos sin `image` (campo vacío en `CATALOGO`) **o** con link roto (foto de Drive borrada/URL inválida — `onerror` en cada `<img>`): tarjetas de Home (Favoritos), miniaturas de `/menu/`, el visor de imagen (lightbox) de ambas páginas, la miniatura de fila en `admin/catalogo/`, y el preview del modal "Editar platillo". Antes, sin foto simplemente no se pintaba nada (hueco vacío) o (en admin) se ocultaba el `<img>` con `visibility:hidden`.
+- No aplica a los placeholders por categoría (`assets/img/catalogo/tacos.svg`, etc.) que trae `data/catalog.seed.json` — esos siguen siendo un ícono válido, no un "sin imagen".
+- Validado local: las 3 páginas tocadas responden 200, el asset carga (`/assets/img/catalogo/imagen-no-disponible.jpg`), sintaxis de los 2 JS verificada.
+
 ## Próximo paso
 
 Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).

@@ -1,5 +1,6 @@
 (function () {
   const CATEGORY_ORDER = ['tortas', 'tacos', 'tostadas', 'combo-infantil', 'extras', 'postres'];
+  const FALLBACK_IMAGE = '../assets/img/catalogo/imagen-no-disponible.jpg';
 
   function toggleVisible(el, visible, displayClass) {
     el.classList.toggle('hidden', !visible);
@@ -16,7 +17,7 @@
   function openImageLightbox(product, onAdd) {
     lightboxProduct = product;
     lightboxOnAdd = onAdd;
-    document.getElementById('image-lightbox-img').src = product.image || '';
+    document.getElementById('image-lightbox-img').src = product.image || FALLBACK_IMAGE;
     document.getElementById('image-lightbox-name').textContent = product.name;
     document.getElementById('image-lightbox-price').textContent = window.LTA_CATALOG.formatPrice(product.price);
     document.getElementById('image-lightbox-desc').textContent = product.description || product.short_description || '';
@@ -45,9 +46,7 @@
       ? '<span class="inline-block px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-[10px] uppercase tracking-wider">Precio requiere validación</span>'
       : '<span></span>';
     const unavailable = product.active === false;
-    const thumb = product.image
-      ? '<img class="thumb-img w-14 h-14 rounded-xl object-cover shrink-0 cursor-pointer" src="' + product.image + '" alt="" loading="lazy">'
-      : '';
+    const thumb = '<img class="thumb-img w-14 h-14 rounded-xl object-cover shrink-0 cursor-pointer" src="' + (product.image || FALLBACK_IMAGE) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMAGE + '\';">';
     article.innerHTML =
       '<div class="p-4 flex items-center justify-between gap-3' + (unavailable ? ' opacity-50' : '') + '">' +
       '  <div class="flex items-center gap-3 min-w-0">' +
@@ -69,9 +68,7 @@
       const addBtn = article.querySelector('button');
       addBtn.addEventListener('click', () => onAdd(product, addBtn));
     }
-    if (product.image) {
-      article.querySelector('.thumb-img').addEventListener('click', () => openImageLightbox(product, onAdd));
-    }
+    article.querySelector('.thumb-img').addEventListener('click', () => openImageLightbox(product, onAdd));
     return article;
   }
 
