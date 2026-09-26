@@ -15,12 +15,12 @@
   <div class="h-16 px-margin flex items-center justify-between">
     <a href="../../" class="font-headline-sm text-headline-sm text-primary">La Tapatía Express</a>
     <nav class="flex items-center gap-4 font-label-md text-label-md">
-      <a href="../historial/" class="text-on-surface-variant hover:text-primary">Historial</a>
+      <a href="../historial/" class="text-on-surface-variant hover:text-primary">Pedidos</a>
     </nav>
   </div>
 </header>
 
-<main class="flex-1 w-full pt-24 pb-24 px-margin max-w-md mx-auto w-full">
+<main class="flex-1 w-full pt-24 pb-28 px-margin max-w-md mx-auto w-full">
   <div id="auth-gate" class="min-h-[50vh] flex items-center justify-center"></div>
 
   <div id="profile-content" class="hidden flex-col gap-4">
@@ -32,27 +32,53 @@
 
     <form id="profile-form" class="flex flex-col gap-3">
       <label class="flex flex-col gap-1 font-label-sm text-label-sm">Nombre completo
-        <input id="field-name" class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm">
+        <input id="field-name" disabled class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm disabled:bg-surface-container disabled:text-on-surface-variant disabled:shadow-none">
       </label>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm">Teléfono / WhatsApp
-        <input id="field-phone" type="tel" class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm">
+        <input id="field-phone" type="tel" disabled class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm disabled:bg-surface-container disabled:text-on-surface-variant disabled:shadow-none">
       </label>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm">Dirección guardada
-        <input id="field-address" class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm">
+        <input id="field-address" disabled class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm disabled:bg-surface-container disabled:text-on-surface-variant disabled:shadow-none">
       </label>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm">Referencias de la dirección
-        <input id="field-address-ref" class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm">
+        <input id="field-address-ref" disabled class="h-11 px-3 rounded-lg bg-surface-container-lowest shadow-sm disabled:bg-surface-container disabled:text-on-surface-variant disabled:shadow-none">
       </label>
       <label class="flex items-center gap-2 p-3 bg-surface-container-lowest rounded-lg shadow-sm">
-        <input id="field-opt-in" type="checkbox" class="w-5 h-5">
+        <input id="field-opt-in" type="checkbox" disabled class="w-5 h-5">
         <span class="font-body-sm text-body-sm">Quiero recibir promociones por correo o WhatsApp</span>
       </label>
-      <button id="save-profile" type="submit" class="min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm shadow-md">
-        Guardar
+      <button id="save-profile" type="button" class="min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm shadow-md transition-colors">
+        Editar
       </button>
     </form>
   </div>
 </main>
+
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-around">
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-fire"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Antojo</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../menu/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-menu"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Menú</span>
+    </a>
+    <a id="nav-pedido" class="relative flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../menu/#pedido">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-cart"/></svg>
+      <span id="nav-cart-badge" class="nav-cart-badge">0</span>
+      <span class="font-label-sm text-[11px] mt-0.5">Pedido</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../ubicacion/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-storefront"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Visítanos</span>
+    </a>
+    <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 text-primary font-bold" href="../perfil/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-person"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Cuenta</span>
+    </a>
+  </div>
+</nav>
 
 <script src="../../src/js/api.js"></script>
 <script src="../../src/js/auth.js"></script>

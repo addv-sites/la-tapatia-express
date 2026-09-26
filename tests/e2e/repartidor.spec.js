@@ -3,7 +3,7 @@ import { mockAppsScript } from './helpers.js';
 
 test.describe('App Repartidor — mobile', () => {
   test('gate auth DRIVERS visible, app-content oculto sin token (mobile)', async ({ page }) => {
-    await page.goto('/reparto/app/');
+    await page.goto('/repartidor/');
     await expect(page).toHaveTitle(/Repartidor/);
     await expect(page.locator('#auth-gate')).toBeVisible();
     await expect(page.locator('#app-content')).toBeHidden();
@@ -15,7 +15,7 @@ test.describe('App Repartidor — mobile', () => {
 
   test('con token DRIVERS mock, muestra empty-state y botones 44px', async ({ page }) => {
     await mockAppsScript(page);
-    await page.goto('/reparto/app/');
+    await page.goto('/repartidor/');
     await page.evaluate(async () => {
       const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InJlcGFydGlkb3JAZXhhbXBsZS5jb20ifQ.fake';
       sessionStorage.setItem('lta_id_token', fakeToken);
@@ -53,7 +53,7 @@ test.describe('App Repartidor — mobile', () => {
       }
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, data: {} }) });
     });
-    await page.goto('/reparto/app/');
+    await page.goto('/repartidor/');
     await page.evaluate(async () => {
       const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InJlcGFydGlkb3JAZXhhbXBsZS5jb20ifQ.fake';
       sessionStorage.setItem('lta_id_token', fakeToken);
@@ -89,7 +89,7 @@ test.describe('App Repartidor — mobile', () => {
   });
 
   test('repartidor entregas y ganancias requieren DRIVERS', async ({ page }) => {
-    for (const path of ['/reparto/app/entregas/', '/reparto/app/ganancias/', '/reparto/app/perfil/']) {
+    for (const path of ['/repartidor/entregas/', '/repartidor/ganancias/', '/repartidor/perfil/']) {
       await page.goto(path);
       // Cada subpágina debe tener gate o título correspondiente
       await expect(page).toHaveURL(new RegExp(path.replace(/\//g,'\\/')));

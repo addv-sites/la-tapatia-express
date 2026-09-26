@@ -137,7 +137,7 @@ Con `npm run serve` corriendo local, en este orden:
 - [ ] **`/admin/config-envio/`**: cambia una tarifa, guarda, recarga la página — debe persistir (confirma que la fila 2 de `CONFIG` cambió).
 - [ ] **`/cuenta/rastreo/`**: busca el pedido de prueba con su folio + el teléfono que usaste — debe mostrar el estado correcto.
 - [ ] **`/cuenta/perfil/`** y **`/cuenta/historial/`**: inicia sesión con la misma cuenta del checkout — debe ver el perfil guardado y el pedido en el historial.
-- [ ] **`/reparto/app/`**: agrega tu email a `DRIVERS`, asigna manualmente un `driver_id` (= tu email) a un pedido en estado `listo` directo en la hoja `PEDIDOS` (no hay UI de asignación en el admin todavía, ver pendientes en `project_state.md`) — debe aparecer como tu ruta activa.
+- [ ] **`/repartidor/`**: agrega tu email a `DRIVERS`, asigna manualmente un `driver_id` (= tu email) a un pedido en estado `listo` directo en la hoja `PEDIDOS` (no hay UI de asignación en el admin todavía, ver pendientes en `project_state.md`) — debe aparecer como tu ruta activa.
 - [ ] **`/analitica/panel/`**: inicia sesión con un correo `@addv.mx` — debe entrar y mostrar los KPIs con datos reales de las pruebas anteriores. Con un correo de otro dominio, debe rechazar.
 
 Si algo de esto falla, revisa primero la consola del navegador (F12) y los "Registros de ejecución" del editor de Apps Script — ahí aparece el error real del lado del servidor.

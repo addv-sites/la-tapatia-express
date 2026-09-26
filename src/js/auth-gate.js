@@ -16,6 +16,28 @@
     }
   }
 
+  // Token de relleno con forma de JWT (no firmado) para saltar el botón de
+  // Google en localhost — solo pinta la UI ya autenticada. Apps Script sigue
+  // verificando criptográficamente el idToken real en cada request, así que
+  // esto no da acceso real a datos STAFF/DRIVERS/ADDV, solo evita el login
+  // repetido mientras se revisa el diseño en el navegador local.
+  function buildLocalDevToken_() {
+    const b64url = (obj) => btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const nowSec = Math.floor(Date.now() / 1000);
+    const payload = {
+      email: 'dev@localhost',
+      name: 'Dev Local',
+      given_name: 'Dev',
+      iat: nowSec,
+      exp: nowSec + 6 * 3600
+    };
+    return b64url({ alg: 'none', typ: 'JWT' }) + '.' + b64url(payload) + '.local-dev';
+  }
+
+  function isLocalDev_() {
+    return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  }
+
   function renderGate(container, opts) {
     const cfg = window.SITE_CONFIG;
     container.innerHTML = '';
@@ -27,6 +49,11 @@
         '  <p class="font-body-sm text-body-sm text-on-surface-variant">Falta desplegar Apps Script y/o el Google Client ID en <code>src/config/site.js</code>. Ver README.md.</p>' +
         '</div>';
       return;
+    }
+
+    if (isLocalDev_() && !sessionStorage.getItem('lta_id_token')) {
+      console.info('[LTA] localhost detectado — se salta el login de Google (LTA_AUTH_GATE.signOut() para forzarlo de nuevo). Las llamadas reales a Apps Script seguirán fallando porque el token no está firmado.');
+      sessionStorage.setItem('lta_id_token', buildLocalDevToken_());
     }
 
     // Sesión ya iniciada en esta pestaña (navegación entre páginas del

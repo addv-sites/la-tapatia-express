@@ -1,5 +1,26 @@
 (function () {
+  function wireShareButton() {
+    const btn = document.getElementById('btn-share-repartidor');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      const url = new URL('../repartidor/', location.href).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'App Repartidor — La Tapatía Express', url });
+        } catch (err) {
+          // Usuario canceló el share sheet — no es un error a mostrar.
+        }
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        window.LTA_TOAST.show('Enlace copiado.');
+      } else {
+        window.LTA_TOAST.show(url);
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    wireShareButton();
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Panel de Administración',
       subtitle: 'Inicia sesión con tu cuenta de Google autorizada para el equipo.',
@@ -22,6 +43,7 @@
           if (active.length > 0) {
             document.getElementById('pedidos-count').textContent = active.length;
             document.getElementById('pedidos-count-wrap').classList.remove('hidden');
+            document.getElementById('pedidos-card').classList.add('pedidos-alert');
           }
         } catch (err) {
           // Si falla, la tarjeta de Pedidos se queda sin contador — nunca un número inventado.

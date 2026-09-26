@@ -36,7 +36,7 @@
       <svg class="w-4 h-4 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-arrow-right"/></svg>
     </a>
 
-    <a href="pedidos/" class="flex items-center gap-3.5 bg-crema-surface rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+    <a id="pedidos-card" href="pedidos/" class="flex items-center gap-3.5 bg-crema-surface rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
       <div class="w-11 h-11 rounded-xl bg-secondary-fixed text-secondary flex items-center justify-center shrink-0">
         <svg class="w-6 h-6" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-soup"/></svg>
       </div>
@@ -104,10 +104,16 @@
 
     <div class="mt-2 pt-3.5 border-t border-dashed border-outline-variant">
       <p class="font-label-sm text-[10px] uppercase tracking-wider font-bold text-on-surface-variant mb-2">Otros portales (login aparte)</p>
-      <a href="../reparto/app/" class="flex items-center gap-2.5 py-2 font-body-sm text-body-sm text-on-surface-variant hover:text-primary">
-        <svg class="w-4 h-4" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-navigation"/></svg>
-        App Repartidor (solo choferes) →
-      </a>
+      <div class="flex items-center justify-between gap-3 py-1">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <svg class="w-4 h-4 text-on-surface-variant shrink-0" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-navigation"/></svg>
+          <span class="font-body-sm text-body-sm text-on-surface truncate">Repartidor <span class="text-on-surface-variant">(solo choferes)</span></span>
+        </div>
+        <button id="btn-share-repartidor" type="button" class="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm">
+          <svg class="w-3.5 h-3.5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-share"/></svg>
+          Compartir app
+        </button>
+      </div>
     </div>
   </div>
 
@@ -133,6 +139,7 @@
 <script src="../src/js/api.js"></script>
 <script src="../src/js/auth.js"></script>
 <script src="../src/js/auth-gate.js"></script>
+<script src="../src/js/toast.js"></script>
 <script src="../src/js/admin-dashboard.js"></script>
 <script src="../src/js/admin-guides.js"></script>
 </body>

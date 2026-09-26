@@ -38,10 +38,10 @@ Indexables: las 4 están en `sitemap.xml` y **no** llevan meta `robots`.
 
 | URL | Qué hace | Endpoints Apps Script |
 |---|---|---|
-| https://addv-sites.github.io/la-tapatia-express/reparto/app/ | Pedidos disponibles, ficha del pedido, mapa de la entrega, cambio de estado (`en_reparto` → `entregado`), reporte de incidencia. | `driver.myOrders`, `driver.pingLocation`, `order.updateStatus`, `incident.report` |
-| https://addv-sites.github.io/la-tapatia-express/reparto/app/entregas/ | Entregas asignadas al repartidor con su historial de estado. | `driver.myDeliveries` |
-| https://addv-sites.github.io/la-tapatia-express/reparto/app/ganancias/ | Ganancias calculadas contra `driver_fixed_commission` de CONFIG. | `driver.myDeliveries`, `config.read` |
-| https://addv-sites.github.io/la-tapatia-express/reparto/app/perfil/ | Perfil del repartidor. Solo el gate de acceso, sin llamadas a la API. | — |
+| https://addv-sites.github.io/la-tapatia-express/repartidor/ | Pedidos disponibles, ficha del pedido, mapa de la entrega, cambio de estado (`en_reparto` → `entregado`), reporte de incidencia. | `driver.myOrders`, `driver.pingLocation`, `order.updateStatus`, `incident.report` |
+| https://addv-sites.github.io/la-tapatia-express/repartidor/entregas/ | Entregas asignadas al repartidor con su historial de estado. | `driver.myDeliveries` |
+| https://addv-sites.github.io/la-tapatia-express/repartidor/ganancias/ | Ganancias calculadas contra `driver_fixed_commission` de CONFIG. | `driver.myDeliveries`, `config.read` |
+| https://addv-sites.github.io/la-tapatia-express/repartidor/perfil/ | Perfil del repartidor. Solo el gate de acceso, sin llamadas a la API. | — |
 
 `noindex, nofollow` en las 4. `driver.pingLocation` es la única superficie que emite geolocalización
 del repartidor; se envía al backend, nunca a un tercero.

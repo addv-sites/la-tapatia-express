@@ -17,7 +17,7 @@
   </div>
 </header>
 
-<main class="flex-1 w-full pt-24 pb-12 px-margin max-w-md mx-auto w-full">
+<main class="flex-1 w-full pt-24 pb-28 px-margin max-w-md mx-auto w-full">
   <form id="lookup-form" class="flex flex-col gap-3">
     <h1 class="font-headline-lg text-headline-lg text-on-surface">¿Cómo va mi pedido?</h1>
     <p class="font-body-sm text-body-sm text-on-surface-variant">Ingresa el folio (te llegó al armar tu pedido) y el teléfono que usaste.</p>
@@ -46,6 +46,32 @@
     </a>
   </div>
 </main>
+
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(50,20,10,0.06)]">
+  <div class="h-16 px-margin flex items-center justify-around">
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-fire"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Antojo</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../menu/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-menu"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Menú</span>
+    </a>
+    <a id="nav-pedido" class="relative flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../menu/#pedido">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-cart"/></svg>
+      <span id="nav-cart-badge" class="nav-cart-badge">0</span>
+      <span class="font-label-sm text-[11px] mt-0.5">Pedido</span>
+    </a>
+    <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../../ubicacion/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-storefront"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Visítanos</span>
+    </a>
+    <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 text-primary font-bold" href="../perfil/">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-person"/></svg>
+      <span class="font-label-sm text-[11px] mt-0.5">Cuenta</span>
+    </a>
+  </div>
+</nav>
 
 <script src="../../src/js/api.js"></script>
 <script src="../../src/js/catalog.js"></script>

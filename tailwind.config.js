@@ -13,7 +13,7 @@ module.exports = {
     './cuenta/perfil/**/*.html',
     './cuenta/historial/**/*.html',
     './analitica/panel/**/*.html',
-    './reparto/app/**/*.html',
+    './repartidor/**/*.html',
     './src/js/**/*.js'
   ],
   theme: {

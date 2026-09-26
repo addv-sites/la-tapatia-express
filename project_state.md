@@ -107,6 +107,23 @@
 - **Pendiente del usuario:** repegar `apps-script/Code.gs` y hacer "Nueva versión" en Implementar → Administrar implementaciones (ya sabe el paso, lo hizo para `driver.list`).
 - Verificado visualmente el layout (miniatura + botón, banner de precarga) con un harness temporal usando el CSS/sprite reales; no probado end-to-end contra el backend real (pendiente redeploy + login STAFF real del usuario).
 
+## Animación del timeline de seguimiento — decisión tomada, pendiente de implementar (2026-09-25)
+
+- Se propusieron 3 animaciones para que el listado de pasos (Recibido y confirmado / En la cocina / Listo / En camino / Entregado) no se sintiera estático, ahora que `cuenta/rastreo` se refresca sola cada 20s: (1) línea conectora que se rellena, (2) pulso tipo radar en el paso activo + rebote al avanzar, (3) marcador viajero que se desliza por la línea.
+- **Elegida: Propuesta 2** (pulso en el paso activo). Falta implementar en `src/js/rastreo.js` (función `renderOrder`, el bloque `STEPS.forEach` que pinta `#result-steps`) — es el único timeline de pasos del sitio hoy (la pantalla de éxito del checkout en `menu/index.html` no tiene uno, solo folio + link).
+- Mockup de referencia (3 propuestas, real, jugable): https://claude.ai/code/artifact/3d92ef9b-f8f4-4d8a-815d-f690a86ab394
+
+## Consistencia de navegación, slug repartidor y aura de pedidos activos (2026-09-25)
+
+- [x] Menú inferior (Antojo/Menú/Pedido/Visítanos) antes solo existía en Home y `/menu/`; desaparecía en las 3 páginas de `/cuenta/`. Se agregó un 5º ícono "Cuenta" y se aplicó el mismo `<nav>` fijo a `cuenta/perfil/`, `cuenta/historial/` y `cuenta/rastreo/`.
+- [x] En `cuenta/perfil/`, el link del header pasó de "Historial" a "Pedidos" (mismo destino). Los campos del formulario ahora inician `disabled`; el botón arranca en "Editar" y alterna a "Guardar" al presionarlo (`src/js/portal-perfil.js`, función `setEditing`).
+- [x] Slug de la app repartidor: `reparto/app/` → `/repartidor/` (los 4 archivos movidos con `git mv`, rutas relativas internas ajustadas un nivel). `reparto/app/index.html` se dejó como **redirect permanente** (meta refresh + `location.replace`) hacia `/repartidor/` — decisión del usuario, no se borra la carpeta vieja. `reparto/code.html`, `DESIGN.md` y `screen.png` (prototipo) no se tocaron. Actualizadas referencias en `admin/index.html`, `README.md`, `docs/google-sheets-setup.md`, `tests/e2e/repartidor.spec.js` y `tailwind.config.js`.
+- [x] En `admin/index.html`, "Otros portales" pasó de un link directo a mostrar el nombre "Repartidor" + botón "Compartir app" (ícono nuevo `icon-share` en el sprite). Usa `navigator.share()`; si el navegador no lo soporta, copia el enlace al portapapeles y muestra un toast (se agregó `toast.js` al admin, que antes no lo cargaba).
+- [x] Tarjeta "Pedidos" del dashboard admin: cuando hay pedidos activos (`admin-dashboard.js`), se le agrega la clase `.pedidos-alert` — latido (`scale`) + resplandor rojo expandente (`box-shadow`), definida en `src/styles/input.css`. Se eligió la Propuesta 3 de 3 mockups (Halo que respira / Ondas expansivas / Latido de tarjeta completa). Cubierta por la regla global de `prefers-reduced-motion` ya existente en `input.css`.
+- Mockups de referencia: https://claude.ai/code/artifact/397bf306-89c6-4e91-a84b-0b224c01e00f (menú inferior + toggle perfil) y https://claude.ai/code/artifact/f601f001-9806-4190-b338-c22884ebf21f (slug, compartir app, 3 auras).
+- Validado local con `npm run build:css` + `npm run serve`: todas las rutas tocadas (`/repartidor/` y sus 3 subpáginas, `/reparto/app/` redirect, `/admin/`, las 3 de `/cuenta/`) responden 200.
+- **Pendiente:** correr `npm run test:e2e` contra el nuevo slug (el spec ya apunta a `/repartidor/`, no se ejecutó en esta sesión) y validar en dispositivo real el fallback de `navigator.share()` en escritorio.
+
 ## Próximo paso
 
 Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).

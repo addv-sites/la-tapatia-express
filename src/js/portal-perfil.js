@@ -1,5 +1,23 @@
 (function () {
   let idToken = null;
+  let editing = false;
+
+  const editableFields = () => [
+    document.getElementById('field-name'),
+    document.getElementById('field-phone'),
+    document.getElementById('field-address'),
+    document.getElementById('field-address-ref'),
+    document.getElementById('field-opt-in')
+  ];
+
+  function setEditing(value) {
+    editing = value;
+    const btn = document.getElementById('save-profile');
+    editableFields().forEach((f) => { f.disabled = !editing; });
+    btn.textContent = editing ? 'Guardar' : 'Editar';
+    btn.classList.toggle('bg-secondary', editing);
+    btn.classList.toggle('bg-primary', !editing);
+  }
 
   async function loadProfile() {
     const data = await window.LTA_API.callAction('client.getProfile', {}, idToken);
@@ -11,8 +29,7 @@
     document.getElementById('field-opt-in').checked = !!p.marketing_opt_in;
   }
 
-  async function save(e) {
-    e.preventDefault();
+  async function save() {
     const btn = document.getElementById('save-profile');
     btn.disabled = true;
     try {
@@ -26,6 +43,7 @@
         optIn: document.getElementById('field-opt-in').checked
       }, idToken);
       window.LTA_TOAST.show('Perfil guardado.');
+      setEditing(false);
     } catch (err) {
       window.LTA_TOAST.show('Error: ' + err.message, 'error');
     }
@@ -33,7 +51,14 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('profile-form').addEventListener('submit', save);
+    document.getElementById('save-profile').addEventListener('click', () => {
+      if (editing) {
+        save();
+      } else {
+        setEditing(true);
+      }
+    });
+    document.getElementById('profile-form').addEventListener('submit', (e) => e.preventDefault());
     document.getElementById('btn-signout').addEventListener('click', () => {
       sessionStorage.removeItem('lta_id_token');
       window.LTA_AUTH.signOut();
