@@ -65,6 +65,7 @@
               <th class="py-3.5 px-3 w-36">Precio (MXN)</th>
               <th class="py-3.5 px-3 text-center">Validación</th>
               <th class="py-3.5 px-3 text-center">Disponibilidad</th>
+              <th class="py-3.5 px-3 text-center">Antojo</th>
               <th class="py-3.5 px-4 text-right"><span class="sr-only">Acción</span></th>
             </tr>
           </thead>
@@ -127,6 +128,17 @@
         <button id="btn-submit-add-dish" type="submit" class="min-h-[44px] px-5 rounded-lg bg-primary text-on-primary font-label-md text-label-md">Guardar</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div id="featured-limit-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40">
+  <div class="w-full max-w-sm bg-surface rounded-2xl shadow-lg p-6 flex flex-col items-center gap-3 text-center">
+    <div class="w-[52px] h-[52px] rounded-full bg-error-container text-primary flex items-center justify-center">
+      <svg class="w-6 h-6" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-alert"/></svg>
+    </div>
+    <h3 id="featured-limit-title" class="font-headline-sm text-headline-sm text-on-surface">Límite de Antojos</h3>
+    <p id="featured-limit-message" class="font-body-sm text-body-sm text-on-surface-variant"></p>
+    <button id="btn-close-featured-limit" type="button" class="min-h-[44px] w-full rounded-lg bg-primary text-on-primary font-label-md text-label-md mt-1">Entendido</button>
   </div>
 </div>
 

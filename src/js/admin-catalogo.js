@@ -54,6 +54,11 @@
         '    <div class="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:bg-tertiary relative after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>' +
         '  </label>' +
         '</td>' +
+        '<td class="py-3 px-3 text-center">' +
+        '  <button class="featured-toggle p-2 rounded-lg hover:bg-surface-container transition-colors ' + (p.featured ? 'text-primary' : 'text-on-surface-variant opacity-40') + '" title="' + (p.featured ? 'Quitar de Antojos' : 'Marcar como Antojo (máx. 3)') + '">' +
+        '    <svg class="w-5 h-5" aria-hidden="true"' + (p.featured ? ' style="filter:drop-shadow(0 0 3px rgba(147,0,11,.45))"' : '') + '><use href="../../assets/icons/sprite.svg#icon-fire"/></svg>' +
+        '  </button>' +
+        '</td>' +
         '<td class="py-3 px-4 text-right whitespace-nowrap">' +
         '  <button class="save-btn p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg" title="Guardar"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-save"/></svg></button>' +
         '  <button class="delete-btn p-2 text-on-surface-variant hover:text-error hover:bg-surface-container rounded-lg" title="Eliminar platillo"><svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-trash"/></svg></button>' +
@@ -82,6 +87,31 @@
           }
         });
       }
+
+      tr.querySelector('.featured-toggle').addEventListener('click', async () => {
+        const nextFeatured = !p.featured;
+        const currentCount = allProducts.filter((item) => item.featured).length;
+        if (nextFeatured && currentCount >= 3) {
+          openFeaturedLimitModal_('Solo se pueden mostrar 3 platillos en la sección de Antojos del inicio. Quita uno antes de activar "' + p.name + '".');
+          return;
+        }
+        if (!nextFeatured && currentCount <= 1) {
+          openFeaturedLimitModal_('La sección de Antojos no puede quedar vacía. Activa otro platillo antes de quitar "' + p.name + '".');
+          return;
+        }
+        try {
+          await window.LTA_API.callAction('catalog.toggleFeatured', { product_id: p.product_id, featured: nextFeatured }, idToken);
+          p.featured = nextFeatured;
+          window.LTA_TOAST.show('"' + p.name + '" ' + (nextFeatured ? 'agregado a' : 'quitado de') + ' Antojos.');
+          render();
+        } catch (err) {
+          if (/3 antojos|al menos 1 antojo/i.test(err.message)) {
+            openFeaturedLimitModal_(err.message);
+          } else {
+            window.LTA_TOAST.show('Error: ' + err.message, 'error');
+          }
+        }
+      });
 
       tr.querySelector('.avail-toggle').addEventListener('change', async (e) => {
         try {
@@ -243,6 +273,15 @@
     document.getElementById('add-dish-modal').classList.add('hidden');
   }
 
+  function openFeaturedLimitModal_(message) {
+    document.getElementById('featured-limit-message').textContent = message;
+    document.getElementById('featured-limit-modal').classList.remove('hidden');
+  }
+
+  function closeFeaturedLimitModal_() {
+    document.getElementById('featured-limit-modal').classList.add('hidden');
+  }
+
   async function submitAddDish_() {
     const submitBtn = document.getElementById('btn-submit-add-dish');
     const name = document.getElementById('add-dish-name').value.trim();
@@ -310,6 +349,7 @@
     document.getElementById('btn-seed-catalog').addEventListener('click', seedCatalog);
     window.LTA_AUTH_GATE.wireSignOutButton(document.getElementById('btn-signout-header'));
 
+    document.getElementById('btn-close-featured-limit').addEventListener('click', closeFeaturedLimitModal_);
     document.getElementById('btn-add-dish').addEventListener('click', openAddDishModal_);
     document.getElementById('btn-close-add-dish').addEventListener('click', closeAddDishModal_);
     document.getElementById('btn-cancel-add-dish').addEventListener('click', closeAddDishModal_);
@@ -330,7 +370,7 @@
         document.getElementById('admin-content').classList.remove('hidden');
         document.getElementById('catalog-table-wrap').classList.remove('hidden');
         document.getElementById('catalog-tbody').innerHTML =
-          '<tr><td colspan="7" class="p-3"><div class="skeleton rounded-lg h-12"></div></td></tr>'.repeat(5);
+          '<tr><td colspan="8" class="p-3"><div class="skeleton rounded-lg h-12"></div></td></tr>'.repeat(5);
         try {
           await loadCatalog();
         } catch (err) {

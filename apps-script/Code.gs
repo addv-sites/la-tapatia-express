@@ -547,6 +547,42 @@ function action_catalogToggleAvailability_(payload, user) {
   });
 }
 
+// Antojos del Home ("Favoritos de la Casa") se limitan a máx. 3 / mín. 1 —
+// validado aquí también porque el botón del admin no es la única puerta
+// (dos pestañas abiertas, o una llamada directa a la API, no deben poder
+// dejar la sección en 0 ni en 4+).
+function action_catalogToggleFeatured_(payload, user) {
+  return withLock_(() => {
+    const sh = sheet_('CATALOGO');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const idCol = headers.indexOf('product_id');
+    const col = headers.indexOf('featured') + 1;
+    const currentCount = values.slice(1).filter((row) => row[col - 1] === true).length;
+    let rowIndex = -1;
+    let wasFeatured = false;
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][idCol] === payload.product_id) {
+        rowIndex = i;
+        wasFeatured = values[i][col - 1] === true;
+        break;
+      }
+    }
+    if (rowIndex === -1) throw new Error('Producto no encontrado');
+
+    if (payload.featured && !wasFeatured && currentCount >= 3) {
+      throw new Error('Ya hay 3 antojos activos. Desactiva uno antes de agregar otro.');
+    }
+    if (!payload.featured && wasFeatured && currentCount <= 1) {
+      throw new Error('Debe quedar al menos 1 antojo activo.');
+    }
+
+    sh.getRange(rowIndex + 1, col).setValue(payload.featured);
+    logAudit_(user.email, 'catalog.toggleFeatured', 'CATALOGO', payload.product_id, { featured: wasFeatured }, { featured: payload.featured });
+    return { ok: true };
+  });
+}
+
 function action_catalogSeed_(payload, user) {
   return withLock_(() => {
     const products = payload.products || [];
@@ -841,6 +877,7 @@ function route_(action, payload, idToken, sessionId) {
     case 'catalog.updatePrice': return action_catalogUpdatePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.approvePrice': return action_catalogApprovePrice_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.toggleAvailability': return action_catalogToggleAvailability_(payload, requireRole_(idToken, 'STAFF'));
+    case 'catalog.toggleFeatured': return action_catalogToggleFeatured_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.seed': return action_catalogSeed_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.create': return action_catalogCreate_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.uploadPhoto': return action_catalogUploadPhoto_(payload, requireRole_(idToken, 'STAFF'));
