@@ -207,6 +207,15 @@ function logAudit_(actorEmail, action, entity, entityId, before, after) {
 // Geocodificación (Nominatim / OpenStreetMap — gratis, respeta 1 req/seg)
 // ---------------------------------------------------------------------------
 
+/**
+ * Geocodifica la dirección del pedido al confirmarlo (order.create). Lleva
+ * el mismo sesgo a Morelia (countrycodes + viewbox sin restringir duro) que
+ * geocodeSearchMulti_ — sin esto, una dirección con poco detalle (ej. solo
+ * "Reyna Xochitl 170, Morelia, Michoacán") puede perder contra una calle del
+ * mismo nombre en otro estado, porque Nominatim no sabe que "Morelia" debe
+ * pesar más que el resto de la consulta. Bug real encontrado en producción:
+ * 3 pedidos geocodificados a Zapopan/Jalisco en vez de Morelia.
+ */
 function geocodeAddress_(address) {
   const cache = CacheService.getScriptCache();
   const cacheKey = 'geo_' + address;
@@ -214,7 +223,9 @@ function geocodeAddress_(address) {
   if (cached) return JSON.parse(cached);
 
   Utilities.sleep(1000); // respeta política de uso de Nominatim
-  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(address);
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1' +
+    '&countrycodes=mx&viewbox=-101.35,19.85,-100.95,19.55&bounded=0' +
+    '&q=' + encodeURIComponent(address);
   const resp = UrlFetchApp.fetch(url, {
     muteHttpExceptions: true,
     headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
