@@ -303,52 +303,6 @@ function action_geoSearch_(payload) {
   return { results: geocodeSearchMulti_(q) };
 }
 
-/**
- * Colonias para un CP dado, vía búsqueda estructurada de Nominatim
- * (postalcode + country). No existe un catálogo SEPOMEX embebido en el
- * proyecto — se decidió así en vez de empaquetar un catálogo estático
- * porque no hay forma de verificar aquí la fuente oficial sin arriesgar
- * datos inventados; esto usa datos reales de OpenStreetMap en vivo, sin
- * costo y sin API key, igual que el resto del mapa. Limitación conocida:
- * la cobertura de postcodes de OSM en México es más floja que el catálogo
- * SEPOMEX — un CP real puede no traer colonias todavía, y el checkout debe
- * tratar eso como "colonia no encontrada", no como error.
- */
-function geocodeByPostalcode_(cp) {
-  const cache = CacheService.getScriptCache();
-  const cacheKey = 'geocp_' + cp;
-  const cached = cache.get(cacheKey);
-  if (cached) return JSON.parse(cached);
-
-  Utilities.sleep(1000); // respeta política de uso de Nominatim
-  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=25' +
-    '&country=mx&postalcode=' + encodeURIComponent(cp);
-  const resp = UrlFetchApp.fetch(url, {
-    muteHttpExceptions: true,
-    headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
-  });
-  if (resp.getResponseCode() !== 200) return [];
-  const results = JSON.parse(resp.getContentText());
-  const seen = {};
-  const out = [];
-  results.forEach((r) => {
-    const addr = r.address || {};
-    if (!/michoac/i.test(String(addr.state || ''))) return; // descarta resultados fuera de Michoacán
-    const colonia = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district;
-    if (!colonia || seen[colonia]) return;
-    seen[colonia] = true;
-    out.push({ colonia: colonia, lat: Number(r.lat), lng: Number(r.lon) });
-  });
-  cache.put(cacheKey, JSON.stringify(out), 21600); // 6h
-  return out;
-}
-
-function action_geoColonias_(payload) {
-  const cp = String(payload.cp || '').trim();
-  if (!/^\d{5}$/.test(cp)) throw new Error('CP inválido — deben ser 5 dígitos');
-  return { colonias: geocodeByPostalcode_(cp) };
-}
-
 function distanceKm_(lat1, lng1, lat2, lng2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1083,7 +1037,7 @@ function action_analyticsRead_(payload) {
 // Router
 // ---------------------------------------------------------------------------
 
-const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode', 'geo.search', 'geo.colonias'];
+const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode', 'geo.search'];
 
 function route_(action, payload, idToken, sessionId) {
   switch (action) {
@@ -1093,7 +1047,6 @@ function route_(action, payload, idToken, sessionId) {
     case 'order.trackingRead': return action_orderTrackingRead_(payload);
     case 'geo.reverseGeocode': return action_geoReverseGeocode_(payload);
     case 'geo.search': return action_geoSearch_(payload);
-    case 'geo.colonias': return action_geoColonias_(payload);
     case 'order.listMine': return action_orderListMine_(requireRole_(idToken, 'ANY'));
     case 'client.getProfile': return action_clientGetProfile_(requireRole_(idToken, 'ANY'));
 

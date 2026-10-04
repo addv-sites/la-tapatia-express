@@ -110,14 +110,15 @@
         <div id="field-address" class="hidden flex-col gap-2">
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="address-search-input">Dirección de entrega</label>
 
-          <div class="relative isolate z-20">
-            <input id="address-search-input" class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" placeholder="Calle, número y colonia" autocomplete="off">
-            <div id="address-predictions" class="hidden absolute left-0 right-0 top-full mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-md z-50 overflow-hidden"></div>
-          </div>
-
-          <div class="relative w-full h-48 rounded-xl overflow-hidden bg-surface-container-high">
+          <div class="relative isolate w-full h-52 rounded-xl overflow-hidden bg-surface-container-high">
             <div id="address-map" class="w-full h-full"></div>
-            <div id="address-map-badge" class="hidden absolute left-2 top-2 items-center gap-1.5 bg-surface-container-lowest rounded-full pl-1.5 pr-2.5 py-1 shadow-sm">
+
+            <div class="absolute left-2 right-2 top-2 z-20">
+              <input id="address-search-input" class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest/95 backdrop-blur-sm shadow-md text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/40" type="text" placeholder="🔍 Buscar calle, número y colonia" autocomplete="off">
+              <div id="address-predictions" class="hidden mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden"></div>
+            </div>
+
+            <div id="address-map-badge" class="hidden absolute left-2 bottom-2 items-center gap-1.5 bg-surface-container-lowest rounded-full pl-1.5 pr-2.5 py-1 shadow-sm z-10">
               <span id="address-map-badge-dot" class="w-1.5 h-1.5 rounded-full"></span>
               <span id="address-map-badge-text" class="font-label-sm text-[10.5px] font-bold text-on-surface"></span>
             </div>

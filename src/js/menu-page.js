@@ -208,17 +208,37 @@
     }
   }
 
-  /** Reconstruye el <select> de colonia con lo que haya traído geo.colonias para el CP capturado. */
-  function renderColoniaOptions(list, preselect) {
+  /**
+   * Catálogo CP -> colonias de Morelia, real (SEPOMEX vía
+   * correosdemexico.gob.mx, exportado 2026-10-03), empaquetado estático en
+   * data/cp-colonias-morelia.json — no depende de que Nominatim/OSM tenga
+   * colonias etiquetadas con código postal (casi nunca las tiene en México,
+   * por eso geo.colonias vía Nominatim nunca cargaba nada). Se carga una
+   * sola vez y se consulta en memoria, sin round-trip a Apps Script.
+   */
+  let cpColoniasData = null;
+  let cpColoniasPromise = null;
+  function loadCpColonias_() {
+    if (!cpColoniasPromise) {
+      cpColoniasPromise = fetch('../data/cp-colonias-morelia.json')
+        .then((r) => r.json())
+        .then((d) => { cpColoniasData = d; return d; })
+        .catch(() => { cpColoniasData = {}; return {}; });
+    }
+    return cpColoniasPromise;
+  }
+
+  /** Reconstruye el <select> de colonia con una lista de nombres (strings). */
+  function renderColoniaOptions(names, preselect) {
     const select = document.getElementById('field-colonia');
-    if (!list.length) {
+    if (!names.length) {
       select.disabled = true;
       select.innerHTML = '<option value="">Ninguna colonia encontrada para ese CP</option>';
       return;
     }
     select.disabled = false;
     select.innerHTML = '<option value="">Elige tu colonia</option>' +
-      list.map((c) => '<option value="' + c.colonia + '"' + (c.colonia === preselect ? ' selected' : '') + '>' + c.colonia + '</option>').join('');
+      names.map((name) => '<option value="' + name + '"' + (name === preselect ? ' selected' : '') + '>' + name + '</option>').join('');
   }
 
   /** Si la colonia que ya trae el pin (por búsqueda o drag) no está en la lista del CP, la agrega para que no se pierda la selección. */
@@ -235,33 +255,37 @@
     select.disabled = false;
   }
 
-  const lookupColonias = debounce_(async (cp) => {
-    try {
-      const data = await window.LTA_API.readAction('geo.colonias', { cp });
-      renderColoniaOptions(data.colonias || [], addressColonia);
-      if (!data.colonias || !data.colonias.length) {
-        if (addressState !== 'ok') setAddressState('notfound');
-      }
-    } catch (err) {
-      renderColoniaOptions([], '');
+  async function refreshColoniaOptionsForCp(cp) {
+    await loadCpColonias_();
+    const names = (cpColoniasData && cpColoniasData[cp]) || [];
+    renderColoniaOptions(names, addressColonia);
+    if (!names.length && addressState !== 'ok') {
+      setAddressState('notfound', 'No encontramos colonias para ese CP en Morelia — verifica el CP o usa la búsqueda de arriba.');
     }
-  }, 500);
+    return names;
+  }
+
+  async function runAddressSearchNow(query) {
+    const box = document.getElementById('address-predictions');
+    const q = query.trim();
+    if (q.length < 4) { box.classList.add('hidden'); return []; }
+    try {
+      const data = await window.LTA_API.readAction('geo.search', { q: q + ', Morelia, Michoacán' });
+      return data.results || [];
+    } catch (err) {
+      return [];
+    }
+  }
 
   const runAddressSearch = debounce_(async (query) => {
     const box = document.getElementById('address-predictions');
-    if (query.trim().length < 4) { box.classList.add('hidden'); return; }
-    try {
-      const data = await window.LTA_API.readAction('geo.search', { q: query + ', Morelia, Michoacán' });
-      const results = data.results || [];
-      if (!results.length) { box.classList.add('hidden'); return; }
-      box.innerHTML = results.map((r, i) =>
-        '<button type="button" data-i="' + i + '" class="w-full text-left px-3 py-2.5 font-body-sm text-body-sm text-on-surface border-t border-surface-container-high first:border-t-0 hover:bg-surface-container-low">' + r.label + '</button>'
-      ).join('');
-      box.classList.remove('hidden');
-      Array.from(box.children).forEach((btn, i) => btn.addEventListener('click', () => pickAddressResult(results[i])));
-    } catch (err) {
-      box.classList.add('hidden');
-    }
+    const results = await runAddressSearchNow(query);
+    if (!results.length) { box.classList.add('hidden'); return; }
+    box.innerHTML = results.map((r, i) =>
+      '<button type="button" data-i="' + i + '" class="w-full text-left px-3 py-2.5 font-body-sm text-body-sm text-on-surface border-t border-surface-container-high first:border-t-0 hover:bg-surface-container-low">' + r.label + '</button>'
+    ).join('');
+    box.classList.remove('hidden');
+    Array.from(box.children).forEach((btn, i) => btn.addEventListener('click', () => pickAddressResult(results[i])));
   }, 500);
 
   function pickAddressResult(r) {
@@ -271,7 +295,7 @@
     addressColonia = r.colonia || '';
     moveMarkerTo(r.lat, r.lng, r.precise ? 17 : 15);
     setAddressState(r.precise ? 'ok' : 'approx');
-    if (r.cp) lookupColonias(r.cp);
+    if (r.cp) refreshColoniaOptionsForCp(r.cp);
   }
 
   async function restoreSession() {
@@ -428,9 +452,24 @@
     orderTypeRadios.forEach((r) => r.addEventListener('change', renderCart));
     document.addEventListener('cart-changed', renderCart);
 
-    document.getElementById('address-search-input').addEventListener('input', (e) => {
+    loadCpColonias_();
+
+    const addressSearchInput = document.getElementById('address-search-input');
+    addressSearchInput.addEventListener('input', (e) => {
       runAddressSearch(e.target.value);
       setAddressState('empty');
+    });
+    addressSearchInput.addEventListener('keydown', async (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault(); // no mandar el form — este input vive dentro de <form>
+      const box = document.getElementById('address-predictions');
+      box.classList.add('hidden');
+      const results = await runAddressSearchNow(e.target.value);
+      if (results.length) {
+        pickAddressResult(results[0]);
+      } else {
+        setAddressState('notfound', 'No encontramos esa dirección — intenta con más detalle o arrastra el pin.');
+      }
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('#field-address')) document.getElementById('address-predictions').classList.add('hidden');
@@ -439,7 +478,7 @@
     document.getElementById('field-cp').addEventListener('input', (e) => {
       const cp = e.target.value.trim();
       if (cp.length === 5) {
-        lookupColonias(cp);
+        refreshColoniaOptionsForCp(cp);
       } else {
         renderColoniaOptions([], '');
         document.getElementById('field-colonia').innerHTML = '<option value="">Escribe tu CP primero</option>';
@@ -452,12 +491,11 @@
       addressColonia = e.target.value;
       composeAddress();
       if (!addressColonia) return;
-      // El centroide de la colonia viene de la misma respuesta de geo.colonias
-      // que llenó el <select> — lo volvemos a pedir del cache (ya respondió
-      // en <6h) para centrar el mapa sin otra llamada "nueva" a Nominatim.
+      // El catálogo CP->colonia (SEPOMEX) no trae coordenadas — se busca la
+      // colonia por nombre en Nominatim solo para centrar el mapa aproximado.
       try {
-        const data = await window.LTA_API.readAction('geo.colonias', { cp: document.getElementById('field-cp').value.trim() });
-        const match = (data.colonias || []).find((c) => c.colonia === addressColonia);
+        const data = await window.LTA_API.readAction('geo.search', { q: addressColonia + ', Morelia, Michoacán, México' });
+        const match = (data.results || [])[0];
         if (match) {
           moveMarkerTo(match.lat, match.lng, 15);
           setAddressState('approx');
