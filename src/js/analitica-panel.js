@@ -64,18 +64,23 @@
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 18
       }).addTo(map);
-      markersLayer = L.layerGroup().addTo(map);
+      // L.heatLayer (plugin leaflet.heat, MIT, gratis) — densidad por zona en
+      // vez de un pin por pedido: responde "qué zona pide más" de un vistazo,
+      // sin tener que contar puntos a ojo ni que el mapa se vea vacío con 1-2
+      // pedidos nada más.
+      markersLayer = L.heatLayer([], { radius: 28, blur: 22, maxZoom: 16, gradient: { 0.3: '#d97706', 0.7: '#b91c1c', 1: '#7f1d1d' } }).addTo(map);
     }
-    markersLayer.clearLayers();
-    points.forEach((p) => {
-      L.circleMarker([p.lat, p.lng], {
-        radius: 6,
-        color: '#93000b',
-        fillColor: '#b91c1c',
-        fillOpacity: 0.6,
-        weight: 1
-      }).bindPopup(fmt(p.total)).addTo(markersLayer);
-    });
+    const emptyEl = document.getElementById('heatmap-empty');
+    toggleVisible_(emptyEl, points.length === 0);
+    // Intensidad pareja por punto: la pregunta es "qué zona pide MÁS seguido"
+    // (densidad de pedidos), no "qué zona deja más dinero" — el plugin ya
+    // acumula calor solo con que varios pedidos caigan cerca uno de otro.
+    markersLayer.setLatLngs(points.map((p) => [p.lat, p.lng, 0.6]));
+  }
+
+  function toggleVisible_(el, visible) {
+    el.classList.toggle('hidden', !visible);
+    el.classList.toggle('flex', visible);
   }
 
   function exportCsv() {

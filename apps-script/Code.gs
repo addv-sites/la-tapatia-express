@@ -970,9 +970,11 @@ function action_incidentReport_(payload, user) {
 function action_analyticsRead_(payload) {
   const orders = readSheetAsObjects_('PEDIDOS').filter((o) => o.status !== 'cancelado' && o.status !== 'abandonado');
   const clients = readSheetAsObjects_('CLIENTES');
-  const rangeDays = { today: 1, week: 7, '30d': 30 }[payload && payload.range] || 30;
+  const range = (payload && payload.range) || '30d';
+  const isAllTime = range === 'all';
+  const rangeDays = { today: 1, week: 7, '30d': 30 }[range] || 30;
   const cutoff = new Date(Date.now() - rangeDays * 24 * 60 * 60 * 1000);
-  const inRange = orders.filter((o) => new Date(o.created_at) >= cutoff);
+  const inRange = isAllTime ? orders : orders.filter((o) => new Date(o.created_at) >= cutoff);
 
   const deliveryOrders = inRange.filter((o) => o.order_type === 'delivery');
   const withPin = deliveryOrders.filter((o) => o.delivery_lat && o.delivery_lng);
@@ -1013,7 +1015,7 @@ function action_analyticsRead_(payload) {
   const totalClientsInRange = Object.keys(byClient).length;
 
   return {
-    range_days: rangeDays,
+    range_days: isAllTime ? null : rangeDays,
     kpis: {
       total_orders: inRange.length,
       delivery_orders: deliveryOrders.length,

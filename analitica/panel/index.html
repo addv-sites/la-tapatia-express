@@ -10,6 +10,7 @@
 <script defer src="../../src/config/site.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js" integrity="sha384-mFKkGiGvT5vo1fEyGCD3hshDdKmW3wzXW/x+fWriYJArD0R3gawT6lMvLboM22c0" crossorigin=""></script>
 </head>
 <body class="bg-crema-bg text-on-surface font-body-md antialiased min-h-screen">
 
@@ -22,6 +23,7 @@
     <option value="today">Hoy</option>
     <option value="week">Esta semana</option>
     <option value="30d" selected>Últimos 30 días</option>
+    <option value="all">Todo el historial</option>
   </select>
 </header>
 
@@ -63,8 +65,20 @@
     </section>
 
     <section class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm">
-      <h2 class="font-headline-md text-headline-md mb-3">Mapa de pedidos a domicilio geocodificados</h2>
-      <div id="heatmap" class="w-full h-96 rounded-xl overflow-hidden"></div>
+      <h2 class="font-headline-md text-headline-md mb-3">Mapa de calor — zonas con más pedidos a domicilio</h2>
+      <div class="relative">
+        <div id="heatmap" class="w-full h-96 rounded-xl overflow-hidden bg-surface-container-high"></div>
+        <div id="heatmap-empty" class="hidden absolute inset-0 rounded-xl flex items-center justify-center text-center p-6 bg-crema-bg/90">
+          <div class="max-w-xs">
+            <p class="font-label-md text-label-md font-bold text-on-surface mb-1">Sin pedidos a domicilio geocodificados en este periodo</p>
+            <p class="font-body-sm text-[12px] text-on-surface-variant">En cuanto se confirme un pedido a domicilio con dirección geocodificada, aparecerá aquí como zona de calor. Prueba "Todo el historial" si crees que ya debería haber datos.</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-2 font-body-sm text-[11.5px] text-on-surface-variant">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#b91c1c"></span>Mucha concentración</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#d97706"></span>Concentración media</span>
+      </div>
       <p class="font-body-sm text-[12px] text-on-surface-variant mt-2">
         OpenStreetMap, sin costo. Solo se ubican pedidos con dirección geocodificada correctamente — no todos los pedidos a domicilio tienen pin.
       </p>

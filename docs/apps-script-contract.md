@@ -60,7 +60,7 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `client.upsertProfile` | POST | Cliente (su propio email) | Crea/actualiza `CLIENTES`, guarda dirección/teléfono |
 | `client.optInMarketing` | POST | Cliente | Guarda consentimiento explícito (LFPDPPP) |
 | `incident.report` | POST | DRIVERS | Escribe en hoja `INCIDENCIAS` |
-| `analytics.read` | POST | ADDV (`@addv.mx`) | Agregados geoespaciales/CRM ya calculados server-side (KPIs, por zona, top clientes, demanda por hora, puntos de mapa) — nunca manda el histórico crudo completo al cliente |
+| `analytics.read` | POST | ADDV (`@addv.mx`) | Agregados geoespaciales/CRM ya calculados server-side (KPIs, por zona, top clientes, demanda por hora, puntos de mapa) — nunca manda el histórico crudo completo al cliente. `payload.range`: `today` / `week` / `30d` (default) / `all` (sin filtro de fecha, para ver el histórico completo desde el primer pedido) |
 | `campaign.sendEmail` | POST | STAFF o ADDV | Envío vía `MailApp`/`GmailApp` (cuota gratuita de la cuenta) |
 | `geo.search` | GET/POST | ninguna | Forward geocoding con hasta 5 resultados (`label`, `lat`, `lng`, `cp`, `colonia`, `precise`), usado en vivo por la barra de búsqueda del mapa de checkout — distinto de `order.create`, que solo geocodifica 1 resultado al confirmar |
 | `client.listAll` | POST | STAFF | Directorio completo de `CLIENTES` + estadísticas (`orders`, `spend`, `last_order_at`) calculadas desde `PEDIDOS`, para `admin/clientes/` |

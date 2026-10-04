@@ -176,3 +176,13 @@
 ## Próximo paso
 
 Los 7 segmentos de construcción están completos y Apps Script/Sheets/OAuth ya están desplegados y probados con datos/cuentas reales. Sigue: **redesplegar `apps-script/Code.gs` actualizado** para activar la asignación de repartidor en producción, validar precios/horarios reales con el negocio, subir fotografía real, logo real, y decidir si se construye lo marcado como "pendiente, no bloqueante" en cada segmento (subida de fotos HD, vínculo retroactivo de pedido-invitado a cuenta, etc.).
+
+## Mapa de calor de pedidos a domicilio en analítica (2026-10-03)
+
+Usuario reportó mapa vacío en `/analitica/panel/` — diagnóstico: `renderMap()` ya dibujaba pines correctamente, causa real era falta de pedidos a domicilio geocodificados dentro del rango de 30 días por default (no un bug de dibujo). Se presentaron 4 propuestas visuales (Artifact) antes de tocar código; eligió **B — mapa de calor**.
+
+- Implementado: `L.heatLayer` (plugin `leaflet.heat`, MIT, gratis, CDN unpkg con SRI) en vez de pines individuales — intensidad pareja por punto (0.6) a propósito, para que el calor refleje **densidad de pedidos** (la pregunta real: "qué zona pide más seguido"), no valor del ticket.
+- Agregado estado vacío explícito (`#heatmap-empty`) que se muestra solo cuando `points.length === 0`, con mensaje claro en vez de dejar el mapa en blanco sin explicación.
+- Agregado rango `all` ("Todo el historial") en `#range-select` y en `action_analyticsRead_` — antes el máximo era 30 días, insuficiente para "ver zonas desde el primer pedido".
+- Verificado: `node --check` sin errores en `Code.gs` y `analitica-panel.js`, `npm run build:css` sin errores.
+- **Pendiente del usuario:** repegar `apps-script/Code.gs` en Apps Script y "Nueva versión" (ya sabe el paso). Sin datos reales de pedidos a domicilio con pin, el mapa seguirá mostrando el estado vacío — eso es correcto, no un bug.
