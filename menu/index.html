@@ -107,17 +107,37 @@
           <input id="field-phone" required class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="tel" autocomplete="tel">
         </div>
         <div id="signin-invite-checkout" hidden></div>
-        <div id="field-address" class="hidden flex-col gap-1">
-          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-address-input">Dirección de entrega</label>
-          <input id="field-address-input" class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" autocomplete="street-address">
-          <button id="btn-toggle-map" type="button" class="self-start mt-1 flex items-center gap-1.5 font-label-sm text-label-sm text-primary font-bold">
-            <svg class="w-4 h-4" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-pin"/></svg>
-            Ajustar ubicación en el mapa
-          </button>
-          <div id="address-map-wrap" class="hidden flex-col gap-1.5 mt-1">
-            <div id="address-map" class="w-full h-56 rounded-xl overflow-hidden bg-surface-container-high"></div>
-            <p class="font-label-sm text-[11px] text-on-surface-variant">Arrastra el pin a tu ubicación exacta — la dirección de arriba se actualiza sola.</p>
+        <div id="field-address" class="hidden flex-col gap-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="address-search-input">Dirección de entrega</label>
+
+          <div class="relative">
+            <input id="address-search-input" class="w-full h-11 px-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" placeholder="Calle, número y colonia" autocomplete="off">
+            <div id="address-predictions" class="hidden absolute left-0 right-0 top-full mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-md z-10 overflow-hidden"></div>
           </div>
+
+          <div class="relative w-full h-48 rounded-xl overflow-hidden bg-surface-container-high">
+            <div id="address-map" class="w-full h-full"></div>
+            <div id="address-map-badge" class="hidden absolute left-2 top-2 items-center gap-1.5 bg-surface-container-lowest rounded-full pl-1.5 pr-2.5 py-1 shadow-sm">
+              <span id="address-map-badge-dot" class="w-1.5 h-1.5 rounded-full"></span>
+              <span id="address-map-badge-text" class="font-label-sm text-[10.5px] font-bold text-on-surface"></span>
+            </div>
+          </div>
+          <p id="address-feedback" class="font-label-sm text-[11px] text-on-surface-variant" aria-live="polite">Busca tu dirección arriba o arrastra el pin para ubicarte.</p>
+
+          <div class="grid grid-cols-[92px_1fr] gap-2">
+            <div class="flex flex-col gap-1">
+              <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-cp">CP</label>
+              <input id="field-cp" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code">
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-colonia">Colonia</label>
+              <select id="field-colonia" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" disabled>
+                <option value="">Escribe tu CP primero</option>
+              </select>
+            </div>
+          </div>
+
+          <input type="hidden" id="field-address-input">
         </div>
         <div class="flex flex-col gap-1">
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-notes">Notas (opcional)</label>

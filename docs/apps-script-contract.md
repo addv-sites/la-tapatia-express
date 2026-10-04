@@ -62,6 +62,10 @@ lecturas públicas del catálogo que pueden ir por `GET ?action=...` sin token.
 | `incident.report` | POST | DRIVERS | Escribe en hoja `INCIDENCIAS` |
 | `analytics.read` | POST | ADDV (`@addv.mx`) | Agregados geoespaciales/CRM ya calculados server-side (KPIs, por zona, top clientes, demanda por hora, puntos de mapa) — nunca manda el histórico crudo completo al cliente |
 | `campaign.sendEmail` | POST | STAFF o ADDV | Envío vía `MailApp`/`GmailApp` (cuota gratuita de la cuenta) |
+| `geo.search` | GET/POST | ninguna | Forward geocoding con hasta 5 resultados (`label`, `lat`, `lng`, `cp`, `colonia`, `precise`), usado en vivo por la barra de búsqueda del mapa de checkout — distinto de `order.create`, que solo geocodifica 1 resultado al confirmar |
+| `geo.colonias` | GET/POST | ninguna | Colonias reales (OpenStreetMap/Nominatim, búsqueda estructurada por `postalcode`) para un CP de 5 dígitos, filtradas a Michoacán. Sin catálogo SEPOMEX embebido — ver nota abajo |
+| `client.listAll` | POST | STAFF | Directorio completo de `CLIENTES` + estadísticas (`orders`, `spend`, `last_order_at`) calculadas desde `PEDIDOS`, para `admin/clientes/` |
+| `client.orders` | POST | STAFF | Historial de pedidos (máx. 20, más reciente primero) de un cliente puntual por `email`, para el panel de detalle de `admin/clientes/` |
 
 ## Hojas de Google Sheets
 
@@ -94,9 +98,19 @@ Enum `status`: `pendiente → confirmado → en_cocina → listo → en_reparto 
 ## Geocodificación
 
 Nominatim (OpenStreetMap) desde Apps Script (server-side, respeta 1 req/seg,
-User-Agent identificado, resultados cacheados en `CacheService`/hoja auxiliar
-para no re-geocodificar la misma dirección dos veces). Nunca Google Geocoding
-API (tiene costo).
+User-Agent identificado, resultados cacheados en `CacheService` 6h para no
+re-geocodificar la misma consulta dos veces). Nunca Google Geocoding API
+(tiene costo).
+
+**CP → colonia sin catálogo SEPOMEX embebido:** se decidió resolver
+`geo.colonias` contra Nominatim en vivo (búsqueda estructurada por
+`postalcode`) en vez de empaquetar un catálogo SEPOMEX estático, porque no
+había forma de verificar aquí una fuente oficial sin arriesgar datos
+inventados. Es gratis, sin API key, y usa datos reales de OSM — pero la
+cobertura de postcodes de OSM en México es más floja que SEPOMEX, así que un
+CP real puede no traer colonias todavía (`geo.colonias` regresa `[]`); el
+checkout trata eso como "colonia no encontrada", nunca como error duro, y
+deja seguir con la búsqueda libre o el pin arrastrable.
 
 ## Backups
 

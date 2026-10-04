@@ -227,7 +227,7 @@ function geocodeAddress_(address) {
   return result;
 }
 
-/** Reverse geocoding: lat/lng -> dirección legible. Usado por el pin arrastrable del checkout. */
+/** Reverse geocoding: lat/lng -> dirección legible + CP/colonia. Usado por el pin arrastrable del checkout. */
 function reverseGeocode_(lat, lng) {
   const cache = CacheService.getScriptCache();
   const cacheKey = 'georev_' + lat + '_' + lng;
@@ -235,7 +235,7 @@ function reverseGeocode_(lat, lng) {
   if (cached) return JSON.parse(cached);
 
   Utilities.sleep(1000); // respeta política de uso de Nominatim
-  const url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng);
+  const url = 'https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng);
   const resp = UrlFetchApp.fetch(url, {
     muteHttpExceptions: true,
     headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
@@ -243,7 +243,12 @@ function reverseGeocode_(lat, lng) {
   if (resp.getResponseCode() !== 200) return null;
   const result = JSON.parse(resp.getContentText());
   if (!result || !result.display_name) return null;
-  const out = { address: result.display_name };
+  const addr = result.address || {};
+  const out = {
+    address: result.display_name,
+    cp: addr.postcode || '',
+    colonia: addr.suburb || addr.neighbourhood || addr.quarter || ''
+  };
   cache.put(cacheKey, JSON.stringify(out), 21600); // 6h
   return out;
 }
@@ -255,6 +260,93 @@ function action_geoReverseGeocode_(payload) {
   const result = reverseGeocode_(lat, lng);
   if (!result) throw new Error('No se pudo obtener la dirección para ese punto');
   return result;
+}
+
+/**
+ * Forward geocoding con varios resultados — usado en vivo por la barra de
+ * búsqueda del checkout (variante "mapa siempre visible"), a diferencia de
+ * geocodeAddress_ que solo trae 1 resultado y corre al confirmar el pedido.
+ * Sesga a Morelia con viewbox sin restringir duro (bounded=0) para no
+ * descartar direcciones reales que caigan justo fuera del cuadro.
+ */
+function geocodeSearchMulti_(query) {
+  const cache = CacheService.getScriptCache();
+  const cacheKey = 'geosearch_' + query;
+  const cached = cache.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  Utilities.sleep(1000); // respeta política de uso de Nominatim
+  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5' +
+    '&countrycodes=mx&viewbox=-101.35,19.85,-100.95,19.55&bounded=0' +
+    '&q=' + encodeURIComponent(query);
+  const resp = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true,
+    headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
+  });
+  if (resp.getResponseCode() !== 200) return [];
+  const results = JSON.parse(resp.getContentText());
+  const out = results.map((r) => ({
+    label: r.display_name,
+    lat: Number(r.lat),
+    lng: Number(r.lon),
+    cp: (r.address && r.address.postcode) || '',
+    colonia: (r.address && (r.address.suburb || r.address.neighbourhood || r.address.quarter)) || '',
+    precise: !!(r.address && r.address.house_number)
+  }));
+  cache.put(cacheKey, JSON.stringify(out), 21600); // 6h
+  return out;
+}
+
+function action_geoSearch_(payload) {
+  const q = String(payload.q || '').trim();
+  if (q.length < 4) throw new Error('Escribe al menos 4 caracteres para buscar');
+  return { results: geocodeSearchMulti_(q) };
+}
+
+/**
+ * Colonias para un CP dado, vía búsqueda estructurada de Nominatim
+ * (postalcode + country). No existe un catálogo SEPOMEX embebido en el
+ * proyecto — se decidió así en vez de empaquetar un catálogo estático
+ * porque no hay forma de verificar aquí la fuente oficial sin arriesgar
+ * datos inventados; esto usa datos reales de OpenStreetMap en vivo, sin
+ * costo y sin API key, igual que el resto del mapa. Limitación conocida:
+ * la cobertura de postcodes de OSM en México es más floja que el catálogo
+ * SEPOMEX — un CP real puede no traer colonias todavía, y el checkout debe
+ * tratar eso como "colonia no encontrada", no como error.
+ */
+function geocodeByPostalcode_(cp) {
+  const cache = CacheService.getScriptCache();
+  const cacheKey = 'geocp_' + cp;
+  const cached = cache.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  Utilities.sleep(1000); // respeta política de uso de Nominatim
+  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=25' +
+    '&country=mx&postalcode=' + encodeURIComponent(cp);
+  const resp = UrlFetchApp.fetch(url, {
+    muteHttpExceptions: true,
+    headers: { 'User-Agent': 'LaTapatiaAhogadas/1.0 (contacto@addv.mx)' }
+  });
+  if (resp.getResponseCode() !== 200) return [];
+  const results = JSON.parse(resp.getContentText());
+  const seen = {};
+  const out = [];
+  results.forEach((r) => {
+    const addr = r.address || {};
+    if (!/michoac/i.test(String(addr.state || ''))) return; // descarta resultados fuera de Michoacán
+    const colonia = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district;
+    if (!colonia || seen[colonia]) return;
+    seen[colonia] = true;
+    out.push({ colonia: colonia, lat: Number(r.lat), lng: Number(r.lon) });
+  });
+  cache.put(cacheKey, JSON.stringify(out), 21600); // 6h
+  return out;
+}
+
+function action_geoColonias_(payload) {
+  const cp = String(payload.cp || '').trim();
+  if (!/^\d{5}$/.test(cp)) throw new Error('CP inválido — deben ser 5 dígitos');
+  return { colonias: geocodeByPostalcode_(cp) };
 }
 
 function distanceKm_(lat1, lng1, lat2, lng2) {
@@ -286,7 +378,18 @@ function action_catalogReadAll_() {
 
 function action_configRead_() {
   const rows = readSheetAsObjects_('CONFIG');
-  return { config: rows[0] || {} };
+  const config = rows[0] || {};
+  // Si alguna vez una celda hours_<dia>_open/close se guardó sin forzar
+  // formato texto, Sheets la auto-detecta como Hora y getValues() regresa
+  // un Date (serial desde 1899-12-30) en vez del string "HH:mm" que espera
+  // business-hours.js — normalizamos aquí para que una celda ya corrompida
+  // no rompa el render sin tener que tocar el Sheet a mano.
+  Object.keys(config).forEach((key) => {
+    if (/^hours_.*_(open|close)$/.test(key) && config[key] instanceof Date) {
+      config[key] = Utilities.formatDate(config[key], TIMEZONE, 'HH:mm');
+    }
+  });
+  return { config: config };
 }
 
 function action_configUpdate_(payload, user) {
@@ -299,7 +402,12 @@ function action_configUpdate_(payload, user) {
     headers.forEach((h, i) => { before[h] = values[1][i]; });
     Object.keys(payload).forEach((key) => {
       const col = headers.indexOf(key);
-      if (col >= 0) sh.getRange(2, col + 1).setValue(payload[key]);
+      if (col < 0) return;
+      const range = sh.getRange(2, col + 1);
+      // Fuerza texto plano en hours_*_open/close para que Sheets nunca las
+      // vuelva a auto-convertir a tipo Hora (ver nota en action_configRead_).
+      if (/^hours_.*_(open|close)$/.test(key)) range.setNumberFormat('@');
+      range.setValue(payload[key]);
     });
     logAudit_(user.email, 'config.update', 'CONFIG', 'default', before, payload);
     return { ok: true };
@@ -843,6 +951,57 @@ function action_clientOptInMarketing_(payload, user) {
   });
 }
 
+/**
+ * Directorio completo de CLIENTES para el admin (STAFF-only) — a diferencia
+ * de client.getProfile (self-service, un cliente solo ve su propio perfil)
+ * y de analytics.read (solo top 5 por gasto). Reemplaza tener que abrir el
+ * Sheet directo para consultar clientes.
+ */
+function action_clientListAll_() {
+  const clients = readSheetAsObjects_('CLIENTES');
+  const orders = readSheetAsObjects_('PEDIDOS').filter((o) => o.status !== 'cancelado' && o.status !== 'abandonado');
+
+  const statsByEmail = {};
+  orders.forEach((o) => {
+    const email = String(o.customer_email || '').toLowerCase();
+    if (!email) return;
+    if (!statsByEmail[email]) statsByEmail[email] = { orders: 0, spend: 0, lastOrderAt: '' };
+    statsByEmail[email].orders += 1;
+    statsByEmail[email].spend += Number(o.total || 0);
+    if (!statsByEmail[email].lastOrderAt || String(o.created_at) > String(statsByEmail[email].lastOrderAt)) {
+      statsByEmail[email].lastOrderAt = o.created_at;
+    }
+  });
+
+  const merged = clients.map((c) => {
+    const email = String(c.email || '').toLowerCase();
+    const stats = statsByEmail[email] || { orders: 0, spend: 0, lastOrderAt: '' };
+    return {
+      email: c.email || '',
+      name: c.name || '',
+      phone: c.phone || '',
+      address: c.address || '',
+      address_reference: c.address_reference || '',
+      marketing_opt_in: !!c.marketing_opt_in,
+      created_at: c.created_at || '',
+      orders: stats.orders,
+      spend: stats.spend,
+      last_order_at: stats.lastOrderAt
+    };
+  });
+
+  return { clients: merged };
+}
+
+/** Historial de pedidos de un cliente puntual (STAFF-only), para el panel de detalle de admin/clientes. */
+function action_clientOrders_(payload) {
+  const email = String(payload.email || '').trim().toLowerCase();
+  if (!email) throw new Error('Falta email');
+  const rows = readSheetAsObjects_('PEDIDOS').filter((o) => String(o.customer_email || '').toLowerCase() === email);
+  rows.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  return { orders: rows.slice(0, 20) };
+}
+
 function action_incidentReport_(payload, user) {
   appendRow_('INCIDENCIAS', {
     timestamp: Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss'),
@@ -924,7 +1083,7 @@ function action_analyticsRead_(payload) {
 // Router
 // ---------------------------------------------------------------------------
 
-const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode'];
+const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode', 'geo.search', 'geo.colonias'];
 
 function route_(action, payload, idToken, sessionId) {
   switch (action) {
@@ -933,6 +1092,8 @@ function route_(action, payload, idToken, sessionId) {
     case 'order.create': return action_orderCreate_(payload, sessionId, idToken);
     case 'order.trackingRead': return action_orderTrackingRead_(payload);
     case 'geo.reverseGeocode': return action_geoReverseGeocode_(payload);
+    case 'geo.search': return action_geoSearch_(payload);
+    case 'geo.colonias': return action_geoColonias_(payload);
     case 'order.listMine': return action_orderListMine_(requireRole_(idToken, 'ANY'));
     case 'client.getProfile': return action_clientGetProfile_(requireRole_(idToken, 'ANY'));
 
@@ -956,6 +1117,8 @@ function route_(action, payload, idToken, sessionId) {
     case 'catalog.create': return action_catalogCreate_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.uploadPhoto': return action_catalogUploadPhoto_(payload, requireRole_(idToken, 'STAFF'));
     case 'catalog.delete': return action_catalogDelete_(payload, requireRole_(idToken, 'STAFF'));
+    case 'client.listAll': return action_clientListAll_(requireRole_(idToken, 'STAFF'));
+    case 'client.orders': return action_clientOrders_(payload, requireRole_(idToken, 'STAFF'));
 
     case 'driver.myOrders': return action_driverMyOrders_(requireRole_(idToken, 'DRIVERS'));
     case 'driver.myDeliveries': return action_driverMyDeliveries_(requireRole_(idToken, 'DRIVERS'));

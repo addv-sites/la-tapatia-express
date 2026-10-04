@@ -56,7 +56,18 @@
       <div class="min-w-0 flex-1">
         <h2 class="font-headline-sm text-headline-sm text-on-surface mb-1">Horario</h2>
         <p id="schedule-fallback" class="font-body-md text-body-md text-on-surface-variant">Horario por confirmar</p>
-        <table id="schedule-table" class="hidden w-full font-body-sm text-body-sm"></table>
+        <div id="schedule-accordion" class="hidden">
+          <button type="button" id="schedule-toggle" class="w-full flex items-center justify-between gap-3 text-left" aria-expanded="false">
+            <div>
+              <span id="schedule-status-pill" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label-sm text-label-sm font-bold"></span>
+              <p id="schedule-today-line" class="font-body-sm text-body-sm text-on-surface-variant mt-1.5"></p>
+            </div>
+            <svg id="schedule-chevron" class="w-5 h-5 text-on-surface-variant shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="schedule-body" class="overflow-hidden max-h-0 transition-[max-height] duration-300 ease-[cubic-bezier(.16,1,.3,1)]">
+            <table id="schedule-table" class="w-full font-body-sm text-body-sm mt-3 pt-3 border-t border-dashed border-outline-variant"></table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -109,7 +120,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // No se inventa un pin sin dato real.
 
   window.LTA_API.readAction('config.read', {}).then(function (data) {
-    var week = window.LTA_HOURS.getWeekSchedule(data.config || {});
+    var config = data.config || {};
+    var week = window.LTA_HOURS.getWeekSchedule(config);
+    var status = window.LTA_HOURS.getStatus(config);
+    var today = week.find(function (d) { return d.isToday; });
+
+    var pill = document.getElementById('schedule-status-pill');
+    pill.textContent = status.isOpen ? 'Abierto ahora' : 'Cerrado';
+    pill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label-sm text-label-sm font-bold ' +
+      (status.isOpen ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-surface-container-high text-on-surface-variant');
+
+    var todayLine = document.getElementById('schedule-today-line');
+    todayLine.innerHTML = today
+      ? 'Hoy ' + today.dayLabel.toLowerCase() + ' · <b class="text-on-surface">' + today.display + '</b>'
+      : status.label;
+
     var table = document.getElementById('schedule-table');
     table.innerHTML = week.map(function (d) {
       var rowClass = d.isToday ? 'text-tertiary font-bold' : 'text-on-surface-variant';
@@ -118,8 +143,19 @@ document.addEventListener('DOMContentLoaded', function () {
         '<td class="py-1 text-right">' + d.display + '</td>' +
         '</tr>';
     }).join('');
-    table.classList.remove('hidden');
+
+    document.getElementById('schedule-accordion').classList.remove('hidden');
     document.getElementById('schedule-fallback').classList.add('hidden');
+
+    var toggleBtn = document.getElementById('schedule-toggle');
+    var body = document.getElementById('schedule-body');
+    var chevron = document.getElementById('schedule-chevron');
+    toggleBtn.addEventListener('click', function () {
+      var expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!expanded));
+      body.style.maxHeight = expanded ? '0px' : body.scrollHeight + 'px';
+      chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+    });
   }).catch(function () {
     // Se queda el texto "Horario por confirmar" si la config no cargó.
   });

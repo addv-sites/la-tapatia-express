@@ -1,6 +1,6 @@
 # Estado del Proyecto — La Tapatía Ahogadas
 
-Última actualización: 2026-09-21
+Última actualización: 2026-10-03
 
 ## Qué existe hoy
 
@@ -107,6 +107,18 @@
 - Documentado en `docs/apps-script-contract.md`.
 - **Pendiente del usuario:** repegar `apps-script/Code.gs` y hacer "Nueva versión" en Implementar → Administrar implementaciones (ya sabe el paso, lo hizo para `driver.list`).
 - Verificado visualmente el layout (miniatura + botón, banner de precarga) con un harness temporal usando el CSS/sprite reales; no probado end-to-end contra el backend real (pendiente redeploy + login STAFF real del usuario).
+
+## Fix horarios NaN + checkout domicilio con mapa/CP/colonia + admin clientes (2026-10-03)
+
+4 pendientes reportados por el usuario, analizados, propuestos como mockups (Claude Artifacts) y aprobados antes de tocar código, siguiendo el flujo del protocolo:
+
+- **Bug "NaN:36" en horario (`/ubicacion/`):** causa raíz real — `admin-config-envio.js` guarda la hora como texto `"09:36"`, Sheets la auto-convierte a tipo Hora, `readSheetAsObjects_` regresa el `Date` crudo, se serializa a ISO y `business-hours.js` lo parte mal. Corregido en dos capas: `action_configRead_` normaliza cualquier `Date` en columnas `hours_*_open/close` a `"HH:mm"` antes de regresar (arregla lo ya corrompido sin tocar el Sheet a mano), y `action_configUpdate_` fuerza formato texto plano (`setNumberFormat('@')`) en esas columnas al escribir, para que no se vuelva a corromper. UI: bloque de horario en `ubicacion/index.html` ahora es un acordeón (pastilla de estado + hoy colapsado, semana completa al expandir) — variante elegida de 3 propuestas.
+- **Mapa de domicilio en checkout (`/menu/`):** rediseño completo de `field-address` — mapa visible siempre (ya no detrás de un botón), barra de búsqueda en vivo con predicciones (`geo.search`, nuevo, Nominatim multi-resultado), campo CP + `<select>` de colonia encadenado (`geo.colonias`, nuevo, búsqueda estructurada de Nominatim por `postalcode`, filtrada a Michoacán), pin arrastrable con reverse-geocode mejorado (ahora también regresa CP/colonia), y estados visuales (precisión de calle / aproximado / colonia no encontrada). **Decisión de arquitectura distinta a lo pedido originalmente:** no se empaquetó un catálogo SEPOMEX estático — no había forma de verificar aquí una fuente oficial sin arriesgar datos inventados (regla anti-invención del proyecto). `geo.colonias` resuelve contra Nominatim en vivo en su lugar: gratis, sin API key, datos reales, mismo stack que el resto del mapa — con la limitación conocida y documentada de que la cobertura de postcodes de OSM en México es más floja que SEPOMEX (ver `docs/apps-script-contract.md`).
+- **Repartidor sin poder abrir ruta (`reparto-app.js`):** no era un bug aislado — `delivery_address` podía llegar vacío o ambiguo porque el campo no era obligatorio ni se validaba. Resuelto como consecuencia directa del punto anterior: el botón "Realizar pedido" ahora se deshabilita en pedidos a domicilio hasta que el pin quede en estado "ok" o "approx" (`updateSubmitState()` en `menu-page.js`), así que `delivery_address` nunca llega vacío a `PEDIDOS` y el repartidor siempre tiene algo navegable.
+- **Admin sin vista de clientes:** nueva página `admin/clientes/` (lista + panel de detalle, con historial de pedidos por cliente) — antes había que abrir el Sheet directo. Backend nuevo: `client.listAll` (STAFF, directorio completo + `orders`/`spend`/`last_order_at` calculados desde `PEDIDOS`) y `client.orders` (STAFF, historial de un cliente). Incluye exportar a CSV con 3 presets (Todo / Solo contacto / Solo opt-in marketing) + "Personalizado…" con selección de columnas a mano.
+- **Cero columnas nuevas en Google Sheets** — `CLIENTES` y `CONFIG` ya tenían todo lo necesario; el fix de horarios es puramente de código (lectura/escritura), no de esquema.
+- Verificado: `npm run build:css` sin errores (clases Tailwind arbitrarias nuevas compilan bien), `node --check` sin errores en `menu-page.js`, `admin-clientes.js`, `business-hours.js` y `Code.gs` (vía copia temporal `.js`, ya borrada).
+- **Pendiente del usuario:** repegar `apps-script/Code.gs` íntegro en el editor de Apps Script y publicar "Nueva versión" — sin eso, `geo.search`, `geo.colonias`, `client.listAll` y `client.orders` no existen todavía en el backend real, y el fix de horarios tampoco toma efecto. No se pudo probar end-to-end contra el backend real ni en navegador (requiere ese redeploy primero).
 
 ## Animación del timeline de seguimiento — decisión tomada, pendiente de implementar (2026-09-25)
 

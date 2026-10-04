@@ -14,7 +14,7 @@ Todas las rutas de este documento fueron verificadas con HTTP 200 contra `main` 
 | URL | Qué hace | Endpoints Apps Script |
 |---|---|---|
 | https://addv-sites.github.io/la-tapatia-express/ | Home. Explora por categoría, favoritos de la casa, cómo funciona el pedido, datos de la sucursal. Carrito persistente. | `catalog.read`, `config.read` |
-| https://addv-sites.github.io/la-tapatia-express/menu/ | Menú completo por categoría + carrito + checkout. El checkout registra el pedido en Sheets y **después** abre `wa.me` con folio y detalle. | `catalog.read`, `config.read`, `client.getProfile`, `client.upsertProfile`, `order.create` |
+| https://addv-sites.github.io/la-tapatia-express/menu/ | Menú completo por categoría + carrito + checkout, con mapa de domicilio siempre visible (búsqueda en vivo, CP + colonia, pin arrastrable). El checkout registra el pedido en Sheets y **después** abre `wa.me` con folio y detalle. | `catalog.read`, `config.read`, `client.getProfile`, `client.upsertProfile`, `order.create`, `geo.search`, `geo.colonias`, `geo.reverseGeocode` |
 | https://addv-sites.github.io/la-tapatia-express/ubicacion/ | Dirección, horario y mapa (OpenStreetMap + Nominatim, sin costo). | — (estático) |
 | https://addv-sites.github.io/la-tapatia-express/contacto/ | Datos de contacto, redes sociales, formulario que deriva a WhatsApp. | — (estático) |
 
@@ -53,6 +53,7 @@ del repartidor; se envía al backend, nunca a un tercero.
 | https://addv-sites.github.io/la-tapatia-express/admin/ | **Punto de entrada.** Login + dashboard con las 3 herramientas de abajo (con contador real de pedidos activos en la tarjeta de Pedidos) y links a los otros portales (App Repartidor). Analítica **no** aparece aquí a propósito — es acceso interno ADDV, ver abajo. | `order.list` (solo para el contador) |
 | https://addv-sites.github.io/la-tapatia-express/admin/catalogo/ | KPIs (platillos registrados / precios pendientes), alta de platillo, **subida de fotos a Drive**, edición y aprobación de precios, activar/desactivar platillo, sembrar catálogo desde el snapshot. | `catalog.readAll`, `catalog.create`, `catalog.updatePrice`, `catalog.approvePrice`, `catalog.toggleAvailability`, `catalog.uploadPhoto`, `catalog.seed` |
 | https://addv-sites.github.io/la-tapatia-express/admin/pedidos/ | KDS de comandas en vivo, asignación de repartidor, cambio de status del enum (`pendiente→confirmado→en_cocina→listo→entregado`), y baja de pedido. | `order.list`, `order.assignDriver`, `order.updateStatus`, `order.delete`, `driver.list` |
+| https://addv-sites.github.io/la-tapatia-express/admin/clientes/ | Directorio de clientes (lista + perfil + historial de pedidos), buscador, exportar CSV (presets + selección personalizada de columnas). | `client.listAll`, `client.orders` |
 | https://addv-sites.github.io/la-tapatia-express/admin/config-envio/ | Tarifas por zona Z1/Z2/Z3, `driver_fixed_commission`, interruptor `delivery_enabled`, horario del negocio. | `config.read`, `config.update` |
 
 `noindex, nofollow` en las 4. Las tres de trabajo están enlazadas entre sí en la barra superior
