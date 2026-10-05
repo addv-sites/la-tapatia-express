@@ -51,17 +51,23 @@
   function playChime() {
     const ctx = ensureAudio();
     const t = ctx.currentTime + 0.02;
-    [880, 1108].forEach((f, i) => {
+    const fundamental = 660;
+    const partials = [
+      { ratio: 1,    gain: 0.26, decay: 1.1 },
+      { ratio: 2.01, gain: 0.14, decay: 0.9 },
+      { ratio: 3.0,  gain: 0.08, decay: 0.7 }
+    ];
+    partials.forEach((p) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, t + i * 0.09);
-      gain.gain.setValueAtTime(0, t + i * 0.09);
-      gain.gain.linearRampToValueAtTime(0.22, t + i * 0.09 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.5);
+      osc.frequency.setValueAtTime(fundamental * p.ratio, t);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(p.gain, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + p.decay);
       osc.connect(gain).connect(ctx.destination);
-      osc.start(t + i * 0.09);
-      osc.stop(t + i * 0.09 + 0.55);
+      osc.start(t);
+      osc.stop(t + p.decay + 0.05);
     });
   }
 
@@ -92,9 +98,10 @@
   }
 
   function addNotification(orderId, status) {
+    const label = status === 'en_reparto' ? 'Tu pedido va en camino 🛵' : (STATUS_LABELS[status] || status);
     notifications.unshift({
       orderId,
-      label: STATUS_LABELS[status] || status,
+      label,
       when: 'hace un momento'
     });
     notifications = notifications.slice(0, MAX_NOTIFS);
@@ -107,6 +114,7 @@
     const bellIcon = document.getElementById('bell-icon');
     if (bellIcon) { bellIcon.classList.remove('bell-ring'); void bellIcon.offsetWidth; bellIcon.classList.add('bell-ring'); }
     playChime();
+    try { if ('vibrate' in navigator) navigator.vibrate([400, 150, 400]); } catch (e) {}
   }
 
   async function poll(token) {
