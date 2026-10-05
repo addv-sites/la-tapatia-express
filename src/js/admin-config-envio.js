@@ -56,6 +56,7 @@
     document.getElementById('cfg-extra-km-cost').value = config.delivery_extra_km_cost || '';
     document.getElementById('cfg-max-km').value = config.delivery_max_km || '';
     document.getElementById('cfg-driver-commission').value = config.driver_fixed_commission || '';
+    document.getElementById('cfg-delivery-whatsapp').value = config.delivery_whatsapp_number || '';
     document.getElementById('cfg-legal-entity-name').value = config.legal_entity_name || '';
     document.getElementById('cfg-terms-version').value = config.terms_version || '';
     DAYS.forEach((d) => {
@@ -71,6 +72,7 @@
       delivery_extra_km_cost: Number(document.getElementById('cfg-extra-km-cost').value),
       delivery_max_km: Number(document.getElementById('cfg-max-km').value),
       driver_fixed_commission: Number(document.getElementById('cfg-driver-commission').value),
+      delivery_whatsapp_number: document.getElementById('cfg-delivery-whatsapp').value.trim(),
       legal_entity_name: document.getElementById('cfg-legal-entity-name').value.trim(),
       terms_version: document.getElementById('cfg-terms-version').value.trim()
     };

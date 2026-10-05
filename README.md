@@ -42,9 +42,12 @@ Indexables: las 4 están en `sitemap.xml` y **no** llevan meta `robots`.
 | https://addv-sites.github.io/la-tapatia-express/repartidor/entregas/ | Entregas asignadas al repartidor con su historial de estado. | `driver.myDeliveries` |
 | https://addv-sites.github.io/la-tapatia-express/repartidor/ganancias/ | Ganancias calculadas contra `driver_fixed_commission` de CONFIG. | `driver.myDeliveries`, `config.read` |
 | https://addv-sites.github.io/la-tapatia-express/repartidor/perfil/ | Perfil del repartidor. Solo el gate de acceso, sin llamadas a la API. | — |
+| https://addv-sites.github.io/la-tapatia-express/repartidor/d/?o=...&t=... | Acceso sin login a un solo pedido vía link temporal (botón "Generar link de reparto" en Gestión de Pedidos). Mismo flujo de entrega que `/repartidor/` + total a cobrar y comisión del repartidor; deja de funcionar en cuanto el pedido se marca `entregado`. | `delivery.getByToken`, `driver.pingLocation`, `order.updateStatus`, `incident.report` |
 
-`noindex, nofollow` en las 4. `driver.pingLocation` es la única superficie que emite geolocalización
-del repartidor; se envía al backend, nunca a un tercero.
+`noindex, nofollow` en las 5. `driver.pingLocation` es la única superficie que emite geolocalización
+del repartidor; se envía al backend, nunca a un tercero. El acceso de `/repartidor/d/` es por posesión
+del link (token largo, de un solo pedido, se invalida al entregar) en vez de cuenta de Google — ver
+`requireDeliveryToken_` en `apps-script/Code.gs`.
 
 ### Administración — Google Sign-In + whitelist hoja `STAFF`
 

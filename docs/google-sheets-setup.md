@@ -34,8 +34,9 @@ Después de crear los encabezados, **carga el menú real** copiando los producto
 
 ### `PEDIDOS`
 ```
-order_id	created_at	customer_name	customer_phone	customer_email	items	subtotal	delivery_fee	total	notes	order_type	delivery_address	delivery_zone	delivery_lat	delivery_lng	cash_denomination	branch_id	status	driver_id	driver_lat	driver_lng	driver_ping_at	source	whatsapp_sent	internal_notes
+order_id	created_at	customer_name	customer_phone	customer_email	items	subtotal	delivery_fee	total	notes	order_type	delivery_address	delivery_zone	delivery_lat	delivery_lng	cash_denomination	branch_id	status	driver_id	driver_lat	driver_lng	driver_ping_at	delivery_token	delivery_token_status	source	whatsapp_sent	internal_notes
 ```
+`delivery_token`/`delivery_token_status` son del link de reparto sin login ("Generar link de reparto" en Gestión de Pedidos) — se llenan solos, no captures nada a mano.
 Se llena sola — el sitio escribe aquí en cada pedido. No captures nada a mano salvo que quieras crear un pedido de prueba.
 
 ### `SUCURSALES`
@@ -50,8 +51,9 @@ Carga **una fila** con la sucursal Morelia:
 
 ### `CONFIG`
 ```
-delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission	legal_entity_name	terms_version
+delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission	delivery_whatsapp_number	legal_entity_name	terms_version
 ```
+`delivery_whatsapp_number` es el WhatsApp del servicio de reparto externo — ahí se mandan los links de "Generar link de reparto". Se edita desde `/admin/config-envio/` (pestaña Repartidores).
 `legal_entity_name` y `terms_version` alimentan `/legal/` (Aviso de Privacidad + Términos) y el modal de aceptación del checkout — mientras `legal_entity_name` esté vacío, la página legal muestra un aviso de "dato pendiente de configurar" en vez de inventar un nombre. Sube `terms_version` (ej. de `2026-10-05-v1` a `2026-11-01-v2`) cada vez que cambies el texto legal para que se vuelva a pedir aceptación a todos los clientes.
 **Importante:** esta hoja necesita **una fila de datos ya creada** (fila 2) antes de usar el admin — si la dejas vacía, `config.update` truena con "Hoja CONFIG sin fila de datos". Llena una fila con valores iniciales (los puedes ajustar después desde `/admin/config-envio/`), por ejemplo:
 ```

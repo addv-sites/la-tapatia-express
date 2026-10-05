@@ -494,12 +494,14 @@ function action_orderCreate_(payload, sessionId, idToken) {
     driver_lat: '',
     driver_lng: '',
     driver_ping_at: '',
+    delivery_token: '',
+    delivery_token_status: '',
     source: 'sitio',
     whatsapp_sent: false,
     internal_notes: ''
   };
 
-  const headers = ['order_id', 'created_at', 'customer_name', 'customer_phone', 'customer_email', 'items', 'subtotal', 'delivery_fee', 'total', 'notes', 'order_type', 'delivery_address', 'delivery_zone', 'delivery_lat', 'delivery_lng', 'cash_denomination', 'branch_id', 'status', 'driver_id', 'driver_lat', 'driver_lng', 'driver_ping_at', 'source', 'whatsapp_sent', 'internal_notes'];
+  const headers = ['order_id', 'created_at', 'customer_name', 'customer_phone', 'customer_email', 'items', 'subtotal', 'delivery_fee', 'total', 'notes', 'order_type', 'delivery_address', 'delivery_zone', 'delivery_lat', 'delivery_lng', 'cash_denomination', 'branch_id', 'status', 'driver_id', 'driver_lat', 'driver_lng', 'driver_ping_at', 'delivery_token', 'delivery_token_status', 'source', 'whatsapp_sent', 'internal_notes'];
   appendRow_('PEDIDOS', order, headers);
   logAudit_(payload.customer_email || 'invitado', 'order.create', 'PEDIDOS', folio, null, order);
 
@@ -525,9 +527,104 @@ function action_orderUpdateStatus_(payload, user) {
     const statusCol = found.headers.indexOf('status') + 1;
     const before = found.row[statusCol - 1];
     sh.getRange(found.rowIndex, statusCol).setValue(payload.status);
+    // El link de reparto (si lo hay) deja de funcionar en cuanto el pedido
+    // termina su ciclo de entrega — es un acceso "mientras se entrega", no permanente.
+    if (payload.status === 'entregado' || payload.status === 'cancelado') {
+      const tokenStatusCol = found.headers.indexOf('delivery_token_status') + 1;
+      if (tokenStatusCol > 0 && found.row[tokenStatusCol - 1]) {
+        sh.getRange(found.rowIndex, tokenStatusCol).setValue('used');
+      }
+    }
     logAudit_(user.email, 'order.updateStatus', 'PEDIDOS', payload.order_id, { status: before }, { status: payload.status });
     return { ok: true };
   });
+}
+
+/**
+ * Valida un link de reparto sin login: el token debe coincidir, seguir
+ * 'active', y el pedido no debe estar ya cerrado (entregado/cancelado). Se
+ * usa tanto para leer el pedido (delivery.getByToken) como para autorizar
+ * acciones del repartidor (actualizar estado, ping de ubicación, incidencia)
+ * sin pedir cuenta de Google — es un acceso temporal "mientras se entrega".
+ */
+function requireDeliveryToken_(orderId, token) {
+  if (!orderId || !token) throw new Error('Este link ya no está disponible.');
+  const found = findOrderRow_(orderId);
+  if (!found) throw new Error('Este link ya no está disponible.');
+  const storedToken = found.row[found.headers.indexOf('delivery_token')];
+  const tokenStatus = found.row[found.headers.indexOf('delivery_token_status')];
+  const orderStatus = found.row[found.headers.indexOf('status')];
+  if (!storedToken || storedToken !== token || tokenStatus !== 'active') {
+    throw new Error('Este link ya no está disponible.');
+  }
+  if (orderStatus === 'entregado' || orderStatus === 'cancelado' || orderStatus === 'abandonado') {
+    throw new Error('Este link ya no está disponible.');
+  }
+  return found;
+}
+
+/** Autoriza order.updateStatus: por link de reparto, o por STAFF/DRIVERS logueado (como hoy). */
+function resolveDeliveryActor_(payload, idToken) {
+  if (payload.token) {
+    requireDeliveryToken_(payload.order_id, payload.token);
+    return { email: 'link:' + payload.order_id };
+  }
+  return requireAnyRole_(idToken, ['STAFF', 'DRIVERS']);
+}
+
+/** Autoriza driver.pingLocation / incident.report: por link de reparto, o por repartidor logueado (como hoy). */
+function resolveDriverActor_(payload, idToken) {
+  if (payload.token) {
+    requireDeliveryToken_(payload.order_id, payload.token);
+    return { email: 'link:' + payload.order_id };
+  }
+  return requireRole_(idToken, 'DRIVERS');
+}
+
+/** Genera (o regresa) el link de acceso sin login para un pedido — botón "Generar link de reparto" del Kanban. */
+function action_orderGenerateDeliveryLink_(payload, user) {
+  return withLock_(() => {
+    const found = findOrderRow_(payload.order_id);
+    if (!found) throw new Error('Pedido no encontrado');
+    const token = Utilities.getUuid().replace(/-/g, '');
+    const sh = sheet_('PEDIDOS');
+    sh.getRange(found.rowIndex, found.headers.indexOf('delivery_token') + 1).setValue(token);
+    sh.getRange(found.rowIndex, found.headers.indexOf('delivery_token_status') + 1).setValue('active');
+    logAudit_(user.email, 'order.generateDeliveryLink', 'PEDIDOS', payload.order_id, null, { delivery_token_status: 'active' });
+    return { ok: true, token: token };
+  });
+}
+
+/**
+ * Lo que ve quien abre el link de reparto — folio, cliente, dirección,
+ * productos, lo que se cobra y lo que le corresponde al repartidor. Nunca
+ * expone más que ESE pedido (nunca una lista de otros pedidos).
+ */
+function action_deliveryGetByToken_(payload) {
+  const found = requireDeliveryToken_(payload.order_id, payload.token);
+  const get = (key) => found.row[found.headers.indexOf(key)];
+  const config = action_configRead_().config;
+  const branches = readSheetAsObjects_('SUCURSALES');
+  const branch = branches.find((b) => b.branch_id === get('branch_id')) || branches[0];
+  return {
+    order: {
+      order_id: get('order_id'),
+      status: get('status'),
+      order_type: get('order_type'),
+      customer_name: get('customer_name'),
+      customer_phone: get('customer_phone'),
+      delivery_address: get('delivery_address'),
+      delivery_lat: get('delivery_lat'),
+      delivery_lng: get('delivery_lng'),
+      notes: get('notes'),
+      items: get('items'),
+      total: get('total'),
+      delivery_fee: get('delivery_fee'),
+      cash_denomination: get('cash_denomination')
+    },
+    pickup_address: branch ? branch.address : '',
+    driver_commission: Number(config.driver_fixed_commission || 0)
+  };
 }
 
 function action_orderDelete_(payload, user) {
@@ -1169,9 +1266,11 @@ function route_(action, payload, idToken, sessionId) {
     case 'config.update': return action_configUpdate_(payload, requireRole_(idToken, 'STAFF'));
     case 'analytics.read': return action_analyticsRead_(payload, requireRole_(idToken, 'ADDV'));
     case 'order.list': return action_orderList_(payload, requireRole_(idToken, 'STAFF'));
-    case 'order.updateStatus': return action_orderUpdateStatus_(payload, requireAnyRole_(idToken, ['STAFF', 'DRIVERS']));
+    case 'order.updateStatus': return action_orderUpdateStatus_(payload, resolveDeliveryActor_(payload, idToken));
     case 'order.delete': return action_orderDelete_(payload, requireRole_(idToken, 'STAFF'));
     case 'order.assignDriver': return action_orderAssignDriver_(payload, requireRole_(idToken, 'STAFF'));
+    case 'order.generateDeliveryLink': return action_orderGenerateDeliveryLink_(payload, requireRole_(idToken, 'STAFF'));
+    case 'delivery.getByToken': return action_deliveryGetByToken_(payload);
     case 'driver.list': return action_driverList_(requireRole_(idToken, 'STAFF'));
     case 'driver.listAll': return action_driverListAll_(requireRole_(idToken, 'STAFF'));
     case 'driver.create': return action_driverCreate_(payload, requireRole_(idToken, 'STAFF'));
@@ -1190,8 +1289,8 @@ function route_(action, payload, idToken, sessionId) {
 
     case 'driver.myOrders': return action_driverMyOrders_(requireRole_(idToken, 'DRIVERS'));
     case 'driver.myDeliveries': return action_driverMyDeliveries_(requireRole_(idToken, 'DRIVERS'));
-    case 'driver.pingLocation': return action_driverPingLocation_(payload, requireRole_(idToken, 'DRIVERS'));
-    case 'incident.report': return action_incidentReport_(payload, requireRole_(idToken, 'DRIVERS'));
+    case 'driver.pingLocation': return action_driverPingLocation_(payload, resolveDriverActor_(payload, idToken));
+    case 'incident.report': return action_incidentReport_(payload, resolveDriverActor_(payload, idToken));
 
     case 'client.upsertProfile': return action_clientUpsertProfile_(payload, requireRole_(idToken, 'ANY'));
     case 'client.optInMarketing': return action_clientOptInMarketing_(payload, requireRole_(idToken, 'ANY'));

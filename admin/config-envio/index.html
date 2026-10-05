@@ -110,6 +110,14 @@
     </div>
 
     <div id="panel-repartidores" class="hidden flex-col gap-4">
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-1">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">
+          <span class="flex items-center gap-1.5 font-bold"><svg class="w-4 h-4 text-whatsapp-green" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-whatsapp"/></svg> WhatsApp del servicio de reparto</span>
+          <input id="cfg-delivery-whatsapp" type="tel" placeholder="Ej. 4431234567" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <p class="font-body-sm text-[11px] text-on-surface-variant">Los links de "Generar link de reparto" (en Gestión de Pedidos) se mandan por WhatsApp a este número — lo editas aquí, sin tocar código.</p>
+      </div>
+
       <button id="btn-add-driver" type="button" class="min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm shadow-md flex items-center justify-center gap-2">
         <svg class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-plus"/></svg>
         Agregar repartidor

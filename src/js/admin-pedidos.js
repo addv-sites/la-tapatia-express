@@ -3,6 +3,7 @@
   let idToken = null;
   let pollTimer = null;
   let drivers = [];
+  let deliveryWhatsapp = '';
 
   const COLUMNS = [
     { id: 'pendiente', title: 'Por Confirmar', statuses: ['pendiente'] },
@@ -45,6 +46,7 @@
         const stack = document.createElement('div');
         stack.className = 'flex flex-col gap-2 w-full';
         stack.appendChild(driverSelect(order));
+        stack.appendChild(deliveryLinkBlock(order));
         stack.appendChild(finalizeBtn);
         actionSlot.appendChild(stack);
       } else {
@@ -80,6 +82,53 @@
 
     select.addEventListener('change', () => assignDriver(order.order_id, select.value));
     return wrap;
+  }
+
+  /**
+   * Link de acceso sin login a la app de reparto, atado a este pedido. Si ya
+   * se generó uno activo, se muestra en vez de ofrecer generar otro (no tiene
+   * caso invalidar un link que ya se mandó). Se invalida solo al marcar
+   * "entregado" (action_orderUpdateStatus_ en Code.gs).
+   */
+  function deliveryLinkBlock(order) {
+    const wrap = document.createElement('div');
+    wrap.className = 'w-full';
+    if (order.delivery_token && order.delivery_token_status === 'active') {
+      renderLinkResult(wrap, order.order_id, order.delivery_token);
+    } else {
+      const btn = actionBtn('Generar link de reparto', 'bg-surface-container text-on-surface w-full', async () => {
+        btn.disabled = true;
+        try {
+          const data = await window.LTA_API.callAction('order.generateDeliveryLink', { order_id: order.order_id }, idToken);
+          renderLinkResult(wrap, order.order_id, data.token);
+        } catch (err) {
+          window.LTA_TOAST.show('Error: ' + err.message, 'error');
+          btn.disabled = false;
+        }
+      });
+      wrap.appendChild(btn);
+    }
+    return wrap;
+  }
+
+  function renderLinkResult(wrap, orderId, token) {
+    const url = new URL('../../repartidor/d/', location.href).href +
+      '?o=' + encodeURIComponent(orderId) + '&t=' + encodeURIComponent(token);
+    wrap.innerHTML =
+      '<div class="flex flex-col gap-1.5 w-full">' +
+      '  <div class="text-[10px] font-mono bg-surface-container px-2 py-1.5 rounded-lg truncate">' + url + '</div>' +
+      '  <div class="flex gap-2">' +
+      '    <button type="button" class="copy-link flex-1 py-1.5 px-2 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-bold">Copiar</button>' +
+      '    <a class="wa-link flex-1 py-1.5 px-2 rounded-lg bg-whatsapp-green text-on-primary font-label-sm text-label-sm font-bold text-center" target="_blank" rel="noopener">WhatsApp</a>' +
+      '  </div>' +
+      '</div>';
+    wrap.querySelector('.copy-link').addEventListener('click', () => {
+      navigator.clipboard.writeText(url).then(() => window.LTA_TOAST.show('Link copiado.'));
+    });
+    const msg = 'Pedido ' + orderId + ' listo para entregar. Tu acceso: ' + url;
+    wrap.querySelector('.wa-link').href = deliveryWhatsapp
+      ? 'https://wa.me/' + deliveryWhatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent(msg)
+      : 'https://wa.me/?text=' + encodeURIComponent(msg);
   }
 
   async function assignDriver(orderId, driverId) {
@@ -165,6 +214,10 @@
         try {
           const driverData = await window.LTA_API.callAction('driver.list', {}, idToken);
           drivers = driverData.drivers || [];
+          try {
+            const configData = await window.LTA_API.callAction('config.read', {}, idToken);
+            deliveryWhatsapp = (configData.config || {}).delivery_whatsapp_number || '';
+          } catch (err) { /* el boton de WhatsApp cae a abrir el selector de contactos */ }
           await loadOrders();
           pollTimer = setInterval(loadOrders, POLL_MS);
         } catch (err) {
