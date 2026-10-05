@@ -8,6 +8,7 @@
 (function () {
   const POLL_MS = 25000;
   const SEEN_KEY = 'lta_order_status_seen';
+  const PROMO_SEEN_KEY = 'lta_promo_credits_seen';
   const MAX_NOTIFS = 10;
 
   const STATUS_LABELS = {
@@ -82,7 +83,7 @@
       '<div class="flex gap-2.5 p-3 border-t border-surface-container-low first:border-t-0">' +
       '  <span class="w-2 h-2 rounded-full bg-tertiary shrink-0 mt-1.5"></span>' +
       '  <div class="min-w-0">' +
-      '    <p class="font-label-sm text-label-sm font-bold text-on-surface">Pedido ' + n.orderId + ' — ' + n.label + '</p>' +
+      '    <p class="font-label-sm text-label-sm font-bold text-on-surface">' + n.title + '</p>' +
       '    <p class="font-label-sm text-[10.5px] text-on-surface-variant mt-0.5">' + n.when + '</p>' +
       '  </div>' +
       '</div>'
@@ -97,13 +98,8 @@
     badge.classList.toggle('flex', unreadCount > 0);
   }
 
-  function addNotification(orderId, status) {
-    const label = status === 'en_reparto' ? 'Tu pedido va en camino 🛵' : (STATUS_LABELS[status] || status);
-    notifications.unshift({
-      orderId,
-      label,
-      when: 'hace un momento'
-    });
+  function pushNotification_(title) {
+    notifications.unshift({ title, when: 'hace un momento' });
     notifications = notifications.slice(0, MAX_NOTIFS);
     unreadCount++;
     updateBadge();
@@ -115,6 +111,15 @@
     if (bellIcon) { bellIcon.classList.remove('bell-ring'); void bellIcon.offsetWidth; bellIcon.classList.add('bell-ring'); }
     playChime();
     try { if ('vibrate' in navigator) navigator.vibrate([400, 150, 400]); } catch (e) {}
+  }
+
+  function addNotification(orderId, status) {
+    const label = status === 'en_reparto' ? 'Tu pedido va en camino 🛵' : (STATUS_LABELS[status] || status);
+    pushNotification_('Pedido ' + orderId + ' — ' + label);
+  }
+
+  function addPromoNotification() {
+    pushNotification_('¡Ganaste envío gratis! 🎉 Se aplica en tu próximo pedido a domicilio.');
   }
 
   async function poll(token) {
@@ -135,6 +140,14 @@
       if (prev !== o.status) { seen[o.order_id] = o.status; changed = true; }
     });
     if (changed) writeSeen(seen);
+
+    try {
+      const profileData = await window.LTA_API.callAction('client.getProfile', {}, token);
+      const credits = Number((profileData.profile || {}).promo_free_delivery_credits || 0);
+      const seenCredits = Number(localStorage.getItem(PROMO_SEEN_KEY) || 0);
+      if (credits > seenCredits) addPromoNotification();
+      if (credits !== seenCredits) localStorage.setItem(PROMO_SEEN_KEY, String(credits));
+    } catch (err) { /* sin perfil todavía o token vencido — se reintenta en el próximo poll */ }
   }
 
   function togglePanel() {

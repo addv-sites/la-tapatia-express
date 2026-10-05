@@ -452,6 +452,7 @@ function action_orderCreate_(payload, sessionId, idToken) {
   let deliveryZone = '';
   let deliveryLat = '';
   let deliveryLng = '';
+  let promoApplied = false;
 
   if (payload.order_type === 'delivery') {
     const config = action_configRead_().config;
@@ -467,6 +468,16 @@ function action_orderCreate_(payload, sessionId, idToken) {
     if (!tariff.available) throw new Error('Tu dirección está fuera de nuestra zona de entrega — elige recoger en sucursal.');
     deliveryFee = tariff.cost;
     deliveryZone = tariff.km + 'km';
+
+    // Sistema de promociones: si el cliente logueado ya ganó un envío gratis
+    // (por pedidos entregados seguidos), se autoaplica aquí — nunca se le
+    // pide un código, nunca se confía en nada declarado por el cliente.
+    if (config.promo_enabled && customerEmail) {
+      if (tryRedeemFreeDelivery_(customerEmail)) {
+        deliveryFee = 0;
+        promoApplied = true;
+      }
+    }
   }
 
   const subtotal = (payload.items || []).reduce((sum, it) => sum + Number(it.price) * Number(it.quantity), 0);
@@ -505,7 +516,75 @@ function action_orderCreate_(payload, sessionId, idToken) {
   appendRow_('PEDIDOS', order, headers);
   logAudit_(payload.customer_email || 'invitado', 'order.create', 'PEDIDOS', folio, null, order);
 
-  return { order_id: folio, delivery_fee: deliveryFee, delivery_zone: deliveryZone, total: order.total };
+  return { order_id: folio, delivery_fee: deliveryFee, delivery_zone: deliveryZone, total: order.total, promo_applied: promoApplied };
+}
+
+/** Consume un crédito de envío gratis si el cliente tiene alguno disponible. Devuelve true si lo aplicó. */
+function tryRedeemFreeDelivery_(email) {
+  return withLock_(() => {
+    const sh = sheet_('CLIENTES');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const emailCol = headers.indexOf('email');
+    const creditsCol = headers.indexOf('promo_free_delivery_credits');
+    if (creditsCol < 0) return false;
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][emailCol]).toLowerCase() === email) {
+        const credits = Number(values[i][creditsCol] || 0);
+        if (credits > 0) {
+          sh.getRange(i + 1, creditsCol + 1).setValue(credits - 1);
+          return true;
+        }
+        return false;
+      }
+    }
+    return false;
+  });
+}
+
+/**
+ * Suma 1 al contador de pedidos entregados seguidos del cliente; si llega a
+ * un múltiplo del umbral configurado, le otorga un crédito de envío gratis
+ * y le avisa por correo (la campana lo recoge sola comparando el conteo de
+ * créditos en cada poll de client.getProfile).
+ */
+function awardPromoProgress_(email) {
+  const config = action_configRead_().config;
+  if (!config.promo_enabled) return;
+  const threshold = Number(config.promo_orders_threshold || 0);
+  if (!threshold) return;
+  withLock_(() => {
+    const sh = sheet_('CLIENTES');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const emailCol = headers.indexOf('email');
+    const consecCol = headers.indexOf('promo_consecutive_orders');
+    const creditsCol = headers.indexOf('promo_free_delivery_credits');
+    const nameCol = headers.indexOf('name');
+    if (consecCol < 0 || creditsCol < 0) return;
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][emailCol]).toLowerCase() === email) {
+        const consec = Number(values[i][consecCol] || 0) + 1;
+        sh.getRange(i + 1, consecCol + 1).setValue(consec);
+        if (consec % threshold === 0) {
+          const credits = Number(values[i][creditsCol] || 0) + 1;
+          sh.getRange(i + 1, creditsCol + 1).setValue(credits);
+          notifyPromoEarned_(values[i][nameCol], email);
+        }
+        return;
+      }
+    }
+  });
+}
+
+function notifyPromoEarned_(name, email) {
+  try {
+    MailApp.sendEmail({
+      to: email,
+      subject: '¡Ganaste envío gratis! — La Tapatía Express',
+      htmlBody: 'Hola ' + (name || '') + ',<br><br>Gracias por seguir pidiendo con nosotros — tu próximo pedido a domicilio trae el <strong>envío gratis</strong>. Se aplica solo, no necesitas ningún código.<br><br>— La Tapatía Express'
+    });
+  } catch (err) { /* MailApp puede fallar por cuota diaria — no debe tumbar order.updateStatus */ }
 }
 
 function findOrderRow_(orderId) {
@@ -534,6 +613,10 @@ function action_orderUpdateStatus_(payload, user) {
       if (tokenStatusCol > 0 && found.row[tokenStatusCol - 1]) {
         sh.getRange(found.rowIndex, tokenStatusCol).setValue('used');
       }
+    }
+    if (payload.status === 'entregado') {
+      const email = String(found.row[found.headers.indexOf('customer_email')] || '').toLowerCase();
+      if (email) awardPromoProgress_(email);
     }
     logAudit_(user.email, 'order.updateStatus', 'PEDIDOS', payload.order_id, { status: before }, { status: payload.status });
     return { ok: true };

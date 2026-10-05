@@ -10,6 +10,7 @@ module.exports = {
     './admin/catalogo/**/*.html',
     './admin/pedidos/**/*.html',
     './admin/config-envio/**/*.html',
+    './admin/clientes/**/*.html',
     './cuenta/rastreo/**/*.html',
     './cuenta/perfil/**/*.html',
     './cuenta/historial/**/*.html',

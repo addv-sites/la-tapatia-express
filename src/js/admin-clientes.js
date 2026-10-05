@@ -167,6 +167,7 @@
     wireExportMenu();
 
     document.getElementById('client-search').addEventListener('input', (e) => applyFilter(e.target.value));
+    document.getElementById('promo-save').addEventListener('click', savePromoConfig);
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Clientes',
@@ -185,8 +186,27 @@
           document.getElementById('admin-content').classList.add('hidden');
           document.getElementById('auth-gate').classList.remove('hidden');
           window.LTA_AUTH_GATE.showUnauthorized(document.getElementById('auth-gate'), err.message);
+          return;
         }
+        try {
+          const configData = await window.LTA_API.callAction('config.read', {}, token);
+          const config = configData.config || {};
+          document.getElementById('promo-enabled').checked = !!config.promo_enabled;
+          document.getElementById('promo-threshold').value = config.promo_orders_threshold || 3;
+        } catch (err) { /* panel de promos no bloquea el resto del admin */ }
       }
     });
   });
+
+  async function savePromoConfig() {
+    try {
+      await window.LTA_API.callAction('config.update', {
+        promo_enabled: document.getElementById('promo-enabled').checked,
+        promo_orders_threshold: Number(document.getElementById('promo-threshold').value) || 3
+      }, idToken);
+      window.LTA_TOAST ? window.LTA_TOAST.show('Promociones guardadas.') : null;
+    } catch (err) {
+      window.LTA_TOAST ? window.LTA_TOAST.show('Error: ' + err.message, 'error') : alert(err.message);
+    }
+  }
 })();

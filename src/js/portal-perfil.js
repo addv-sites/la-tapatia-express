@@ -1,6 +1,7 @@
 (function () {
   let idToken = null;
   let editing = false;
+  let promoThreshold = 0;
 
   const editableFields = () => [
     document.getElementById('field-name'),
@@ -27,6 +28,38 @@
     document.getElementById('field-address').value = p.address || '';
     document.getElementById('field-address-ref').value = p.address_reference || '';
     document.getElementById('field-opt-in').checked = !!p.marketing_opt_in;
+    renderPromo(p);
+  }
+
+  function renderPromo(p) {
+    const card = document.getElementById('promo-card');
+    if (!promoThreshold) { card.classList.add('hidden'); card.classList.remove('flex'); return; }
+    card.classList.remove('hidden');
+    card.classList.add('flex');
+
+    const credits = Number(p.promo_free_delivery_credits || 0);
+    const consecutive = Number(p.promo_consecutive_orders || 0);
+    const progressInCycle = consecutive % promoThreshold;
+
+    document.getElementById('promo-progress-text').textContent =
+      progressInCycle + ' de ' + promoThreshold + ' pedidos entregados para tu próximo envío gratis';
+
+    const track = document.getElementById('promo-progress-track');
+    track.innerHTML = '';
+    for (let i = 0; i < promoThreshold; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'flex-1 h-1.5 rounded-full ' + (i < progressInCycle ? 'bg-tertiary' : 'bg-surface-container-high');
+      track.appendChild(dot);
+    }
+
+    const creditsText = document.getElementById('promo-credits-text');
+    if (credits > 0) {
+      creditsText.textContent = credits + (credits === 1 ? ' envío gratis disponible' : ' envíos gratis disponibles') +
+        ' — se aplica solo en tu próximo pedido a domicilio.';
+      creditsText.classList.remove('hidden');
+    } else {
+      creditsText.classList.add('hidden');
+    }
   }
 
   async function save() {
@@ -73,6 +106,11 @@
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('profile-content').classList.remove('hidden');
         document.getElementById('account-email').textContent = profile.email || '';
+        try {
+          const configData = await window.LTA_API.callAction('config.read', {}, token);
+          const config = configData.config || {};
+          promoThreshold = config.promo_enabled ? Number(config.promo_orders_threshold || 0) : 0;
+        } catch (err) { promoThreshold = 0; }
         try {
           await loadProfile();
         } catch (err) {

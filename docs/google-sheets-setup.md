@@ -51,9 +51,9 @@ Carga **una fila** con la sucursal Morelia:
 
 ### `CONFIG`
 ```
-delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission	delivery_whatsapp_number	legal_entity_name	terms_version
+delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission	delivery_whatsapp_number	legal_entity_name	terms_version	promo_enabled	promo_orders_threshold
 ```
-`delivery_whatsapp_number` es el WhatsApp del servicio de reparto externo — ahí se mandan los links de "Generar link de reparto". Se edita desde `/admin/config-envio/` (pestaña Repartidores).
+`delivery_whatsapp_number` es el WhatsApp del servicio de reparto externo — ahí se mandan los links de "Generar link de reparto". Se edita desde `/admin/config-envio/` (pestaña Repartidores). `promo_enabled`/`promo_orders_threshold` son del sistema de promociones automáticas (envío gratis cada N pedidos entregados seguidos) — se editan desde `/admin/clientes/`.
 `legal_entity_name` y `terms_version` alimentan `/legal/` (Aviso de Privacidad + Términos) y el modal de aceptación del checkout — mientras `legal_entity_name` esté vacío, la página legal muestra un aviso de "dato pendiente de configurar" en vez de inventar un nombre. Sube `terms_version` (ej. de `2026-10-05-v1` a `2026-11-01-v2`) cada vez que cambies el texto legal para que se vuelva a pedir aceptación a todos los clientes.
 **Importante:** esta hoja necesita **una fila de datos ya creada** (fila 2) antes de usar el admin — si la dejas vacía, `config.update` truena con "Hoja CONFIG sin fila de datos". Llena una fila con valores iniciales (los puedes ajustar después desde `/admin/config-envio/`), por ejemplo:
 ```
