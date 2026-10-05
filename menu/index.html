@@ -164,9 +164,13 @@
       </div>
 
       <div id="order-success" class="hidden flex-col gap-3 pt-2 border-t border-surface-container-high">
-        <div class="p-3 bg-tertiary-fixed/40 rounded-xl">
+        <div class="p-3 bg-tertiary-fixed/40 rounded-xl flex flex-col gap-1.5">
           <p class="font-label-md text-label-md text-on-surface font-bold">Pedido enviado — Folio <span id="success-folio"></span></p>
           <p class="font-body-sm text-body-sm text-on-surface-variant">Tu pedido ya está en cocina — guarda tu folio para dar seguimiento.</p>
+          <div id="success-total-row" class="hidden justify-between font-body-sm text-body-sm text-on-surface pt-1.5 mt-0.5 border-t border-tertiary/20">
+            <span id="success-total-label">Total a pagar</span><span id="success-total-value" class="font-bold"></span>
+          </div>
+          <p id="success-fee-note" class="hidden font-body-sm text-[12px] text-on-surface-variant"></p>
         </div>
         <a id="success-tracking-link" href="#" class="font-label-md text-label-md text-primary font-bold text-center">Ver seguimiento de mi pedido →</a>
         <div id="signin-invite-postorder" hidden></div>

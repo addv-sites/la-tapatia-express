@@ -636,6 +636,21 @@
       document.getElementById('success-tracking-link').href =
         '../cuenta/rastreo/?folio=' + encodeURIComponent(folio) + '&tel=' + encodeURIComponent(customer.phone);
 
+      // El fee de envío se calcula server-side (geocoding + zona) — aquí solo
+      // mostramos lo que Code.gs ya regresó en la respuesta de order.create.
+      if (result.total != null) {
+        document.getElementById('success-total-value').textContent = window.LTA_CATALOG.formatPrice(result.total);
+        const totalRow = document.getElementById('success-total-row');
+        totalRow.classList.remove('hidden');
+        totalRow.classList.add('flex');
+        if (customer.orderType === 'delivery' && result.delivery_fee) {
+          document.getElementById('success-total-label').textContent = 'Total a pagar (incluye envío)';
+          const feeNote = document.getElementById('success-fee-note');
+          feeNote.textContent = 'Envío a tu zona: ' + window.LTA_CATALOG.formatPrice(result.delivery_fee);
+          feeNote.classList.remove('hidden');
+        }
+      }
+
       if (!currentIdToken) {
         window.LTA_INLINE_SIGNIN.render(document.getElementById('signin-invite-postorder'), {
           key: 'postorder',
