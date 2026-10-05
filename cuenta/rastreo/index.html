@@ -13,7 +13,19 @@
 <header class="fixed top-0 w-full z-50 bg-crema-bg/90 backdrop-blur-xl shadow-sm">
   <div class="h-16 px-margin flex items-center justify-between">
     <a href="../../" class="font-headline-sm text-headline-sm text-primary">La Tapatía Express</a>
-    <span class="font-label-sm text-label-sm text-on-surface-variant">Rastreo de pedido</span>
+    <div class="flex items-center gap-2">
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Rastreo de pedido</span>
+      <div id="bell-wrap" class="hidden relative">
+        <button id="bell-btn" type="button" aria-label="Notificaciones" class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container">
+          <svg id="bell-icon" class="w-5 h-5" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-bell"/></svg>
+          <span id="bell-badge" class="hidden absolute top-1.5 right-1.5 bg-primary text-on-primary font-label-sm text-[10px] w-4 h-4 rounded-full items-center justify-center font-bold">0</span>
+        </button>
+        <div id="bell-panel" class="hidden flex-col opacity-0 scale-95 pointer-events-none absolute right-0 top-full mt-2 w-72 max-w-[85vw] bg-surface-container-lowest rounded-2xl shadow-lg border border-outline-variant overflow-hidden origin-top-right transition-all duration-200 z-50">
+          <div class="px-4 py-3 font-label-md text-label-md font-bold border-b border-surface-container-low">Notificaciones</div>
+          <div id="bell-notif-list" class="max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -76,5 +88,6 @@
 <script src="../../src/js/api.js"></script>
 <script src="../../src/js/catalog.js"></script>
 <script src="../../src/js/rastreo.js"></script>
+<script src="../../src/js/order-notifications.js"></script>
 </body>
 </html>
