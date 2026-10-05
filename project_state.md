@@ -1,6 +1,6 @@
 # Estado del Proyecto — La Tapatía Ahogadas
 
-Última actualización: 2026-10-03
+Última actualización: 2026-10-05
 
 ## Qué existe hoy
 
@@ -186,3 +186,22 @@ Usuario reportó mapa vacío en `/analitica/panel/` — diagnóstico: `renderMap
 - Agregado rango `all` ("Todo el historial") en `#range-select` y en `action_analyticsRead_` — antes el máximo era 30 días, insuficiente para "ver zonas desde el primer pedido".
 - Verificado: `node --check` sin errores en `Code.gs` y `analitica-panel.js`, `npm run build:css` sin errores.
 - **Pendiente del usuario:** repegar `apps-script/Code.gs` en Apps Script y "Nueva versión" (ya sabe el paso). Sin datos reales de pedidos a domicilio con pin, el mapa seguirá mostrando el estado vacío — eso es correcto, no un bug.
+
+## 5 requerimientos nuevos: solo-recoger, tarifario por km, aviso legal, reparto sin login, promociones (2026-10-05)
+
+Propuesta visual/funcional (Artifact) revisada y ajustada por el usuario antes de implementar, protocolo `addv-web-app` completo. Las 5 features quedan en commits separados en `main`.
+
+1. **Modo solo para llevar**: reusa `delivery_enabled` (ya existía) — el checkout ahora avisa explícitamente "solo servicio para recoger en sucursal" en vez de ocultar la opción en silencio.
+2. **Tarifario por distancia**: reemplaza zonas Z1/Z2/Z3 por tabla km→costo configurable (`resolveDeliveryTariff_`), redondeo a 300m confirmado con el usuario, costo por km extra y distancia máxima de entrega. Nueva acción pública `delivery.quote` cotiza en vivo en el checkout antes de pagar (antes el fee solo aparecía después de enviar el pedido).
+3. **Aviso de privacidad + T&C**: modal de aceptación única (`client.acceptTerms` para logueados, `localStorage` para invitados), página `/legal/` nueva. Razón social queda como campo configurable vacío (`legal_entity_name`) — **no se inventó**, hay que llenarlo en el admin antes de publicar, y el texto legal completo debería pasar por revisión de un abogado antes de darlo por definitivo.
+4. **Reparto sin login**: nuevo botón "Generar link de reparto" en Gestión de Pedidos → token único por pedido → `/repartidor/d/?o=...&t=...` sin Google Sign-In, con total a cobrar y comisión del repartidor visibles. Se invalida solo al marcar entregado/cancelado. El login de Google para repartidores (`DRIVERS`, `/repartidor/`, entregas/ganancias) **no se tocó** — el link es una vía adicional, no un reemplazo.
+5. **Promociones automáticas**: panel en `admin/clientes` (activar + umbral de pedidos). Cada N pedidos entregados seguidos de un cliente logueado, el siguiente envío a domicilio es gratis — se autoaplica (`tryRedeemFreeDelivery_`), avisa por correo (`MailApp`) y por la campana (compara créditos en cada poll de `client.getProfile`), y se ve en `cuenta/perfil` ("Mis promociones").
+
+- Verificado: `node --check` sin errores en los ~12 archivos JS/Code.gs tocados, `npm run build:css` sin errores, harness headless (Node `vm`) para la campana (notificación de promo) y para `reparto-link.js` (render de folio/total/cobro/comisión desde `delivery.getByToken` simulado) — sin acceso a navegador real esta sesión.
+- **Pendiente del usuario, antes de que cualquiera de las 5 features funcione en producción:**
+  - Repegar `apps-script/Code.gs` completo en Apps Script y crear "Nueva versión" (el de siempre).
+  - Agregar en la hoja `CONFIG` las columnas nuevas: `delivery_tariff_table`, `delivery_extra_km_cost`, `delivery_max_km`, `delivery_whatsapp_number`, `legal_entity_name`, `terms_version`, `promo_enabled`, `promo_orders_threshold` — y **borrar** las 3 columnas viejas de zona (`delivery_zone_1_km_max`/`_cost`, `_2_*`, `_3_*`), ya no se usan. Ver `docs/google-sheets-setup.md` actualizado.
+  - Agregar en `PEDIDOS` las columnas `delivery_token`, `delivery_token_status`.
+  - Agregar en `CLIENTES` las columnas `accepted_terms_version`, `accepted_terms_at`, `promo_consecutive_orders`, `promo_free_delivery_credits`.
+  - Llenar `legal_entity_name` en Envío > Aviso de privacidad, y la tabla de tarifas + WhatsApp del servicio de reparto en sus pestañas correspondientes.
+  - Idealmente, que un abogado revise el texto de `/legal/` antes de considerarlo definitivo.
