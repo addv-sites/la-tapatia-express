@@ -35,49 +35,42 @@
 
     <div id="panel-envio" class="flex flex-col gap-4">
       <label class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm">
-        <span class="font-label-md text-label-md font-bold">Entrega a domicilio habilitada</span>
-        <input id="cfg-delivery-enabled" type="checkbox" class="w-5 h-5">
+        <span class="flex flex-col gap-0.5">
+          <span class="font-label-md text-label-md font-bold">Entrega a domicilio</span>
+          <span class="font-body-sm text-[12px] text-on-surface-variant">Si lo apagas, el sitio pasa a <strong>modo solo para llevar</strong>: el cliente ve un aviso y solo puede recoger en sucursal.</span>
+        </span>
+        <input id="cfg-delivery-enabled" type="checkbox" class="w-5 h-5 shrink-0">
       </label>
 
       <div class="flex items-center gap-2 px-1">
         <svg class="w-4 h-4 text-primary" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-location"/></svg>
-        <h2 class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Zonas de envío</h2>
+        <h2 class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Tarifario de envío por distancia</h2>
       </div>
+      <p class="font-body-sm text-[12px] text-on-surface-variant px-1 -mt-2">Costo por kilómetro completo entre la sucursal y la dirección de entrega. Si el sobrante pasa de 300 m, se cobra el km completo siguiente.</p>
 
       <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
-        <h3 class="font-headline-sm text-headline-sm">Zona 1</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <label class="flex flex-col gap-1 font-label-sm text-label-sm">Hasta (km)
-            <input id="cfg-z1-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
-          </label>
-          <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo (MXN)
-            <input id="cfg-z1-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
-          </label>
+        <div class="overflow-x-auto -mx-1 px-1">
+          <table class="w-full text-left font-body-sm text-body-sm">
+            <thead>
+              <tr class="text-[11px] uppercase tracking-wider text-on-surface-variant">
+                <th class="font-bold pb-1">Km</th><th class="font-bold pb-1">Tarifa (MXN)</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="tariff-rows"></tbody>
+          </table>
         </div>
+        <button id="btn-add-tariff-row" type="button" class="min-h-[40px] rounded-lg bg-surface-container font-label-md text-label-md text-on-surface-variant flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-plus"/></svg> Agregar escalón
+        </button>
       </div>
 
-      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
-        <h3 class="font-headline-sm text-headline-sm">Zona 2</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <label class="flex flex-col gap-1 font-label-sm text-label-sm">Hasta (km)
-            <input id="cfg-z2-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
-          </label>
-          <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo (MXN)
-            <input id="cfg-z2-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
-          </label>
-        </div>
-      </div>
-
-      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
-        <h3 class="font-headline-sm text-headline-sm">Zona 3</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <label class="flex flex-col gap-1 font-label-sm text-label-sm">Hasta (km)
-            <input id="cfg-z3-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
-          </label>
-          <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo (MXN)
-            <input id="cfg-z3-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
-          </label>
-        </div>
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Costo por km extra (más allá de la tabla)
+          <input id="cfg-extra-km-cost" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Distancia máxima de entrega (km)
+          <input id="cfg-max-km" type="number" step="0.1" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
       </div>
 
       <div class="flex items-center gap-2 px-1 mt-1">

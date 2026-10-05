@@ -116,6 +116,8 @@
   // 'empty' (nada capturado aún) | 'approx' (solo colonia/aprox) | 'ok' (precisión de calle o pin confirmado)
   let addressState = 'empty';
   let addressColonia = '';
+  let currentDeliveryFee = 0;
+  let deliveryUnavailable = false;
 
   // Centro aproximado de Morelia — mismo fallback que ya usa analitica-panel.js
   // cuando no hay una ubicación más precisa disponible.
@@ -161,7 +163,65 @@
     feedback.className = 'font-label-sm text-[11px] ' +
       (state === 'notfound' ? 'text-error font-semibold' : state === 'ok' ? 'text-tertiary font-semibold' : 'text-on-surface-variant');
     composeAddress();
+    refreshDeliveryQuote();
     if (window.LTA_updateSubmitState) window.LTA_updateSubmitState();
+  }
+
+  /**
+   * Cotiza el envío en vivo (delivery.quote) antes de que el cliente pague —
+   * el cálculo real y autoritativo se repite server-side en order.create;
+   * esto solo evita que el costo "aparezca" hasta después de pagar.
+   */
+  async function refreshDeliveryQuote() {
+    const feeRow = document.getElementById('delivery-fee-row');
+    const feeValue = document.getElementById('delivery-fee-value');
+    const externalNote = document.getElementById('delivery-external-note');
+    deliveryUnavailable = false;
+
+    if (currentOrderType() !== 'delivery') {
+      currentDeliveryFee = 0;
+      renderCartTotals();
+      return;
+    }
+    if (!addressMarker || (addressState !== 'ok' && addressState !== 'approx')) {
+      currentDeliveryFee = 0;
+      feeValue.textContent = 'Se calcula al confirmar tu dirección';
+      externalNote.classList.add('hidden');
+      renderCartTotals();
+      return;
+    }
+    feeValue.textContent = 'Calculando…';
+    const ll = addressMarker.getLatLng();
+    try {
+      const data = await window.LTA_API.readAction('delivery.quote', {
+        branch_id: window.SITE_CONFIG.branchId, lat: ll.lat, lng: ll.lng
+      });
+      if (currentOrderType() !== 'delivery') return; // el cliente cambió de opción mientras cotizaba
+      if (!data.available) {
+        deliveryUnavailable = true;
+        currentDeliveryFee = 0;
+        feeValue.textContent = 'Fuera de zona de cobertura';
+        externalNote.classList.add('hidden');
+      } else {
+        currentDeliveryFee = Number(data.cost) || 0;
+        feeValue.textContent = window.LTA_CATALOG.formatPrice(currentDeliveryFee) + ' (' + data.distance_km + ' km)';
+        externalNote.classList.remove('hidden');
+      }
+    } catch (err) {
+      currentDeliveryFee = 0;
+      feeValue.textContent = 'No se pudo calcular — intenta de nuevo';
+      externalNote.classList.add('hidden');
+    }
+    renderCartTotals();
+    if (window.LTA_updateSubmitState) window.LTA_updateSubmitState();
+  }
+
+  /** Subtotal + envío (si aplica) — separado de renderCart() para no repintar todo el carrito solo por una cotización. */
+  function renderCartTotals() {
+    const subtotal = window.LTA_CART.subtotal();
+    const isDelivery = currentOrderType() === 'delivery';
+    const total = subtotal + (isDelivery ? currentDeliveryFee : 0);
+    document.getElementById('cart-total').textContent = window.LTA_CATALOG.formatPrice(total);
   }
 
   async function onAddressPinDragEnd() {
@@ -407,7 +467,7 @@
     function updateSubmitState() {
       const isDelivery = currentOrderType() === 'delivery';
       const addressOk = !isDelivery || addressState === 'ok' || addressState === 'approx';
-      submitBtn.disabled = !cartHasItems || !addressOk;
+      submitBtn.disabled = !cartHasItems || !addressOk || (isDelivery && deliveryUnavailable);
     }
     window.LTA_updateSubmitState = updateSubmitState;
 
@@ -434,12 +494,12 @@
       cartSubtotal.textContent = window.LTA_CATALOG.formatPrice(subtotal);
       const isDelivery = currentOrderType() === 'delivery';
       toggleVisible(deliveryFeeRow, isDelivery, 'flex');
-      cartTotal.textContent = window.LTA_CATALOG.formatPrice(subtotal);
       toggleVisible(addressField, isDelivery, 'flex-col');
       if (isDelivery) {
         initAddressMap();
         setTimeout(() => { if (addressMap) addressMap.invalidateSize(); }, 50);
       }
+      refreshDeliveryQuote();
       updateSubmitState();
     }
 
@@ -506,6 +566,7 @@
     function renderMenu(data) {
       runtimeConfig = Object.assign(runtimeConfig, data.config || {});
       toggleVisible(deliveryOption, !!runtimeConfig.delivery_enabled, 'grid');
+      toggleVisible(document.getElementById('pickup-only-banner'), !runtimeConfig.delivery_enabled, 'flex');
 
       const groups = window.LTA_CATALOG.byCategory((data.products || []).sort((a, b) => a.sort_order - b.sort_order));
       const orderedGroups = CATEGORY_ORDER
@@ -618,7 +679,8 @@
         sendingEl.classList.remove('flex');
         form.classList.remove('hidden');
         submitBtn.disabled = false;
-        window.LTA_TOAST && window.LTA_TOAST.show('No se pudo enviar tu pedido — revisa tu conexión e intenta de nuevo.', 'error');
+        const msg = (err && err.message) || 'No se pudo enviar tu pedido — revisa tu conexión e intenta de nuevo.';
+        window.LTA_TOAST && window.LTA_TOAST.show(msg, 'error');
         return;
       }
 

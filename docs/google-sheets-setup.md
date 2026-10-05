@@ -50,13 +50,15 @@ Carga **una fila** con la sucursal Morelia:
 
 ### `CONFIG`
 ```
-delivery_enabled	delivery_zone_1_km_max	delivery_zone_1_cost	delivery_zone_2_km_max	delivery_zone_2_cost	delivery_zone_3_km_max	delivery_zone_3_cost	driver_fixed_commission
+delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission
 ```
 **Importante:** esta hoja necesita **una fila de datos ya creada** (fila 2) antes de usar el admin — si la dejas vacía, `config.update` truena con "Hoja CONFIG sin fila de datos". Llena una fila con valores iniciales (los puedes ajustar después desde `/admin/config-envio/`), por ejemplo:
 ```
-TRUE	2.5	25	5	40	8.5	65	20
+TRUE	[{"km":1,"cost":40},{"km":2,"cost":45},{"km":3,"cost":50}]	10	30	20
 ```
-(Estos números son solo un punto de partida razonable — confírmalos con el negocio, igual que los precios del menú.)
+`delivery_tariff_table` es un **JSON** (texto plano en una sola celda): un arreglo de `{"km":N,"cost":M}`, uno por cada kilómetro completo. Se edita cómodamente desde `/admin/config-envio/` (tabla con botón "Agregar escalón") — no hace falta tocar el JSON a mano salvo para la carga inicial. `delivery_extra_km_cost` aplica a distancias más allá del último km de la tabla; `delivery_max_km` es la distancia tope — pasándola, el sitio no ofrece entrega a domicilio para esa dirección.
+
+> **Si ya tenías la versión anterior de esta hoja** (columnas `delivery_zone_1_km_max`, `delivery_zone_1_cost`, `delivery_zone_2_*`, `delivery_zone_3_*`): bórralas y agrega las 3 columnas nuevas de arriba en su lugar — es un reemplazo, no conviven ambos esquemas.
 
 ### `STAFF`
 ```

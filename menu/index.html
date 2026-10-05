@@ -79,14 +79,19 @@
           <span>Subtotal</span><span id="cart-subtotal">$0 MXN</span>
         </div>
         <div id="delivery-fee-row" class="hidden justify-between font-body-sm text-body-sm text-on-surface-variant">
-          <span>Envío</span><span id="delivery-fee-value">Se calcula al enviar</span>
+          <span>Envío</span><span id="delivery-fee-value">Se calcula al confirmar tu dirección</span>
         </div>
+        <p id="delivery-external-note" class="hidden font-label-sm text-[11px] text-on-surface-variant -mt-1">Entrega por servicio externo — costo estimado por distancia en línea recta.</p>
         <div class="flex justify-between font-headline-sm text-headline-sm text-primary pt-1">
           <span>Total</span><span id="cart-total">$0 MXN</span>
         </div>
       </div>
 
       <form id="checkout-form" class="flex flex-col gap-3 pt-2">
+        <div id="pickup-only-banner" class="hidden items-start gap-2 p-3 rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm">
+          <svg class="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-alert"/></svg>
+          <span>Por el momento solo tenemos <strong>servicio para recoger en sucursal</strong>. La entrega a domicilio está pausada temporalmente.</span>
+        </div>
         <div id="delivery-option" class="hidden grid-cols-2 gap-2 p-1 bg-surface-container-low rounded-lg">
           <label class="flex items-center justify-center gap-1.5 py-2 rounded-lg cursor-pointer has-[:checked]:bg-primary has-[:checked]:text-on-primary font-label-md text-label-md">
             <input class="sr-only" type="radio" name="order_type" value="pickup" checked>

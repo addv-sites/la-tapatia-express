@@ -22,14 +22,39 @@
     ).join('');
   }
 
+  let tariffRows = []; // [{km, cost}, ...]
+
+  function renderTariffRows() {
+    const tbody = document.getElementById('tariff-rows');
+    tbody.innerHTML = tariffRows.map((row, i) =>
+      '<tr>' +
+      '  <td class="py-1 pr-2"><input type="number" step="1" min="1" class="tariff-km h-9 w-16 px-2 rounded-lg bg-surface-container-low" data-i="' + i + '" value="' + row.km + '"></td>' +
+      '  <td class="py-1 pr-2"><input type="number" step="1" min="0" class="tariff-cost h-9 w-24 px-2 rounded-lg bg-surface-container-low" data-i="' + i + '" value="' + row.cost + '"></td>' +
+      '  <td class="py-1"><button type="button" class="tariff-remove w-8 h-8 rounded-lg text-error flex items-center justify-center" data-i="' + i + '" aria-label="Quitar escalón"><svg class="w-4 h-4" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-close"/></svg></button></td>' +
+      '</tr>'
+    ).join('');
+    tbody.querySelectorAll('.tariff-km').forEach((el) => el.addEventListener('input', (e) => {
+      tariffRows[Number(e.target.dataset.i)].km = Number(e.target.value) || 0;
+    }));
+    tbody.querySelectorAll('.tariff-cost').forEach((el) => el.addEventListener('input', (e) => {
+      tariffRows[Number(e.target.dataset.i)].cost = Number(e.target.value) || 0;
+    }));
+    tbody.querySelectorAll('.tariff-remove').forEach((el) => el.addEventListener('click', (e) => {
+      tariffRows.splice(Number(e.currentTarget.dataset.i), 1);
+      renderTariffRows();
+    }));
+  }
+
   function fill(config) {
     document.getElementById('cfg-delivery-enabled').checked = !!config.delivery_enabled;
-    document.getElementById('cfg-z1-km').value = config.delivery_zone_1_km_max || '';
-    document.getElementById('cfg-z1-cost').value = config.delivery_zone_1_cost || '';
-    document.getElementById('cfg-z2-km').value = config.delivery_zone_2_km_max || '';
-    document.getElementById('cfg-z2-cost').value = config.delivery_zone_2_cost || '';
-    document.getElementById('cfg-z3-km').value = config.delivery_zone_3_km_max || '';
-    document.getElementById('cfg-z3-cost').value = config.delivery_zone_3_cost || '';
+    try { tariffRows = JSON.parse(config.delivery_tariff_table || '[]'); } catch (e) { tariffRows = []; }
+    if (!tariffRows.length) {
+      // Semilla razonable si CONFIG todavía no trae tabla — el admin la ajusta y guarda.
+      tariffRows = [1, 2, 3, 4, 5, 6, 7, 8].map((km) => ({ km, cost: '' }));
+    }
+    renderTariffRows();
+    document.getElementById('cfg-extra-km-cost').value = config.delivery_extra_km_cost || '';
+    document.getElementById('cfg-max-km').value = config.delivery_max_km || '';
     document.getElementById('cfg-driver-commission').value = config.driver_fixed_commission || '';
     DAYS.forEach((d) => {
       document.getElementById('cfg-hours-' + d.key + '-open').value = config['hours_' + d.key + '_open'] || '';
@@ -40,12 +65,9 @@
   async function save() {
     const payload = {
       delivery_enabled: document.getElementById('cfg-delivery-enabled').checked,
-      delivery_zone_1_km_max: Number(document.getElementById('cfg-z1-km').value),
-      delivery_zone_1_cost: Number(document.getElementById('cfg-z1-cost').value),
-      delivery_zone_2_km_max: Number(document.getElementById('cfg-z2-km').value),
-      delivery_zone_2_cost: Number(document.getElementById('cfg-z2-cost').value),
-      delivery_zone_3_km_max: Number(document.getElementById('cfg-z3-km').value),
-      delivery_zone_3_cost: Number(document.getElementById('cfg-z3-cost').value),
+      delivery_tariff_table: JSON.stringify(tariffRows.filter((r) => r.km > 0).sort((a, b) => a.km - b.km)),
+      delivery_extra_km_cost: Number(document.getElementById('cfg-extra-km-cost').value),
+      delivery_max_km: Number(document.getElementById('cfg-max-km').value),
       driver_fixed_commission: Number(document.getElementById('cfg-driver-commission').value)
     };
     DAYS.forEach((d) => {
@@ -154,6 +176,11 @@
   document.addEventListener('DOMContentLoaded', () => {
     renderHoursRows();
     document.getElementById('save-config').addEventListener('click', save);
+    document.getElementById('btn-add-tariff-row').addEventListener('click', () => {
+      const lastKm = tariffRows.length ? tariffRows[tariffRows.length - 1].km : 0;
+      tariffRows.push({ km: lastKm + 1, cost: '' });
+      renderTariffRows();
+    });
     document.getElementById('tab-envio').addEventListener('click', () => showTab('envio'));
     document.getElementById('tab-horario').addEventListener('click', () => showTab('horario'));
     document.getElementById('tab-repartidores').addEventListener('click', () => showTab('repartidores'));

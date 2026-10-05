@@ -322,10 +322,39 @@ function distanceKm_(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function resolveDeliveryZone_(distanceKm, config) {
-  if (distanceKm <= Number(config.delivery_zone_1_km_max)) return { zone: 'Z1', cost: Number(config.delivery_zone_1_cost) };
-  if (distanceKm <= Number(config.delivery_zone_2_km_max)) return { zone: 'Z2', cost: Number(config.delivery_zone_2_cost) };
-  return { zone: 'Z3', cost: Number(config.delivery_zone_3_cost) };
+/**
+ * Tarifario configurable por km (reemplaza las 3 zonas fijas Z1/Z2/Z3).
+ * config.delivery_tariff_table es JSON [{"km":1,"cost":40}, ...] guardado como
+ * texto en una sola celda de CONFIG (incluso un arreglo de longitud variable
+ * no cabe en columnas fijas de Sheet). Redondeo: la distancia baja al km
+ * cerrado salvo que el sobrante pase de 300 m (0.3 km), en cuyo caso se cobra
+ * el km completo siguiente — regla confirmada con el negocio.
+ * Más allá del último km de la tabla, cada km extra sube
+ * delivery_extra_km_cost. Pasando delivery_max_km, la entrega no está
+ * disponible (el checkout debe ofrecer solo recoger en sucursal).
+ */
+function resolveDeliveryTariff_(distanceKm, config) {
+  const maxKm = Number(config.delivery_max_km || 0);
+  if (maxKm && distanceKm > maxKm) return { available: false };
+
+  let table;
+  try { table = JSON.parse(config.delivery_tariff_table || '[]'); } catch (e) { table = []; }
+  if (!table.length) return { available: false };
+
+  const byKm = {};
+  table.forEach((row) => { byKm[Number(row.km)] = Number(row.cost); });
+
+  let tier = Math.floor(distanceKm);
+  const remainder = distanceKm - tier;
+  if (remainder > 0.3) tier += 1;
+  if (tier < 1) tier = 1;
+
+  if (byKm[tier] !== undefined) return { available: true, km: tier, cost: byKm[tier] };
+
+  const knownKms = Object.keys(byKm).map(Number);
+  const lastKm = Math.max.apply(null, knownKms);
+  const extraCost = Number(config.delivery_extra_km_cost || 0);
+  return { available: true, km: tier, cost: byKm[lastKm] + (tier - lastKm) * extraCost };
 }
 
 // ---------------------------------------------------------------------------
@@ -379,6 +408,31 @@ function action_configUpdate_(payload, user) {
   });
 }
 
+/**
+ * Cotización de envío en vivo, antes de confirmar el pedido — el checkout la
+ * llama cada vez que el pin de dirección queda en estado 'ok'/'approx' para
+ * mostrar el costo antes de pagar. No crea nada, no requiere sesión; el
+ * cálculo real y autoritativo se repite en action_orderCreate_ (nunca se
+ * confía en lo que haya mostrado el cliente).
+ */
+function action_deliveryQuote_(payload) {
+  const lat = Number(payload.lat);
+  const lng = Number(payload.lng);
+  if (!lat || !lng) throw new Error('Faltan coordenadas');
+
+  const config = action_configRead_().config;
+  if (!config.delivery_enabled) return { available: false, reason: 'disabled' };
+
+  const branches = readSheetAsObjects_('SUCURSALES');
+  const branch = branches.find((b) => b.branch_id === payload.branch_id) || branches[0];
+  if (!branch || !branch.latitude || !branch.longitude) return { available: false, reason: 'no_branch' };
+
+  const km = distanceKm_(Number(branch.latitude), Number(branch.longitude), lat, lng);
+  const tariff = resolveDeliveryTariff_(km, config);
+  if (!tariff.available) return { available: false, reason: 'out_of_range', distance_km: Math.round(km * 10) / 10 };
+  return { available: true, cost: tariff.cost, km: tariff.km, distance_km: Math.round(km * 10) / 10 };
+}
+
 function action_orderCreate_(payload, sessionId, idToken) {
   checkRateLimit_(sessionId);
   if (payload.clientLoadedAt && (Date.now() - Number(payload.clientLoadedAt)) < MIN_SUBMIT_MS) {
@@ -401,15 +455,18 @@ function action_orderCreate_(payload, sessionId, idToken) {
 
   if (payload.order_type === 'delivery') {
     const config = action_configRead_().config;
+    if (!config.delivery_enabled) throw new Error('La entrega a domicilio no está disponible por el momento — elige recoger en sucursal.');
     const branch = readSheetAsObjects_('SUCURSALES').find((b) => b.branch_id === payload.branch_id);
     const dest = geocodeAddress_(payload.delivery_address);
     if (dest) { deliveryLat = dest.lat; deliveryLng = dest.lng; }
-    if (branch && dest && branch.latitude && branch.longitude) {
-      const km = distanceKm_(Number(branch.latitude), Number(branch.longitude), dest.lat, dest.lng);
-      const zoneInfo = resolveDeliveryZone_(km, config);
-      deliveryFee = zoneInfo.cost;
-      deliveryZone = zoneInfo.zone;
+    if (!branch || !dest || !branch.latitude || !branch.longitude) {
+      throw new Error('No se pudo calcular el costo de envío para esa dirección — intenta de nuevo o elige recoger en sucursal.');
     }
+    const km = distanceKm_(Number(branch.latitude), Number(branch.longitude), dest.lat, dest.lng);
+    const tariff = resolveDeliveryTariff_(km, config);
+    if (!tariff.available) throw new Error('Tu dirección está fuera de nuestra zona de entrega — elige recoger en sucursal.');
+    deliveryFee = tariff.cost;
+    deliveryZone = tariff.km + 'km';
   }
 
   const subtotal = (payload.items || []).reduce((sum, it) => sum + Number(it.price) * Number(it.quantity), 0);
@@ -1050,7 +1107,7 @@ function action_analyticsRead_(payload) {
 // Router
 // ---------------------------------------------------------------------------
 
-const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode', 'geo.search'];
+const PUBLIC_ACTIONS = ['catalog.read', 'config.read', 'order.create', 'order.trackingRead', 'geo.reverseGeocode', 'geo.search', 'delivery.quote'];
 
 function route_(action, payload, idToken, sessionId) {
   switch (action) {
@@ -1060,6 +1117,7 @@ function route_(action, payload, idToken, sessionId) {
     case 'order.trackingRead': return action_orderTrackingRead_(payload);
     case 'geo.reverseGeocode': return action_geoReverseGeocode_(payload);
     case 'geo.search': return action_geoSearch_(payload);
+    case 'delivery.quote': return action_deliveryQuote_(payload);
     case 'order.listMine': return action_orderListMine_(requireRole_(idToken, 'ANY'));
     case 'client.getProfile': return action_clientGetProfile_(requireRole_(idToken, 'ANY'));
 
