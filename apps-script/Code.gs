@@ -949,9 +949,13 @@ function action_clientUpsertProfile_(payload, user) {
       address: payload.address || '',
       address_reference: payload.address_reference || '',
       marketing_opt_in: false,
+      accepted_terms_version: '',
+      accepted_terms_at: '',
+      promo_consecutive_orders: 0,
+      promo_free_delivery_credits: 0,
       created_at: now,
       updated_at: now
-    }, ['email', 'name', 'phone', 'address', 'address_reference', 'marketing_opt_in', 'created_at', 'updated_at']);
+    }, ['email', 'name', 'phone', 'address', 'address_reference', 'marketing_opt_in', 'accepted_terms_version', 'accepted_terms_at', 'promo_consecutive_orders', 'promo_free_delivery_credits', 'created_at', 'updated_at']);
     return { ok: true, created: true };
   });
 }
@@ -970,6 +974,46 @@ function action_clientOptInMarketing_(payload, user) {
       }
     }
     throw new Error('Perfil de cliente no encontrado — llama client.upsertProfile primero');
+  });
+}
+
+/**
+ * Guarda la aceptación del Aviso de Privacidad + Términos y Condiciones de
+ * un cliente logueado. Si todavía no tiene fila en CLIENTES (primera vez
+ * que acepta, antes de llenar su perfil) se crea una mínima — el resto de
+ * sus datos se completa después con client.upsertProfile normal.
+ */
+function action_clientAcceptTerms_(payload, user) {
+  return withLock_(() => {
+    const version = String(payload.version || '').trim();
+    if (!version) throw new Error('Falta la versión del aviso a aceptar');
+    const now = Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
+    const sh = sheet_('CLIENTES');
+    const values = sh.getDataRange().getValues();
+    const headers = values[0];
+    const emailCol = headers.indexOf('email');
+    for (let i = 1; i < values.length; i++) {
+      if (String(values[i][emailCol]).toLowerCase() === user.email) {
+        sh.getRange(i + 1, headers.indexOf('accepted_terms_version') + 1).setValue(version);
+        sh.getRange(i + 1, headers.indexOf('accepted_terms_at') + 1).setValue(now);
+        return { ok: true };
+      }
+    }
+    appendRow_('CLIENTES', {
+      email: user.email,
+      name: user.name || '',
+      phone: '',
+      address: '',
+      address_reference: '',
+      marketing_opt_in: false,
+      accepted_terms_version: version,
+      accepted_terms_at: now,
+      promo_consecutive_orders: 0,
+      promo_free_delivery_credits: 0,
+      created_at: now,
+      updated_at: now
+    }, ['email', 'name', 'phone', 'address', 'address_reference', 'marketing_opt_in', 'accepted_terms_version', 'accepted_terms_at', 'promo_consecutive_orders', 'promo_free_delivery_credits', 'created_at', 'updated_at']);
+    return { ok: true };
   });
 }
 
@@ -1151,6 +1195,7 @@ function route_(action, payload, idToken, sessionId) {
 
     case 'client.upsertProfile': return action_clientUpsertProfile_(payload, requireRole_(idToken, 'ANY'));
     case 'client.optInMarketing': return action_clientOptInMarketing_(payload, requireRole_(idToken, 'ANY'));
+    case 'client.acceptTerms': return action_clientAcceptTerms_(payload, requireRole_(idToken, 'ANY'));
 
     default:
       throw new Error('Acción no reconocida: ' + action);

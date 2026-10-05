@@ -56,6 +56,8 @@
     document.getElementById('cfg-extra-km-cost').value = config.delivery_extra_km_cost || '';
     document.getElementById('cfg-max-km').value = config.delivery_max_km || '';
     document.getElementById('cfg-driver-commission').value = config.driver_fixed_commission || '';
+    document.getElementById('cfg-legal-entity-name').value = config.legal_entity_name || '';
+    document.getElementById('cfg-terms-version').value = config.terms_version || '';
     DAYS.forEach((d) => {
       document.getElementById('cfg-hours-' + d.key + '-open').value = config['hours_' + d.key + '_open'] || '';
       document.getElementById('cfg-hours-' + d.key + '-close').value = config['hours_' + d.key + '_close'] || '';
@@ -68,7 +70,9 @@
       delivery_tariff_table: JSON.stringify(tariffRows.filter((r) => r.km > 0).sort((a, b) => a.km - b.km)),
       delivery_extra_km_cost: Number(document.getElementById('cfg-extra-km-cost').value),
       delivery_max_km: Number(document.getElementById('cfg-max-km').value),
-      driver_fixed_commission: Number(document.getElementById('cfg-driver-commission').value)
+      driver_fixed_commission: Number(document.getElementById('cfg-driver-commission').value),
+      legal_entity_name: document.getElementById('cfg-legal-entity-name').value.trim(),
+      terms_version: document.getElementById('cfg-terms-version').value.trim()
     };
     DAYS.forEach((d) => {
       payload['hours_' + d.key + '_open'] = document.getElementById('cfg-hours-' + d.key + '-open').value;

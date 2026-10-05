@@ -50,8 +50,9 @@ Carga **una fila** con la sucursal Morelia:
 
 ### `CONFIG`
 ```
-delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission
+delivery_enabled	delivery_tariff_table	delivery_extra_km_cost	delivery_max_km	driver_fixed_commission	legal_entity_name	terms_version
 ```
+`legal_entity_name` y `terms_version` alimentan `/legal/` (Aviso de Privacidad + Términos) y el modal de aceptación del checkout — mientras `legal_entity_name` esté vacío, la página legal muestra un aviso de "dato pendiente de configurar" en vez de inventar un nombre. Sube `terms_version` (ej. de `2026-10-05-v1` a `2026-11-01-v2`) cada vez que cambies el texto legal para que se vuelva a pedir aceptación a todos los clientes.
 **Importante:** esta hoja necesita **una fila de datos ya creada** (fila 2) antes de usar el admin — si la dejas vacía, `config.update` truena con "Hoja CONFIG sin fila de datos". Llena una fila con valores iniciales (los puedes ajustar después desde `/admin/config-envio/`), por ejemplo:
 ```
 TRUE	[{"km":1,"cost":40},{"km":2,"cost":45},{"km":3,"cost":50}]	10	30	20
@@ -74,9 +75,9 @@ Igual que STAFF pero para repartidores. El `email` de aquí es el mismo valor qu
 
 ### `CLIENTES`
 ```
-email	name	phone	address	address_reference	marketing_opt_in	created_at	updated_at
+email	name	phone	address	address_reference	marketing_opt_in	accepted_terms_version	accepted_terms_at	promo_consecutive_orders	promo_free_delivery_credits	created_at	updated_at
 ```
-Se llena sola cuando un cliente se registra con Google en el sitio o en el checkout. No captures nada a mano.
+Se llena sola cuando un cliente se registra con Google en el sitio o en el checkout. No captures nada a mano. `accepted_terms_version`/`accepted_terms_at` registran su aceptación del aviso legal; `promo_consecutive_orders`/`promo_free_delivery_credits` son del sistema de promociones automáticas.
 
 ### `LOG`
 ```

@@ -208,6 +208,23 @@
   </div>
 </div>
 
+<!-- Aceptación de Aviso de Privacidad + Términos (solo se pide una vez) -->
+<div aria-hidden="true" class="hidden fixed inset-0 z-[70] items-center justify-center p-4 bg-inverse-surface/75" id="terms-gate-modal">
+  <div class="w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl p-6 flex flex-col gap-4 text-center">
+    <svg class="w-8 h-8 text-primary mx-auto" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-check"/></svg>
+    <div>
+      <h3 class="font-headline-sm text-headline-sm text-on-surface">Antes de tu pedido</h3>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Necesitamos tu confirmación — solo se pregunta una vez.</p>
+    </div>
+    <label class="flex items-start gap-2 text-left font-body-sm text-[13px] text-on-surface">
+      <input id="terms-gate-check" type="checkbox" class="mt-0.5 w-4 h-4 shrink-0">
+      <span>He leído y acepto el <a href="../legal/" target="_blank" rel="noopener" class="text-primary font-semibold">Aviso de Privacidad</a> y los <a href="../legal/" target="_blank" rel="noopener" class="text-primary font-semibold">Términos y Condiciones</a>.</span>
+    </label>
+    <button id="terms-gate-continue" type="button" disabled class="min-h-[48px] rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm shadow-md disabled:opacity-50">Continuar con mi pedido</button>
+    <button id="terms-gate-cancel" type="button" class="font-label-md text-label-md text-on-surface-variant">Cancelar</button>
+  </div>
+</div>
+
 <nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(50,20,10,0.06)]">
   <div class="h-16 px-margin flex items-center justify-around">
     <a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant" href="../">

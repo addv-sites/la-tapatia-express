@@ -82,6 +82,21 @@
         <input id="cfg-driver-commission" type="number" class="h-10 px-3 rounded-lg bg-surface-container-low">
       </label>
 
+      <div class="flex items-center gap-2 px-1 mt-1">
+        <svg class="w-4 h-4 text-tertiary" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg>
+        <h2 class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Aviso de privacidad y Términos</h2>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Razón social / responsable ante la ley
+          <input id="cfg-legal-entity-name" type="text" placeholder="Ej. Juan Pérez Gómez, o nombre de la razón social" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <p class="font-body-sm text-[11px] text-on-surface-variant -mt-1">Aparece en <code>/legal/</code> como responsable de los datos. Mientras esté vacío, la página muestra un aviso de "dato pendiente de configurar".</p>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm">Versión del aviso
+          <input id="cfg-terms-version" type="text" placeholder="Ej. 2026-10-05-v1" class="h-10 px-3 rounded-lg bg-surface-container-low">
+        </label>
+        <p class="font-body-sm text-[11px] text-on-surface-variant -mt-1">Si cambias el texto legal en <code>/legal/</code>, sube esta versión — a todos los clientes se les vuelve a pedir aceptar, aunque ya lo hubieran hecho antes.</p>
+      </div>
+
     </div>
 
     <div id="panel-horario" class="hidden flex-col gap-4">

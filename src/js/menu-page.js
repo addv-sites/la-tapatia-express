@@ -111,6 +111,8 @@
   }
 
   let currentIdToken = null;
+  let currentProfile = null;
+  const TERMS_LS_KEY = 'lta_terms_accepted_version';
   let addressMap = null;
   let addressMarker = null;
   // 'empty' (nada capturado aún) | 'approx' (solo colonia/aprox) | 'ok' (precisión de calle o pin confirmado)
@@ -373,6 +375,7 @@
 
   function applyProfile(profile) {
     if (!profile) return;
+    currentProfile = profile;
     const nameEl = document.getElementById('field-name');
     const phoneEl = document.getElementById('field-phone');
     const addrEl = document.getElementById('address-search-input');
@@ -647,8 +650,7 @@
 
     const sendingEl = document.getElementById('order-sending');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    async function submitOrder() {
       submitBtn.disabled = true;
       form.classList.add('hidden');
       sendingEl.classList.remove('hidden');
@@ -727,6 +729,48 @@
           }
         });
       }
+    }
+
+    function hasAcceptedTerms() {
+      const version = runtimeConfig.terms_version;
+      if (!version) return true; // sin versión configurada todavía, no hay nada que pedir
+      if (currentIdToken) return !!(currentProfile && currentProfile.accepted_terms_version === version);
+      return localStorage.getItem(TERMS_LS_KEY) === version;
+    }
+
+    async function recordTermsAccepted() {
+      const version = runtimeConfig.terms_version;
+      if (currentIdToken) {
+        try { await window.LTA_API.callAction('client.acceptTerms', { version }, currentIdToken); } catch (err) { /* no bloquea el pedido por esto */ }
+        currentProfile = Object.assign({}, currentProfile, { accepted_terms_version: version });
+      } else {
+        localStorage.setItem(TERMS_LS_KEY, version);
+      }
+    }
+
+    function showTermsGate() {
+      document.getElementById('terms-gate-modal').classList.remove('hidden');
+      document.getElementById('terms-gate-modal').classList.add('flex');
+    }
+    function hideTermsGate() {
+      document.getElementById('terms-gate-modal').classList.add('hidden');
+      document.getElementById('terms-gate-modal').classList.remove('flex');
+    }
+
+    document.getElementById('terms-gate-check').addEventListener('change', (e) => {
+      document.getElementById('terms-gate-continue').disabled = !e.target.checked;
+    });
+    document.getElementById('terms-gate-cancel').addEventListener('click', hideTermsGate);
+    document.getElementById('terms-gate-continue').addEventListener('click', async () => {
+      await recordTermsAccepted();
+      hideTermsGate();
+      await submitOrder();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!hasAcceptedTerms()) { showTermsGate(); return; }
+      await submitOrder();
     });
   });
 })();
