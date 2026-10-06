@@ -3,6 +3,8 @@
   let allClients = [];
   let filteredClients = [];
   let activeEmail = null;
+  let lastQuery = '';
+  let promoFilterOn = false;
   const ordersCache = {};
 
   const COLUMNS = [
@@ -37,8 +39,11 @@
       '<button type="button" data-email="' + c.email + '" class="client-row w-full flex items-center gap-2.5 px-3.5 py-2.5 border-b border-surface-container-high last:border-b-0 text-left ' +
       (c.email === activeEmail ? 'bg-primary-fixed' : 'hover:bg-surface-container-low') + '">' +
       '<span class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center font-label-sm text-[10px] font-bold text-on-surface-variant shrink-0">' + initials(c.name) + '</span>' +
-      '<span class="min-w-0"><span class="block font-label-sm text-label-sm font-bold text-on-surface truncate">' + (c.name || c.email) + '</span>' +
+      '<span class="min-w-0 flex-1"><span class="block font-label-sm text-label-sm font-bold text-on-surface truncate">' + (c.name || c.email) + '</span>' +
       '<span class="block font-label-sm text-[10px] text-on-surface-variant">' + c.orders + ' pedidos · ' + money(c.spend) + '</span></span>' +
+      (Number(c.promo_free_delivery_credits || 0) > 0
+        ? '<span class="shrink-0 font-label-sm text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant whitespace-nowrap">Envío gratis</span>'
+        : '') +
       '</button>'
     )).join('');
     Array.from(el.querySelectorAll('.client-row')).forEach((btn) => {
@@ -72,6 +77,13 @@
       '  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-[10px] font-bold ' +
       (client.marketing_opt_in ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-surface-container-high text-on-surface-variant') + '">' +
       (client.marketing_opt_in ? 'Acepta mensajes' : 'No acepta mensajes') + '</span></div>' +
+      '<div class="mb-4"><h3 class="font-label-sm text-[10.5px] uppercase tracking-wide text-on-surface-variant mb-1">Promoción</h3>' +
+      (Number(client.promo_free_delivery_credits || 0) > 0
+        ? '  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-[10px] font-bold bg-primary-fixed text-on-primary-fixed-variant">' +
+          client.promo_free_delivery_credits + (client.promo_free_delivery_credits === 1 ? ' envío gratis disponible' : ' envíos gratis disponibles') + '</span>'
+        : '  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-[10px] font-bold bg-surface-container-high text-on-surface-variant">Sin promoción disponible</span>') +
+      '  <p class="font-label-sm text-[10px] text-on-surface-variant mt-1">' + (client.promo_consecutive_orders || 0) + ' pedidos entregados seguidos en su racha actual</p>' +
+      '</div>' +
       '<div><h3 class="font-label-sm text-[10.5px] uppercase tracking-wide text-on-surface-variant mb-1.5">Últimos pedidos</h3>' +
       '  <div id="client-orders" class="flex flex-col gap-1.5"><p class="font-body-sm text-body-sm text-on-surface-variant">Cargando…</p></div></div>';
 
@@ -98,13 +110,37 @@
   }
 
   function applyFilter(query) {
-    const q = query.trim().toLowerCase();
-    filteredClients = !q ? allClients.slice() : allClients.filter((c) =>
-      (c.name || '').toLowerCase().includes(q) ||
-      (c.phone || '').includes(q) ||
-      (c.email || '').toLowerCase().includes(q)
-    );
+    lastQuery = query.trim().toLowerCase();
+    recomputeFilteredClients();
+  }
+
+  function recomputeFilteredClients() {
+    const q = lastQuery;
+    filteredClients = allClients.filter((c) => {
+      const matchesQuery = !q ||
+        (c.name || '').toLowerCase().includes(q) ||
+        (c.phone || '').includes(q) ||
+        (c.email || '').toLowerCase().includes(q);
+      const matchesPromo = !promoFilterOn || Number(c.promo_free_delivery_credits || 0) > 0;
+      return matchesQuery && matchesPromo;
+    });
     renderList();
+  }
+
+  function togglePromoFilter() {
+    promoFilterOn = !promoFilterOn;
+    const chip = document.getElementById('promo-filter-chip');
+    chip.classList.toggle('bg-primary', promoFilterOn);
+    chip.classList.toggle('text-on-primary', promoFilterOn);
+    chip.classList.toggle('border-primary', promoFilterOn);
+    chip.classList.toggle('bg-surface-container', !promoFilterOn);
+    chip.classList.toggle('text-on-surface-variant', !promoFilterOn);
+    recomputeFilteredClients();
+  }
+
+  function updatePromoFilterCount() {
+    const count = allClients.filter((c) => Number(c.promo_free_delivery_credits || 0) > 0).length;
+    document.getElementById('promo-filter-count').textContent = '(' + count + ')';
   }
 
   function downloadCsv(cols, rows, filename) {
@@ -167,6 +203,7 @@
     wireExportMenu();
 
     document.getElementById('client-search').addEventListener('input', (e) => applyFilter(e.target.value));
+    document.getElementById('promo-filter-chip').addEventListener('click', togglePromoFilter);
     document.getElementById('promo-save').addEventListener('click', savePromoConfig);
     document.getElementById('promo-enabled').addEventListener('change', (e) => togglePromoEnabled(e.target.checked));
     document.getElementById('promo-threshold-minus').addEventListener('click', () => stepThreshold(-1));
@@ -185,6 +222,7 @@
           allClients = (data.clients || []).sort((a, b) => b.spend - a.spend);
           filteredClients = allClients.slice();
           renderList();
+          updatePromoFilterCount();
         } catch (err) {
           document.getElementById('admin-content').classList.add('hidden');
           document.getElementById('auth-gate').classList.remove('hidden');

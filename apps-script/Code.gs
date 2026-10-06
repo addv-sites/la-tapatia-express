@@ -1232,7 +1232,9 @@ function action_clientListAll_() {
       created_at: c.created_at || '',
       orders: stats.orders,
       spend: stats.spend,
-      last_order_at: stats.lastOrderAt
+      last_order_at: stats.lastOrderAt,
+      promo_consecutive_orders: Number(c.promo_consecutive_orders || 0),
+      promo_free_delivery_credits: Number(c.promo_free_delivery_credits || 0)
     };
   });
 
