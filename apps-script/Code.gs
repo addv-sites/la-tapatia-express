@@ -458,7 +458,18 @@ function action_orderCreate_(payload, sessionId, idToken) {
     const config = action_configRead_().config;
     if (!config.delivery_enabled) throw new Error('La entrega a domicilio no está disponible por el momento — elige recoger en sucursal.');
     const branch = readSheetAsObjects_('SUCURSALES').find((b) => b.branch_id === payload.branch_id);
-    const dest = geocodeAddress_(payload.delivery_address);
+
+    // El cliente ya confirmó un pin preciso en el mapa antes de pagar — se usa
+    // tal cual en vez de volver a adivinar la dirección por texto (eso podía
+    // fallar distinto al intento que el cliente ya vio funcionar, y tronaba
+    // el pedido aunque el mapa se viera bien). Solo se re-geocodifica como
+    // respaldo si por algún motivo no llegó lat/lng (cliente viejo en caché).
+    let dest = null;
+    if (payload.delivery_lat && payload.delivery_lng) {
+      dest = { lat: Number(payload.delivery_lat), lng: Number(payload.delivery_lng) };
+    } else {
+      dest = geocodeAddress_(payload.delivery_address);
+    }
     if (dest) { deliveryLat = dest.lat; deliveryLng = dest.lng; }
     if (!branch || !dest || !branch.latitude || !branch.longitude) {
       throw new Error('No se pudo calcular el costo de envío para esa dirección — intenta de nuevo o elige recoger en sucursal.');
@@ -1114,7 +1125,7 @@ function action_clientUpsertProfile_(payload, user) {
     for (let i = 1; i < values.length; i++) {
       if (String(values[i][emailCol]).toLowerCase() === user.email) {
         headers.forEach((h, colIdx) => {
-          if (h === 'name' || h === 'phone' || h === 'address' || h === 'address_reference') {
+          if (h === 'name' || h === 'phone' || h === 'address' || h === 'address_reference' || h === 'address_lat' || h === 'address_lng') {
             if (payload[h] !== undefined) sh.getRange(i + 1, colIdx + 1).setValue(payload[h]);
           }
           if (h === 'updated_at') sh.getRange(i + 1, colIdx + 1).setValue(now);
@@ -1128,6 +1139,8 @@ function action_clientUpsertProfile_(payload, user) {
       phone: payload.phone || '',
       address: payload.address || '',
       address_reference: payload.address_reference || '',
+      address_lat: payload.address_lat || '',
+      address_lng: payload.address_lng || '',
       marketing_opt_in: false,
       accepted_terms_version: '',
       accepted_terms_at: '',
@@ -1135,7 +1148,7 @@ function action_clientUpsertProfile_(payload, user) {
       promo_free_delivery_credits: 0,
       created_at: now,
       updated_at: now
-    }, ['email', 'name', 'phone', 'address', 'address_reference', 'marketing_opt_in', 'accepted_terms_version', 'accepted_terms_at', 'promo_consecutive_orders', 'promo_free_delivery_credits', 'created_at', 'updated_at']);
+    }, ['email', 'name', 'phone', 'address', 'address_reference', 'address_lat', 'address_lng', 'marketing_opt_in', 'accepted_terms_version', 'accepted_terms_at', 'promo_consecutive_orders', 'promo_free_delivery_credits', 'created_at', 'updated_at']);
     return { ok: true, created: true };
   });
 }
@@ -1185,6 +1198,8 @@ function action_clientAcceptTerms_(payload, user) {
       phone: '',
       address: '',
       address_reference: '',
+      address_lat: '',
+      address_lng: '',
       marketing_opt_in: false,
       accepted_terms_version: version,
       accepted_terms_at: now,
@@ -1192,7 +1207,7 @@ function action_clientAcceptTerms_(payload, user) {
       promo_free_delivery_credits: 0,
       created_at: now,
       updated_at: now
-    }, ['email', 'name', 'phone', 'address', 'address_reference', 'marketing_opt_in', 'accepted_terms_version', 'accepted_terms_at', 'promo_consecutive_orders', 'promo_free_delivery_credits', 'created_at', 'updated_at']);
+    }, ['email', 'name', 'phone', 'address', 'address_reference', 'address_lat', 'address_lng', 'marketing_opt_in', 'accepted_terms_version', 'accepted_terms_at', 'promo_consecutive_orders', 'promo_free_delivery_credits', 'created_at', 'updated_at']);
     return { ok: true };
   });
 }

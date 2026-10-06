@@ -77,9 +77,9 @@ Igual que STAFF pero para repartidores. El `email` de aquí es el mismo valor qu
 
 ### `CLIENTES`
 ```
-email	name	phone	address	address_reference	marketing_opt_in	accepted_terms_version	accepted_terms_at	promo_consecutive_orders	promo_free_delivery_credits	created_at	updated_at
+email	name	phone	address	address_reference	address_lat	address_lng	marketing_opt_in	accepted_terms_version	accepted_terms_at	promo_consecutive_orders	promo_free_delivery_credits	created_at	updated_at
 ```
-Se llena sola cuando un cliente se registra con Google en el sitio o en el checkout. No captures nada a mano. `accepted_terms_version`/`accepted_terms_at` registran su aceptación del aviso legal; `promo_consecutive_orders`/`promo_free_delivery_credits` son del sistema de promociones automáticas.
+Se llena sola cuando un cliente se registra con Google en el sitio o en el checkout. No captures nada a mano. `address_lat`/`address_lng` son el pin confirmado en el mapa la última vez que pidió — permiten mostrar su dirección como "ya guardada" sin volver a geocodificar. `accepted_terms_version`/`accepted_terms_at` registran su aceptación del aviso legal; `promo_consecutive_orders`/`promo_free_delivery_credits` son del sistema de promociones automáticas.
 
 ### `LOG`
 ```

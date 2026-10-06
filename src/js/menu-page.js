@@ -115,9 +115,10 @@
   const TERMS_LS_KEY = 'lta_terms_accepted_version';
   let addressMap = null;
   let addressMarker = null;
-  // 'empty' (nada capturado aún) | 'approx' (solo colonia/aprox) | 'ok' (precisión de calle o pin confirmado)
+  // 'empty' (nada capturado aún) | 'approx' (colonia/centro, nunca bloquea) | 'ok' (precisión de calle o pin confirmado)
   let addressState = 'empty';
   let addressColonia = '';
+  let addressLocked = false;
   let currentDeliveryFee = 0;
   let deliveryUnavailable = false;
 
@@ -130,17 +131,29 @@
     return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
   }
 
-  /** Arma el texto final que se manda a order.create (delivery_address) a partir de calle+colonia+CP. */
+  /** Arma el texto final que se manda a order.create (delivery_address) a partir de calle+número+colonia+CP. */
   function composeAddress() {
-    const street = document.getElementById('address-search-input').value.trim();
+    const street = document.getElementById('field-calle').value.trim();
+    const numero = document.getElementById('field-numero').value.trim();
     const cp = document.getElementById('field-cp').value.trim();
-    const parts = [street];
+    const parts = [];
+    if (street) parts.push(street + (numero ? ' ' + numero : ''));
     if (addressColonia) parts.push(addressColonia);
     if (cp) parts.push('CP ' + cp);
     parts.push('Morelia, Michoacán');
     document.getElementById('field-address-input').value = street ? parts.join(', ') : '';
+    return parts.join(', ');
   }
 
+  function revealMap() {
+    const wrap = document.getElementById('address-map-wrap');
+    wrap.classList.remove('hidden');
+    wrap.classList.add('flex');
+    initAddressMap();
+    setTimeout(() => { if (addressMap) addressMap.invalidateSize(); }, 50);
+  }
+
+  /** El mapa nunca se queda sin pin — 'ok' (precisión de calle/pin ajustado) o 'approx' (colonia/centro) son los únicos estados finales; nunca bloquea el envío. */
   function setAddressState(state, message) {
     addressState = state;
     const badge = document.getElementById('address-map-badge');
@@ -148,10 +161,9 @@
     const text = document.getElementById('address-map-badge-text');
     const feedback = document.getElementById('address-feedback');
     const styles = {
-      ok: { dot: 'bg-tertiary', label: 'Precisión de calle', fb: 'hint-ok', msg: message || 'Ubicación confirmada — el pin está en el lugar correcto.' },
-      approx: { dot: 'bg-secondary', label: 'Ubicación aproximada', fb: 'hint-warn', msg: message || 'Solo tenemos la colonia — arrastra el pin a tu casa exacta.' },
-      notfound: { dot: 'bg-error', label: 'Colonia no encontrada', fb: 'hint-err', msg: message || 'No encontramos esa colonia — intenta buscar tu dirección arriba o arrastra el pin.' },
-      empty: { dot: 'bg-outline', label: '', fb: '', msg: message || 'Busca tu dirección arriba o arrastra el pin para ubicarte.' }
+      ok: { dot: 'bg-tertiary', label: 'Precisión de calle', msg: message || 'Ubicación confirmada — el pin está en el lugar correcto.' },
+      approx: { dot: 'bg-secondary', label: 'Ubicación aproximada', msg: message || 'No encontramos la calle exacta — ajusta el pin a tu casa.' },
+      empty: { dot: 'bg-outline', label: '', msg: message || '' }
     };
     const s = styles[state] || styles.empty;
     if (state === 'empty') {
@@ -162,11 +174,46 @@
       text.textContent = s.label;
     }
     feedback.textContent = s.msg;
-    feedback.className = 'font-label-sm text-[11px] ' +
-      (state === 'notfound' ? 'text-error font-semibold' : state === 'ok' ? 'text-tertiary font-semibold' : 'text-on-surface-variant');
+    feedback.className = 'font-label-sm text-[11px] ' + (state === 'ok' ? 'text-tertiary font-semibold' : 'text-on-surface-variant');
     composeAddress();
+    const confirmBtn = document.getElementById('btn-confirmar-direccion');
+    if (confirmBtn) {
+      confirmBtn.classList.toggle('hidden', state === 'empty');
+      confirmBtn.disabled = state === 'empty';
+    }
     refreshDeliveryQuote();
     if (window.LTA_updateSubmitState) window.LTA_updateSubmitState();
+  }
+
+  /** Vista fija: dirección ya confirmada (cuenta guardada o ya la confirmaste en este pedido). */
+  function showLockedAddress(lat, lng) {
+    addressLocked = true;
+    document.getElementById('field-address-lat').value = lat;
+    document.getElementById('field-address-lng').value = lng;
+    document.getElementById('address-form').classList.add('hidden');
+    document.getElementById('address-form').classList.remove('flex-col');
+    document.getElementById('address-locked').classList.remove('hidden');
+    document.getElementById('address-locked').classList.add('flex');
+    document.getElementById('address-locked-text').textContent = document.getElementById('field-address-input').value || composeAddress();
+    document.getElementById('address-locked-meta').textContent = currentIdToken
+      ? 'Guardada en tu cuenta — la próxima vez no la vuelves a escribir.'
+      : 'Confirmada para este pedido.';
+    document.getElementById('address-locked-maps-link').href = 'https://maps.google.com/?q=' + lat + ',' + lng;
+    if (window.LTA_updateSubmitState) window.LTA_updateSubmitState();
+  }
+
+  function enterEditAddress() {
+    addressLocked = false;
+    document.getElementById('address-locked').classList.add('hidden');
+    document.getElementById('address-locked').classList.remove('flex');
+    document.getElementById('address-form').classList.remove('hidden');
+    document.getElementById('address-form').classList.add('flex-col');
+    const lat = Number(document.getElementById('field-address-lat').value);
+    const lng = Number(document.getElementById('field-address-lng').value);
+    if (lat && lng) {
+      revealMap();
+      moveMarkerTo(lat, lng, 16);
+    }
   }
 
   /**
@@ -185,7 +232,9 @@
       renderCartTotals();
       return;
     }
-    if (!addressMarker || (addressState !== 'ok' && addressState !== 'approx')) {
+    const lat = document.getElementById('field-address-lat').value;
+    const lng = document.getElementById('field-address-lng').value;
+    if (!lat || !lng || (!addressLocked && addressState !== 'ok' && addressState !== 'approx')) {
       currentDeliveryFee = 0;
       feeValue.textContent = 'Se calcula al confirmar tu dirección';
       externalNote.classList.add('hidden');
@@ -193,10 +242,9 @@
       return;
     }
     feeValue.textContent = 'Calculando…';
-    const ll = addressMarker.getLatLng();
     try {
       const data = await window.LTA_API.readAction('delivery.quote', {
-        branch_id: window.SITE_CONFIG.branchId, lat: ll.lat, lng: ll.lng
+        branch_id: window.SITE_CONFIG.branchId, lat: lat, lng: lng
       });
       if (currentOrderType() !== 'delivery') return; // el cliente cambió de opción mientras cotizaba
       if (!data.available) {
@@ -228,24 +276,29 @@
 
   async function onAddressPinDragEnd() {
     const ll = addressMarker.getLatLng();
-    const input = document.getElementById('address-search-input');
-    const previous = input.value;
-    setAddressState('empty', 'Buscando dirección de ese punto…');
+    document.getElementById('field-address-lat').value = ll.lat;
+    document.getElementById('field-address-lng').value = ll.lng;
+    const calleEl = document.getElementById('field-calle');
+    const previous = calleEl.value;
+    setAddressState('approx', 'Buscando dirección de ese punto…');
     try {
       const data = await window.LTA_API.readAction('geo.reverseGeocode', { lat: ll.lat, lng: ll.lng });
-      input.value = data.address;
+      calleEl.value = data.address;
       if (data.cp) document.getElementById('field-cp').value = data.cp;
       addressColonia = data.colonia || addressColonia;
       syncColoniaSelect(addressColonia);
-      setAddressState('ok');
+      setAddressState('ok', 'Pin ajustado a mano — así se entrega tu pedido.');
     } catch (err) {
-      input.value = previous;
-      setAddressState(previous ? 'approx' : 'empty');
-      window.LTA_TOAST && window.LTA_TOAST.show('No se pudo obtener la dirección de ese punto — intenta de nuevo.', 'error');
+      calleEl.value = previous;
+      // Aunque falle el reverse-geocode, el pin ya quedó donde el cliente lo
+      // puso a mano — eso sigue siendo válido para calcular el envío.
+      setAddressState('approx', 'Pin ajustado a mano — no pudimos traducirlo a texto, pero la ubicación sí quedó guardada.');
     }
   }
 
   function moveMarkerTo(lat, lng, zoom) {
+    document.getElementById('field-address-lat').value = lat;
+    document.getElementById('field-address-lng').value = lng;
     if (!addressMap) return;
     addressMap.setView([lat, lng], zoom || 16);
     addressMarker.setLatLng([lat, lng]);
@@ -321,9 +374,6 @@
     await loadCpColonias_();
     const names = (cpColoniasData && cpColoniasData[cp]) || [];
     renderColoniaOptions(names, addressColonia);
-    if (!names.length && addressState !== 'ok') {
-      setAddressState('notfound', 'No encontramos colonias para ese CP en Morelia — verifica el CP o usa la búsqueda de arriba.');
-    }
     return names;
   }
 
@@ -351,10 +401,11 @@
   }, 500);
 
   function pickAddressResult(r) {
-    document.getElementById('address-search-input').value = r.label;
+    document.getElementById('field-calle').value = r.label;
     document.getElementById('address-predictions').classList.add('hidden');
     if (r.cp) document.getElementById('field-cp').value = r.cp;
     addressColonia = r.colonia || '';
+    revealMap();
     moveMarkerTo(r.lat, r.lng, r.precise ? 17 : 15);
     setAddressState(r.precise ? 'ok' : 'approx');
     if (r.cp) refreshColoniaOptionsForCp(r.cp);
@@ -378,25 +429,35 @@
     currentProfile = profile;
     const nameEl = document.getElementById('field-name');
     const phoneEl = document.getElementById('field-phone');
-    const addrEl = document.getElementById('address-search-input');
     if (!nameEl.value && profile.name) nameEl.value = profile.name;
     if (!phoneEl.value && profile.phone) phoneEl.value = profile.phone;
-    if (!addrEl.value && profile.address) {
-      addrEl.value = profile.address;
-      // Dirección ya guardada de una sesión previa — se confía (el usuario ya
-      // la había confirmado antes) sin forzar una nueva búsqueda/pin.
-      setAddressState('ok', 'Dirección guardada de tu cuenta — ajusta el pin si cambió algo.');
+    if (!addressLocked && !document.getElementById('field-calle').value && profile.address) {
+      document.getElementById('field-address-input').value = profile.address;
+      if (profile.address_lat && profile.address_lng) {
+        // Ya tiene un pin confirmado de una sesión anterior — directo a la
+        // vista fija, sin pedirle que lo vuelva a buscar.
+        showLockedAddress(profile.address_lat, profile.address_lng);
+      } else {
+        // Perfil de antes de guardar lat/lng — precarga el texto nada más;
+        // el mapa se revela hasta que el cliente elija "A domicilio" y toque
+        // "Buscar dirección" (así queda guardado completo desde ese momento).
+        document.getElementById('field-calle').value = profile.address;
+      }
     }
   }
 
   async function saveProfileFromForm() {
     if (!currentIdToken) return;
     try {
-      await window.LTA_API.callAction('client.upsertProfile', {
+      const payload = {
         name: document.getElementById('field-name').value.trim(),
         phone: document.getElementById('field-phone').value.trim(),
-        address: document.getElementById('field-address-input').value.trim() || document.getElementById('address-search-input').value.trim()
-      }, currentIdToken);
+        address: document.getElementById('field-address-input').value.trim() || document.getElementById('field-calle').value.trim()
+      };
+      const lat = document.getElementById('field-address-lat').value;
+      const lng = document.getElementById('field-address-lng').value;
+      if (lat && lng) { payload.address_lat = lat; payload.address_lng = lng; }
+      await window.LTA_API.callAction('client.upsertProfile', payload, currentIdToken);
     } catch (err) {
       console.warn('No se pudo guardar el perfil:', err.message);
     }
@@ -464,12 +525,13 @@
 
     let cartHasItems = false;
 
-    /** Repartidor no puede navegar con una dirección vacía/ambigua — el submit
-     * exige carrito con productos y, si es entrega, un pin confirmado (estado
-     * 'ok' o 'approx'; 'empty'/'notfound' bloquean el envío). */
+    /** Repartidor no puede navegar sin un pin — el submit exige carrito con
+     * productos y, si es entrega, una dirección confirmada o bloqueada
+     * (nunca se queda en un estado sin salida: 'ok'/'approx' siempre tienen
+     * algún pin puesto, aunque sea aproximado). */
     function updateSubmitState() {
       const isDelivery = currentOrderType() === 'delivery';
-      const addressOk = !isDelivery || addressState === 'ok' || addressState === 'approx';
+      const addressOk = !isDelivery || addressLocked || addressState === 'ok' || addressState === 'approx';
       submitBtn.disabled = !cartHasItems || !addressOk || (isDelivery && deliveryUnavailable);
     }
     window.LTA_updateSubmitState = updateSubmitState;
@@ -498,8 +560,7 @@
       const isDelivery = currentOrderType() === 'delivery';
       toggleVisible(deliveryFeeRow, isDelivery, 'flex');
       toggleVisible(addressField, isDelivery, 'flex-col');
-      if (isDelivery) {
-        initAddressMap();
+      if (isDelivery && (addressState === 'ok' || addressState === 'approx') && document.getElementById('address-map-wrap').classList.contains('flex')) {
         setTimeout(() => { if (addressMap) addressMap.invalidateSize(); }, 50);
       }
       refreshDeliveryQuote();
@@ -517,22 +578,59 @@
 
     loadCpColonias_();
 
-    const addressSearchInput = document.getElementById('address-search-input');
-    addressSearchInput.addEventListener('input', (e) => {
-      runAddressSearch(e.target.value);
-      setAddressState('empty');
+    /**
+     * Busca la dirección con lo que ya se tiene (calle+número, colonia, CP) y
+     * SIEMPRE deja un pin puesto — calle exacta ('ok'), si no colonia
+     * ('approx'), si no el centro de Morelia ('approx' con aviso). Nunca
+     * termina en un estado sin salida que le impida seguir con su pedido.
+     */
+    async function buscarDireccion() {
+      const calle = document.getElementById('field-calle').value.trim();
+      const numero = document.getElementById('field-numero').value.trim();
+      document.getElementById('address-predictions').classList.add('hidden');
+      revealMap();
+      setAddressState('approx', 'Buscando tu dirección…');
+
+      if (calle.length >= 3) {
+        const fullQuery = [calle + (numero ? ' ' + numero : ''), addressColonia, 'Morelia, Michoacán'].filter(Boolean).join(', ');
+        const results = await runAddressSearchNow(fullQuery);
+        if (results.length) {
+          const r = results[0];
+          if (!addressColonia && r.colonia) { addressColonia = r.colonia; syncColoniaSelect(addressColonia); }
+          moveMarkerTo(r.lat, r.lng, r.precise ? 17 : 15);
+          setAddressState(r.precise ? 'ok' : 'approx', r.precise ? undefined : 'Ubicamos la zona, pero no la calle exacta — ajusta el pin a tu casa.');
+          return;
+        }
+      }
+      if (addressColonia) {
+        try {
+          const data = await window.LTA_API.readAction('geo.search', { q: addressColonia + ', Morelia, Michoacán, México' });
+          const match = (data.results || [])[0];
+          if (match) {
+            moveMarkerTo(match.lat, match.lng, 15);
+            setAddressState('approx', 'No encontramos esa calle — ubicamos tu colonia, ajusta el pin a tu casa.');
+            return;
+          }
+        } catch (err) { /* sigue al último recurso */ }
+      }
+      moveMarkerTo(MORELIA_CENTER[0], MORELIA_CENTER[1], 13);
+      setAddressState('approx', 'No encontramos tu dirección — arrastra el pin hasta tu casa.');
+    }
+
+    document.getElementById('btn-buscar-direccion').addEventListener('click', buscarDireccion);
+    document.getElementById('btn-confirmar-direccion').addEventListener('click', () => {
+      const lat = document.getElementById('field-address-lat').value;
+      const lng = document.getElementById('field-address-lng').value;
+      if (lat && lng) showLockedAddress(lat, lng);
     });
-    addressSearchInput.addEventListener('keydown', async (e) => {
+    document.getElementById('btn-edit-address').addEventListener('click', enterEditAddress);
+
+    const calleInput = document.getElementById('field-calle');
+    calleInput.addEventListener('input', (e) => runAddressSearch(e.target.value));
+    calleInput.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
       e.preventDefault(); // no mandar el form — este input vive dentro de <form>
-      const box = document.getElementById('address-predictions');
-      box.classList.add('hidden');
-      const results = await runAddressSearchNow(e.target.value);
-      if (results.length) {
-        pickAddressResult(results[0]);
-      } else {
-        setAddressState('notfound', 'No encontramos esa dirección — intenta con más detalle o arrastra el pin.');
-      }
+      buscarDireccion();
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('#field-address')) document.getElementById('address-predictions').classList.add('hidden');
@@ -550,20 +648,9 @@
       composeAddress();
     });
 
-    document.getElementById('field-colonia').addEventListener('change', async (e) => {
+    document.getElementById('field-colonia').addEventListener('change', (e) => {
       addressColonia = e.target.value;
       composeAddress();
-      if (!addressColonia) return;
-      // El catálogo CP->colonia (SEPOMEX) no trae coordenadas — se busca la
-      // colonia por nombre en Nominatim solo para centrar el mapa aproximado.
-      try {
-        const data = await window.LTA_API.readAction('geo.search', { q: addressColonia + ', Morelia, Michoacán, México' });
-        const match = (data.results || [])[0];
-        if (match) {
-          moveMarkerTo(match.lat, match.lng, 15);
-          setAddressState('approx');
-        }
-      } catch (err) { /* el usuario puede seguir y afinar el pin a mano */ }
     });
 
     function renderMenu(data) {
@@ -661,6 +748,8 @@
         name: document.getElementById('field-name').value.trim(),
         phone: document.getElementById('field-phone').value.trim(),
         address: document.getElementById('field-address-input').value.trim(),
+        lat: document.getElementById('field-address-lat').value,
+        lng: document.getElementById('field-address-lng').value,
         notes: document.getElementById('field-notes').value.trim(),
         orderType: currentOrderType()
       };
@@ -673,6 +762,8 @@
           customer_phone: customer.phone,
           order_type: customer.orderType,
           delivery_address: customer.address,
+          delivery_lat: customer.lat,
+          delivery_lng: customer.lng,
           notes: customer.notes,
           items: items
         }, currentIdToken);

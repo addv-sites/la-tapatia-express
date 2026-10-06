@@ -113,37 +113,73 @@
         </div>
         <div id="signin-invite-checkout" hidden></div>
         <div id="field-address" class="hidden flex-col gap-2">
-          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="address-search-input">Dirección de entrega</label>
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Dirección de entrega</label>
 
-          <div class="relative isolate w-full h-52 rounded-xl overflow-hidden bg-surface-container-high">
-            <div id="address-map" class="w-full h-full"></div>
-
-            <div class="absolute left-2 right-2 top-2 z-[1001]">
-              <input id="address-search-input" class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest/95 backdrop-blur-sm shadow-md text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary/40" type="text" placeholder="🔍 Buscar calle, número y colonia" autocomplete="off">
-              <div id="address-predictions" class="hidden mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden"></div>
+          <!-- Vista fija: dirección ya confirmada (cuenta guardada o ya la confirmaste en este pedido) -->
+          <div id="address-locked" class="hidden flex-col gap-2 bg-surface-container-lowest rounded-xl p-3 shadow-sm">
+            <div class="flex gap-2.5 items-start">
+              <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-pin"/></svg>
+              <div class="min-w-0 flex-1">
+                <p id="address-locked-text" class="font-label-md text-label-md font-bold text-on-surface"></p>
+                <p id="address-locked-meta" class="font-label-sm text-[11px] text-on-surface-variant mt-0.5"></p>
+              </div>
             </div>
-
-            <div id="address-map-badge" class="hidden absolute left-2 bottom-2 items-center gap-1.5 bg-surface-container-lowest rounded-full pl-1.5 pr-2.5 py-1 shadow-sm z-[1001]">
-              <span id="address-map-badge-dot" class="w-1.5 h-1.5 rounded-full"></span>
-              <span id="address-map-badge-text" class="font-label-sm text-[10.5px] font-bold text-on-surface"></span>
+            <div class="flex items-center gap-4 pl-[30px]">
+              <a id="address-locked-maps-link" href="#" target="_blank" rel="noopener" class="font-label-sm text-[12px] text-primary font-bold">Ver en Google Maps ↗</a>
+              <button type="button" id="btn-edit-address" class="font-label-sm text-[12px] text-primary font-bold">Editar</button>
             </div>
           </div>
-          <p id="address-feedback" class="font-label-sm text-[11px] text-on-surface-variant" aria-live="polite">Busca tu dirección arriba o arrastra el pin para ubicarte.</p>
 
-          <div class="grid grid-cols-[92px_1fr] gap-2">
-            <div class="flex flex-col gap-1">
-              <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-cp">CP</label>
-              <input id="field-cp" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code">
+          <!-- Formulario de captura -->
+          <div id="address-form" class="flex-col gap-2.5">
+            <div id="address-map-wrap" class="hidden flex-col gap-1.5">
+              <div class="relative isolate w-full h-48 rounded-xl overflow-hidden bg-surface-container-high">
+                <div id="address-map" class="w-full h-full"></div>
+                <div id="address-map-badge" class="hidden absolute left-2 top-2 items-center gap-1.5 bg-surface-container-lowest rounded-full pl-1.5 pr-2.5 py-1 shadow-sm z-[1001]">
+                  <span id="address-map-badge-dot" class="w-1.5 h-1.5 rounded-full"></span>
+                  <span id="address-map-badge-text" class="font-label-sm text-[10.5px] font-bold text-on-surface"></span>
+                </div>
+              </div>
+              <p id="address-feedback" class="font-label-sm text-[11px] text-on-surface-variant" aria-live="polite"></p>
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-colonia">Colonia</label>
-              <select id="field-colonia" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" disabled>
-                <option value="">Escribe tu CP primero</option>
-              </select>
+
+            <div class="grid grid-cols-[1.6fr_1fr] gap-2">
+              <div class="flex flex-col gap-1 relative">
+                <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-calle">Calle</label>
+                <input id="field-calle" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" placeholder="Reyna Xóchitl" autocomplete="off">
+                <div id="address-predictions" class="hidden absolute top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden z-[1002]"></div>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-numero">Número</label>
+                <input id="field-numero" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" placeholder="170" autocomplete="off">
+              </div>
             </div>
+
+            <div class="grid grid-cols-[92px_1fr] gap-2">
+              <div class="flex flex-col gap-1">
+                <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-cp">CP</label>
+                <input id="field-cp" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code">
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="font-label-sm text-[10.5px] text-on-surface-variant font-semibold" for="field-colonia">Colonia</label>
+                <select id="field-colonia" class="w-full h-10 px-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary/30" disabled>
+                  <option value="">Escribe tu CP primero</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" id="btn-buscar-direccion" class="min-h-[44px] rounded-lg bg-surface-container text-on-surface font-label-md text-label-md font-bold flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" aria-hidden="true"><use href="../assets/icons/sprite.svg#icon-location"/></svg>
+              Buscar dirección
+            </button>
+            <button type="button" id="btn-confirmar-direccion" disabled class="hidden min-h-[44px] rounded-lg bg-primary text-on-primary font-label-md text-label-md font-bold disabled:opacity-50">
+              Confirmar esta dirección
+            </button>
           </div>
 
           <input type="hidden" id="field-address-input">
+          <input type="hidden" id="field-address-lat">
+          <input type="hidden" id="field-address-lng">
         </div>
         <div class="flex flex-col gap-1">
           <label class="font-label-sm text-label-sm text-on-surface-variant font-semibold" for="field-notes">Notas (opcional)</label>
