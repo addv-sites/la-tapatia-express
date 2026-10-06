@@ -45,8 +45,45 @@
     }));
   }
 
+  /**
+   * Verde = entrega+recoger disponible. Amarillo/mostaza (no rojo — rojo se
+   * lee como error) = modo solo para llevar activo, para que salte a la
+   * vista que el sitio está en modo limitado sin tener que leer el texto.
+   */
+  function updateDeliveryBanner(enabled) {
+    const banner = document.getElementById('delivery-mode-banner');
+    const icon = document.getElementById('delivery-mode-icon');
+    const title = document.getElementById('delivery-mode-title');
+    const sub = document.getElementById('delivery-mode-sub');
+    if (enabled) {
+      banner.style.background = 'linear-gradient(135deg, #006d30, #005223)';
+      icon.innerHTML = '<use href="../../assets/icons/sprite.svg#icon-navigation"/>';
+      title.textContent = 'Entrega + Recoger activo';
+      sub.textContent = 'Apaga para pasar a modo solo para llevar';
+    } else {
+      banner.style.background = 'linear-gradient(135deg, #fe932c, #904d00)';
+      icon.innerHTML = '<use href="../../assets/icons/sprite.svg#icon-storefront"/>';
+      title.textContent = 'Modo solo para llevar activo';
+      sub.textContent = 'Enciende para ofrecer también entrega a domicilio';
+    }
+  }
+
+  async function toggleDeliveryEnabled(checked) {
+    const checkbox = document.getElementById('cfg-delivery-enabled');
+    updateDeliveryBanner(checked);
+    try {
+      await window.LTA_API.callAction('config.update', { delivery_enabled: checked }, idToken);
+      window.LTA_TOAST.show(checked ? 'Entrega a domicilio activada.' : 'Modo solo para llevar activado.');
+    } catch (err) {
+      checkbox.checked = !checked;
+      updateDeliveryBanner(!checked);
+      window.LTA_TOAST.show('Error: ' + err.message, 'error');
+    }
+  }
+
   function fill(config) {
     document.getElementById('cfg-delivery-enabled').checked = !!config.delivery_enabled;
+    updateDeliveryBanner(!!config.delivery_enabled);
     try { tariffRows = JSON.parse(config.delivery_tariff_table || '[]'); } catch (e) { tariffRows = []; }
     if (!tariffRows.length) {
       // Semilla razonable si CONFIG todavía no trae tabla — el admin la ajusta y guarda.
@@ -67,7 +104,6 @@
 
   async function save() {
     const payload = {
-      delivery_enabled: document.getElementById('cfg-delivery-enabled').checked,
       delivery_tariff_table: JSON.stringify(tariffRows.filter((r) => r.km > 0).sort((a, b) => a.km - b.km)),
       delivery_extra_km_cost: Number(document.getElementById('cfg-extra-km-cost').value),
       delivery_max_km: Number(document.getElementById('cfg-max-km').value),
@@ -182,6 +218,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     renderHoursRows();
     document.getElementById('save-config').addEventListener('click', save);
+    document.getElementById('cfg-delivery-enabled').addEventListener('change', (e) => toggleDeliveryEnabled(e.target.checked));
     document.getElementById('btn-add-tariff-row').addEventListener('click', () => {
       const lastKm = tariffRows.length ? tariffRows[tariffRows.length - 1].km : 0;
       tariffRows.push({ km: lastKm + 1, cost: '' });

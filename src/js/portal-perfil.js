@@ -31,6 +31,7 @@
     renderPromo(p);
   }
 
+  /** Tarjeta de sellos: cada pedido entregado llena un sello; el siguiente queda marcado como "meta". */
   function renderPromo(p) {
     const card = document.getElementById('promo-card');
     if (!promoThreshold) { card.classList.add('hidden'); card.classList.remove('flex'); return; }
@@ -41,24 +42,36 @@
     const consecutive = Number(p.promo_consecutive_orders || 0);
     const progressInCycle = consecutive % promoThreshold;
 
-    document.getElementById('promo-progress-text').textContent =
-      progressInCycle + ' de ' + promoThreshold + ' pedidos entregados para tu próximo envío gratis';
-
-    const track = document.getElementById('promo-progress-track');
-    track.innerHTML = '';
+    const row = document.getElementById('promo-stamp-row');
+    row.innerHTML = '';
     for (let i = 0; i < promoThreshold; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'flex-1 h-1.5 rounded-full ' + (i < progressInCycle ? 'bg-tertiary' : 'bg-surface-container-high');
-      track.appendChild(dot);
+      const stamp = document.createElement('div');
+      stamp.className = 'w-9 h-9 rounded-full flex items-center justify-center shrink-0';
+      if (i < progressInCycle) {
+        stamp.style.background = '#006d30';
+        stamp.innerHTML = '<svg class="w-4 h-4" style="color:#8bed9d" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg>';
+      } else if (i === progressInCycle) {
+        stamp.style.cssText = 'border:2px dashed #93000b;background:#ffdad633';
+        stamp.innerHTML = '<svg class="w-4 h-4" style="color:#93000b" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-navigation"/></svg>';
+      } else {
+        stamp.style.cssText = 'border:2px dashed #e4beb9';
+      }
+      row.appendChild(stamp);
     }
 
-    const creditsText = document.getElementById('promo-credits-text');
+    const chip = document.getElementById('promo-credits-chip');
+    const progressText = document.getElementById('promo-progress-text');
     if (credits > 0) {
-      creditsText.textContent = credits + (credits === 1 ? ' envío gratis disponible' : ' envíos gratis disponibles') +
-        ' — se aplica solo en tu próximo pedido a domicilio.';
-      creditsText.classList.remove('hidden');
+      chip.textContent = credits + (credits === 1 ? ' disponible' : ' disponibles');
+      chip.style.background = '#ffdad6';
+      chip.style.color = '#93000b';
+      chip.classList.remove('hidden');
+      progressText.innerHTML = 'Ya tienes <strong>' + credits + (credits === 1 ? ' crédito' : ' créditos') +
+        '</strong> de envío gratis — se aplica solo en tu próximo pedido a domicilio.';
     } else {
-      creditsText.classList.add('hidden');
+      chip.classList.add('hidden');
+      const remaining = promoThreshold - progressInCycle;
+      progressText.textContent = remaining + (remaining === 1 ? ' pedido más' : ' pedidos más') + ' y tu envío es gratis.';
     }
   }
 

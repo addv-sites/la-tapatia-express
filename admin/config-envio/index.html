@@ -34,13 +34,18 @@
     </div>
 
     <div id="panel-envio" class="flex flex-col gap-4">
-      <label class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm">
-        <span class="flex flex-col gap-0.5">
-          <span class="font-label-md text-label-md font-bold">Entrega a domicilio</span>
-          <span class="font-body-sm text-[12px] text-on-surface-variant">Si lo apagas, el sitio pasa a <strong>modo solo para llevar</strong>: el cliente ve un aviso y solo puede recoger en sucursal.</span>
-        </span>
-        <input id="cfg-delivery-enabled" type="checkbox" class="w-5 h-5 shrink-0">
-      </label>
+      <div id="delivery-mode-banner" class="rounded-2xl p-4 flex items-center gap-3 shadow-md transition-colors">
+        <svg id="delivery-mode-icon" class="w-9 h-9 shrink-0 text-white" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-navigation"/></svg>
+        <div class="flex-1 min-w-0">
+          <p id="delivery-mode-title" class="font-headline-sm text-headline-sm font-bold text-white"></p>
+          <p id="delivery-mode-sub" class="font-body-sm text-[12px] text-white/85"></p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input id="cfg-delivery-enabled" type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-white/30 rounded-full peer relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+        </label>
+      </div>
+      <p class="font-body-sm text-[11px] text-on-surface-variant px-1 -mt-2">Este interruptor guarda solo — no necesita el botón "Guardar configuración" de abajo.</p>
 
       <div class="flex items-center gap-2 px-1">
         <svg class="w-4 h-4 text-primary" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-location"/></svg>

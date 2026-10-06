@@ -42,14 +42,16 @@
     </div>
     <p id="account-email" class="font-body-sm text-body-sm text-on-surface-variant"></p>
 
-    <div id="promo-card" class="hidden flex-col gap-2 bg-surface-container-lowest rounded-xl p-4 shadow-sm">
-      <p class="font-label-md text-label-md font-bold flex items-center gap-1.5">
-        <svg class="w-4 h-4 text-tertiary" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg>
-        Mis promociones
-      </p>
-      <p id="promo-progress-text" class="font-body-sm text-body-sm text-on-surface-variant"></p>
-      <div id="promo-progress-track" class="flex gap-1"></div>
-      <p id="promo-credits-text" class="hidden font-body-sm text-body-sm text-tertiary font-bold"></p>
+    <div id="promo-card" class="hidden flex-col gap-3 bg-surface-container-lowest rounded-2xl p-4 shadow-sm" style="border:1.5px solid #e4beb9">
+      <div class="flex items-center justify-between">
+        <span class="font-label-md text-label-md font-bold flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-tertiary" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-cake"/></svg>
+          Tu tarjeta de sellos
+        </span>
+        <span id="promo-credits-chip" class="hidden font-label-sm text-[11px] font-bold px-2 py-0.5 rounded-full"></span>
+      </div>
+      <div id="promo-stamp-row" class="flex gap-2"></div>
+      <p id="promo-progress-text" class="font-body-sm text-[12.5px] text-on-surface-variant"></p>
     </div>
 
     <form id="profile-form" class="flex flex-col gap-3">

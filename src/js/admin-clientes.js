@@ -168,6 +168,9 @@
 
     document.getElementById('client-search').addEventListener('input', (e) => applyFilter(e.target.value));
     document.getElementById('promo-save').addEventListener('click', savePromoConfig);
+    document.getElementById('promo-enabled').addEventListener('change', (e) => togglePromoEnabled(e.target.checked));
+    document.getElementById('promo-threshold-minus').addEventListener('click', () => stepThreshold(-1));
+    document.getElementById('promo-threshold-plus').addEventListener('click', () => stepThreshold(1));
 
     window.LTA_AUTH_GATE.renderGate(document.getElementById('auth-gate'), {
       title: 'Clientes',
@@ -193,10 +196,67 @@
           const config = configData.config || {};
           document.getElementById('promo-enabled').checked = !!config.promo_enabled;
           document.getElementById('promo-threshold').value = config.promo_orders_threshold || 3;
+          updatePromoBanner(!!config.promo_enabled);
         } catch (err) { /* panel de promos no bloquea el resto del admin */ }
       }
     });
   });
+
+  function updatePromoBanner(enabled) {
+    const banner = document.getElementById('promo-banner');
+    const icon = document.getElementById('promo-banner-icon');
+    const title = document.getElementById('promo-banner-title');
+    const sub = document.getElementById('promo-banner-sub');
+    const stepperWrap = document.getElementById('promo-stepper-wrap');
+    const labels = stepperWrap.querySelectorAll('label');
+    const minusBtn = document.getElementById('promo-threshold-minus');
+    const plusBtn = document.getElementById('promo-threshold-plus');
+    const input = document.getElementById('promo-threshold');
+    const saveBtn = document.getElementById('promo-save');
+    const threshold = input.value || 3;
+
+    if (enabled) {
+      banner.style.background = 'linear-gradient(135deg, #b91c1c, #93000b)';
+      icon.style.color = '#fff';
+      title.style.color = '#fff'; title.textContent = 'Promociones activas';
+      sub.style.color = '#ffffffd9'; sub.textContent = 'Envío gratis cada ' + threshold + ' pedidos entregados seguidos';
+      stepperWrap.style.background = '#ffffff22';
+      labels.forEach((l) => l.style.color = '#fff');
+      [minusBtn, plusBtn].forEach((b) => { b.style.background = '#ffffff33'; b.style.color = '#fff'; });
+      input.style.background = '#ffffff22'; input.style.color = '#fff';
+      saveBtn.style.background = '#fff'; saveBtn.style.color = '#93000b';
+    } else {
+      banner.style.background = '#eae7eb';
+      icon.style.color = '#5b403d';
+      title.style.color = '#1b1b1e'; title.textContent = 'Promociones desactivadas';
+      sub.style.color = '#5b403d'; sub.textContent = 'Actívalas para premiar a tus clientes frecuentes';
+      stepperWrap.style.background = 'transparent';
+      labels.forEach((l) => l.style.color = '#5b403d');
+      [minusBtn, plusBtn].forEach((b) => { b.style.background = '#f0edf1'; b.style.color = '#93000b'; });
+      input.style.background = '#f6f2f7'; input.style.color = '#1b1b1e';
+      saveBtn.style.background = '#93000b'; saveBtn.style.color = '#fff';
+    }
+  }
+
+  async function togglePromoEnabled(checked) {
+    const checkbox = document.getElementById('promo-enabled');
+    updatePromoBanner(checked);
+    try {
+      await window.LTA_API.callAction('config.update', { promo_enabled: checked }, idToken);
+      window.LTA_TOAST.show(checked ? 'Promociones activadas.' : 'Promociones desactivadas.');
+    } catch (err) {
+      checkbox.checked = !checked;
+      updatePromoBanner(!checked);
+      window.LTA_TOAST.show('Error: ' + err.message, 'error');
+    }
+  }
+
+  function stepThreshold(delta) {
+    const input = document.getElementById('promo-threshold');
+    const next = Math.max(1, (Number(input.value) || 3) + delta);
+    input.value = next;
+    updatePromoBanner(document.getElementById('promo-enabled').checked);
+  }
 
   async function savePromoConfig() {
     try {

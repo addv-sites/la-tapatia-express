@@ -27,19 +27,25 @@
   <div id="auth-gate" class="min-h-[70vh] flex items-center justify-center"></div>
 
   <div id="admin-content" class="hidden max-w-5xl mx-auto px-4 sm:px-6 py-6">
-    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-4 mb-4 flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <span class="flex items-center gap-1.5 font-label-md text-label-md font-bold text-on-surface">
-          <svg class="w-4 h-4 text-tertiary" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg>
-          Promociones automáticas
-        </span>
-        <input id="promo-enabled" type="checkbox" class="w-5 h-5">
+    <div id="promo-banner" class="rounded-2xl p-4 mb-4 flex flex-col gap-3 shadow-md transition-colors">
+      <div class="flex items-center gap-3">
+        <svg id="promo-banner-icon" class="w-8 h-8 shrink-0" aria-hidden="true"><use href="../../assets/icons/sprite.svg#icon-check"/></svg>
+        <div class="flex-1 min-w-0">
+          <p id="promo-banner-title" class="font-headline-sm text-headline-sm font-bold"></p>
+          <p id="promo-banner-sub" class="font-body-sm text-[12px]"></p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+          <input id="promo-enabled" type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-white/30 rounded-full peer relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+        </label>
       </div>
-      <div class="flex items-center gap-2">
-        <label class="font-body-sm text-body-sm text-on-surface-variant">Cada</label>
-        <input id="promo-threshold" type="number" min="1" class="w-16 h-9 px-2 rounded-lg bg-surface-container-low text-center">
-        <label class="font-body-sm text-body-sm text-on-surface-variant">pedidos entregados seguidos, el siguiente trae envío gratis.</label>
-        <button id="promo-save" type="button" class="ml-auto h-9 px-3 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-bold">Guardar</button>
+      <div class="flex items-center gap-2 rounded-xl p-2" id="promo-stepper-wrap">
+        <label class="font-body-sm text-body-sm">Cada</label>
+        <button id="promo-threshold-minus" type="button" class="w-8 h-8 rounded-lg font-bold">−</button>
+        <input id="promo-threshold" type="number" min="1" class="w-14 h-8 px-2 rounded-lg text-center font-bold" readonly>
+        <button id="promo-threshold-plus" type="button" class="w-8 h-8 rounded-lg font-bold">+</button>
+        <label class="font-body-sm text-body-sm">pedidos entregados seguidos, el siguiente trae envío gratis.</label>
+        <button id="promo-save" type="button" class="ml-auto h-9 px-3 rounded-lg font-label-sm text-label-sm font-bold">Guardar</button>
       </div>
     </div>
 
